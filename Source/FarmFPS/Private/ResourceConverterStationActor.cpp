@@ -17,8 +17,8 @@ AResourceConverterStationActor::AResourceConverterStationActor()
 	_resourceInputPoint = CreateDefaultSubobject<UAutomaticResourceTransferPoint>("ResourceInputPoint");
 	_resourceOutputPoint = CreateDefaultSubobject<UAutomaticResourceTransferPoint>("ResourceOutputPoint");
 
-	_resourceInput = CreateDefaultSubobject<UResourceInventory>("ResourceInput");
-	_resourceOutput = CreateDefaultSubobject<UResourceInventory>("ResourceOutput");
+	//_resourceInput = CreateDefaultSubobject<UResourceInventory>("ResourceInput");
+	//_resourceOutput = CreateDefaultSubobject<UResourceInventory>("ResourceOutput");
 }
 
 // Called when the game starts or when spawned

@@ -40,5 +40,5 @@ protected:
 	UResourceInventory* _outputInventory = nullptr;
 
 	UPROPERTY(EditAnywhere)
-	UResourceConverterComponent _resourceConverter = nullptr;
+	UResourceConverterComponent* _resourceConverter = nullptr;
 };
