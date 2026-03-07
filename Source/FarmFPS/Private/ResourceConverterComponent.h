@@ -27,4 +27,8 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	bool CanCreateResource(UResourceInventory* inputInventory, FCraftingData& recipeToCraft) const;
+	void ConvertAllResourcesPossible(UResourceInventory* inputInventory, UResourceInventory* outputInventory, FCraftingData& recipeToCraft);
+	int GetMaxAmountOfResourceCanBeCrafted(UResourceInventory* inputInventory, FCraftingData& recipeToCraft) const;
 };

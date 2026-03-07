@@ -9,5 +9,6 @@ enum class EResourceType : uint8
 {
 	Wheat,
 	Pumpkin,
-	Bread
+	Bread,
+	Money
 };

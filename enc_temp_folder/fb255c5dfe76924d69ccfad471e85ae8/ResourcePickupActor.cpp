@@ -25,8 +25,6 @@ AResourcePickupActor::AResourcePickupActor()
 	_playerCollider->SetSphereRadius(16.0f);
 	_playerCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	_playerCollider->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
-
-	_playerCollider->SetGenerateOverlapEvents(true);
 }
 
 void AResourcePickupActor::BeginPlay()

@@ -20,20 +20,24 @@ class UResourceInventory : public UActorComponent
 public:	
 	UResourceInventory();
 
-	void AddResource(EResourceType cropType, uint16 yieldAmount);
-	void RemoveResource(EResourceType cropType, uint16 yieldAmount);
+	void AddResource(EResourceType resourceType, uint16 yieldAmount);
+	void RemoveResource(EResourceType resourceType, uint16 yieldAmount);
+	void SetResourceAmount(EResourceType resourceType, uint16 newAmount);
 
 	void AddAllResourcesInInventory(UResourceInventory* otherInventory);
 
-	bool CanAddResource(EResourceType cropType, uint16 amount) const;
+	bool CanAddResource(EResourceType resourceType, uint16 amount) const;
 
 	UFUNCTION(BlueprintPure)
-	int GetResourceCount(EResourceType cropType) const;
+	int GetResourceCount(EResourceType resourceType) const;
 
 	UFUNCTION(BlueprintPure)
-	bool HasResourceAmount(EResourceType cropType, int amount) const;
+	bool HasResourceAmount(EResourceType resourceType, int amount) const;
 
 	uint16 GetResourceCap(EResourceType resourceType) const;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnResourceCountChangedEvent, EResourceType, resourceType, int, newAmount);
+	FOnResourceCountChangedEvent OnResourceCountChanged;
 
 protected:
 	virtual void BeginPlay() override;		

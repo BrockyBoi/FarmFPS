@@ -14,19 +14,39 @@ void UResourceInventory::BeginPlay()
 
 void UResourceInventory::AddResource(EResourceType resourceType, uint16 amount)
 {
-	CheckInitializeMap(resourceType);
+	if (amount > 0)
+	{
+		CheckInitializeMap(resourceType);
 
-	_resourcesMap[resourceType] += amount;
+		SetResourceAmount(resourceType, GetResourceCount(resourceType) + amount);
+	}
 }
 
 void UResourceInventory::RemoveResource(EResourceType resourceType, uint16 amount)
 {
+	if (amount > 0)
+	{
+		CheckInitializeMap(resourceType);
+
+		if (ensure(HasResourceAmount(resourceType, amount)))
+		{
+			SetResourceAmount(resourceType, GetResourceCount(resourceType) - amount);
+		}
+	}
+}
+
+void UResourceInventory::SetResourceAmount(EResourceType resourceType, uint16 newAmount)
+{
 	CheckInitializeMap(resourceType);
 
-	if (ensure(HasResourceAmount(resourceType, amount)))
+	if (GetResourceCount(resourceType) == newAmount)
 	{
-		_resourcesMap[resourceType] -= amount;
+		return;
 	}
+
+	_resourcesMap[resourceType] = FMath::Clamp(newAmount, 0 , GetResourceCap(resourceType));
+
+	OnResourceCountChanged.Broadcast(resourceType, GetResourceCount(resourceType));
 }
 
 void UResourceInventory::AddAllResourcesInInventory(UResourceInventory* otherInventory)

@@ -2,6 +2,8 @@
 
 #pragma once
 
+//Brock
+#include "CraftingData.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -27,18 +29,24 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere)
+	UFUNCTION()
+	void OnInputInventoryResourceCountChanged(EResourceType resourceType, int amount);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UAutomaticResourceTransferPoint* _resourceInputPoint = nullptr;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UAutomaticResourceTransferPoint* _resourceOutputPoint = nullptr;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UResourceInventory* _inputInventory = nullptr;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UResourceInventory* _outputInventory = nullptr;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UResourceConverterComponent* _resourceConverter = nullptr;
+
+	UPROPERTY(EditDefaultsOnly)
+	FCraftingData _craftingRecipe;
 };
