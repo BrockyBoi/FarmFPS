@@ -80,7 +80,7 @@ bool UResourceInventory::HasResourceAmount(EResourceType cropType, int amount) c
 
 uint16 UResourceInventory::GetResourceCap(EResourceType resourceType) const
 {
-	return _resourceCaps.Contains(resourceType) ? _resourceCaps[resourceType] : BIG_NUMBER;
+	return _resourceCaps.Contains(resourceType) ? _resourceCaps[resourceType] : 999;
 }
 
 void UResourceInventory::CheckInitializeMap(EResourceType cropType)

@@ -25,6 +25,23 @@ void AResourceConverterStationActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (ensure(IsValid(_resourceInputPoint)) && ensure(IsValid(_resourceOutputPoint)) && ensure(IsValid(_inputInventory)))
+	{
+		_resourceInputPoint->SetInventory(_inputInventory);
+		_resourceOutputPoint->SetInventory(_outputInventory);
+
+		_inputInventory->OnResourceCountChanged.AddDynamic(this, &AResourceConverterStationActor::OnInputInventoryResourceCountChanged);
+	}
+}
+
+void AResourceConverterStationActor::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+	if (IsValid(_inputInventory))
+	{
+		_inputInventory->OnResourceCountChanged.RemoveAll(this);
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 void AResourceConverterStationActor::OnInputInventoryResourceCountChanged(EResourceType, int)

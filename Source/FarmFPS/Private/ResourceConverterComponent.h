@@ -22,13 +22,13 @@ public:
 	// Sets default values for this component's properties
 	UResourceConverterComponent();
 
-	bool TryConvertResources(UResourceInventory* inputInventory, UResourceInventory* outputInventory, FCraftingData& recipeToCraft);
+	bool TryConvertResources(UResourceInventory* inputInventory, UResourceInventory* outputInventory, const FCraftingData& recipeToCraft);
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	bool CanCreateResource(UResourceInventory* inputInventory, FCraftingData& recipeToCraft) const;
-	void ConvertAllResourcesPossible(UResourceInventory* inputInventory, UResourceInventory* outputInventory, FCraftingData& recipeToCraft);
-	int GetMaxAmountOfResourceCanBeCrafted(UResourceInventory* inputInventory, FCraftingData& recipeToCraft) const;
+	bool CanCreateResource(UResourceInventory* inputInventory, const FCraftingData& recipeToCraft) const;
+	void ConvertAllResourcesPossible(UResourceInventory* inputInventory, UResourceInventory* outputInventory, const FCraftingData& recipeToCraft);
+	int GetMaxAmountOfResourceCanBeCrafted(UResourceInventory* inputInventory, const FCraftingData& recipeToCraft) const;
 };

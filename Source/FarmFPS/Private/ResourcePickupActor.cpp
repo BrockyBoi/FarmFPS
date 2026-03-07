@@ -89,7 +89,7 @@ void AResourcePickupActor::OnCapsuleColliderHit(UPrimitiveComponent* HitComp, AA
 {
 	if (ensure(IsValid(_capsuleCollider)))
 	{
-		_capsuleCollider->SetSimulatePhysics(false);
+		//_capsuleCollider->SetSimulatePhysics(false);
 	}
 }
 

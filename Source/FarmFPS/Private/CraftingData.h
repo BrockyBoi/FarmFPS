@@ -16,8 +16,11 @@ struct FCraftingData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	EResourceType ResourceProductType;
+
+	UPROPERTY(EditDefaultsOnly)
+	uint16 ResourceProductCount;
 
 	UPROPERTY(EditDefaultsOnly)
 	TMap<EResourceType, uint16> RequiredResources;

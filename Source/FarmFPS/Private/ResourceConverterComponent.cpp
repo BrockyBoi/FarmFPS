@@ -11,7 +11,7 @@ UResourceConverterComponent::UResourceConverterComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-bool UResourceConverterComponent::TryConvertResources(UResourceInventory* inputInventory, UResourceInventory* outputInventory, FCraftingData& recipeToCraft)
+bool UResourceConverterComponent::TryConvertResources(UResourceInventory* inputInventory, UResourceInventory* outputInventory, const FCraftingData& recipeToCraft)
 {
 	if (!ensure(IsValid(inputInventory)) || !ensure(IsValid(outputInventory)))
 	{
@@ -34,7 +34,7 @@ void UResourceConverterComponent::BeginPlay()
 	
 }
 
-bool UResourceConverterComponent::CanCreateResource(UResourceInventory* inputInventory, FCraftingData& recipeToCraft) const
+bool UResourceConverterComponent::CanCreateResource(UResourceInventory* inputInventory, const FCraftingData& recipeToCraft) const
 {
 	for (auto pair : recipeToCraft.RequiredResources)
 	{
@@ -49,7 +49,7 @@ bool UResourceConverterComponent::CanCreateResource(UResourceInventory* inputInv
 	return true;
 }
 
-void UResourceConverterComponent::ConvertAllResourcesPossible(UResourceInventory* inputInventory, UResourceInventory* outputInventory, FCraftingData& recipeToCraft)
+void UResourceConverterComponent::ConvertAllResourcesPossible(UResourceInventory* inputInventory, UResourceInventory* outputInventory, const FCraftingData& recipeToCraft)
 {
 	int resourcesToCreate = GetMaxAmountOfResourceCanBeCrafted(inputInventory, recipeToCraft);
 	if (resourcesToCreate > 0)
@@ -60,11 +60,11 @@ void UResourceConverterComponent::ConvertAllResourcesPossible(UResourceInventory
 			uint16 requiredAmount = pair.Value;
 			inputInventory->RemoveResource(resourceType, requiredAmount * resourcesToCreate);
 		}
-		outputInventory->AddResource(recipeToCraft.ResourceProductType, resourcesToCreate);
+		outputInventory->AddResource(recipeToCraft.ResourceProductType, resourcesToCreate* recipeToCraft.ResourceProductCount);
 	}
 }
 
-int UResourceConverterComponent::GetMaxAmountOfResourceCanBeCrafted(UResourceInventory* inputInventory, FCraftingData& recipeToCraft) const
+int UResourceConverterComponent::GetMaxAmountOfResourceCanBeCrafted(UResourceInventory* inputInventory, const FCraftingData& recipeToCraft) const
 {
 	int maxCanMake = INT_MAX;
 	for (auto pair : recipeToCraft.RequiredResources)
