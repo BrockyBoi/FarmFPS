@@ -3,6 +3,8 @@
 #include "CropComponent.h"
 
 // Brock
+#include "FarmFPSUtilities.h"
+#include "PerkManager.h"
 #include "ResourcePickupActor.h"
 
 UCropComponent::UCropComponent()
@@ -33,7 +35,14 @@ void UCropComponent::BreakCrop()
 {
 	if (ensure(IsValid(GetWorld())) && ensure(IsValid(GetOwner())) && ensure(IsValid(_cropYieldPickupClass)))
 	{
-		for (int i = 0; i < _cropData.NumberOfPickupsToDrop; i++)
+		UPerkManager* perkManager = FarmFPSUtilities::GetPlayerPerkManager(this);
+		if (!ensure(IsValid(perkManager)))
+		{
+			return;
+		}
+
+		int countToDrop = perkManager->ModifyValueByPerks(EPerkType::MoreYield, _cropData.NumberOfPickupsToDrop);
+		for (int i = 0; i < countToDrop; i++)
 		{
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
