@@ -3,6 +3,7 @@
 #pragma once
 
 // Brock
+#include "PerkData.h"
 #include "ResourceData.h"
 
 // UE
@@ -12,16 +13,34 @@
 #include "CraftingData.generated.h"
 
 USTRUCT(BlueprintType)
-struct FCraftingData
+struct FModifiedResourceValue
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly)
-	EResourceType ResourceProductType;
+	EResourceType ResourceType;
 
 	UPROPERTY(EditDefaultsOnly)
+	EPerkModifiers Modifier;
+};
+
+// Provide a hash function so this strongly-typed enum can be used as a key in UE containers (TSet/TMap)
+FORCEINLINE uint32 GetTypeHash(const FModifiedResourceValue Value)
+{
+	return ::GetTypeHash(static_cast<uint8>(Value.ResourceType) + static_cast<uint8>(Value.Modifier));
+}
+
+USTRUCT(BlueprintType)
+struct FCraftingData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TMap<FModifiedResourceValue, uint16> RequiredResources;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Output")
+	FModifiedResourceValue ResourceProduct;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Output")
 	uint16 ResourceProductCount;
-
-	UPROPERTY(EditDefaultsOnly)
-	TMap<EResourceType, uint16> RequiredResources;
 };

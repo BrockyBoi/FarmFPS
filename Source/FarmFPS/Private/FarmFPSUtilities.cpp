@@ -8,7 +8,7 @@
 // UE
 #include "Kismet/GameplayStatics.h"
 
-UPerkManager* FarmFPSUtilities::GetPlayerPerkManager(UObject* WorldContextObject)
+UPerkManager* FarmFPSUtilities::GetPlayerPerkManager(const UObject* WorldContextObject)
 {
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(WorldContextObject, 0);
 	if (ensure(IsValid(playerController)) && ensure(IsValid(playerController->GetPawn())))
@@ -16,4 +16,15 @@ UPerkManager* FarmFPSUtilities::GetPlayerPerkManager(UObject* WorldContextObject
 		return playerController->GetPawn()->FindComponentByClass<UPerkManager>();
 	}
 	return nullptr;
+}
+
+float FarmFPSUtilities::GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, EPerkModifiers perkType, float valueToModify)
+{
+	UPerkManager* perkManager = GetPlayerPerkManager(WorldContextObject);
+	if (ensure(IsValid(perkManager)))
+	{
+		return perkManager->ModifyValueByPerks(perkType, valueToModify);
+	}
+
+	return 0.f;
 }

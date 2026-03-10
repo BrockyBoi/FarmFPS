@@ -41,7 +41,7 @@ void UCropComponent::BreakCrop()
 			return;
 		}
 
-		int countToDrop = perkManager->ModifyValueByPerks(EPerkType::MoreYield, _cropData.NumberOfPickupsToDrop);
+		int countToDrop = perkManager->ModifyValueByPerks(EPerkModifiers::MoreYield, _cropData.NumberOfPickupsToDrop);
 		for (int i = 0; i < countToDrop; i++)
 		{
 			FActorSpawnParameters SpawnParams;
@@ -50,7 +50,7 @@ void UCropComponent::BreakCrop()
 			if (ensure(IsValid(pickup)))
 			{
 				UPrimitiveComponent* pickupCollider = pickup->FindComponentByClass<UPrimitiveComponent>();
-				if (ensure(IsValid(pickupCollider)))
+				if (IsValid(pickupCollider))
 				{
 					pickupCollider->AddImpulse(FVector(FMath::RandRange(-100, 100), FMath::RandRange(-100, 100), 200.f), NAME_None, true);
 				}

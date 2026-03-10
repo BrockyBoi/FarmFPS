@@ -30,7 +30,7 @@ protected:
 	bool AttemptUpgradePurchase(class UPerkManager* perkManager, class UResourceInventory* inventory);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Upgrade")
-	EPerkType _upgradeType;
+	EPerkModifiers _upgradeType;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Upgrade")
 	float _upgradeCost;

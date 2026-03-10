@@ -53,11 +53,11 @@ void ACropResourceProjectile::OnComponentOverlap(UPrimitiveComponent* Overlapped
 			{
 				if (_cropResourceType == ECropResourceType::Light)
 				{
-					cropComponent->AddLight(perkManager->ModifyValueByPerks(EPerkType::LightEfficacy, _resourceAmount));
+					cropComponent->AddLight(perkManager->ModifyValueByPerks(EPerkModifiers::LightEfficacy, _resourceAmount));
 				}
 				else if (_cropResourceType == ECropResourceType::Water)
 				{
-					cropComponent->AddWater(perkManager->ModifyValueByPerks(EPerkType::WaterEfficacy, _resourceAmount));
+					cropComponent->AddWater(perkManager->ModifyValueByPerks(EPerkModifiers::WaterEfficacy, _resourceAmount));
 				}
 			}
 		}

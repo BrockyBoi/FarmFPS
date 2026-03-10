@@ -20,17 +20,17 @@ class UPerkManager : public UActorComponent
 public:	
 	UPerkManager();
 
-	const FPerkData GetPerkData(EPerkType PerkType) const;
+	const FPerkData GetPerkData(EPerkModifiers PerkType) const;
 
-	void ModifyAdditiveValue(EPerkType perkType, float valueChange);
-	void ModifyMultiplicativeValue(EPerkType perkType, float valueToMultiplyBy);
-	void ModifyPerkData(EPerkType perkType, const FPerkData& perkDataChange);
+	void ModifyAdditiveValue(EPerkModifiers perkType, float valueChange);
+	void ModifyMultiplicativeValue(EPerkModifiers perkType, float valueToMultiplyBy);
+	void ModifyPerkData(EPerkModifiers perkType, const FPerkData& perkDataChange);
 
-	float ModifyValueByPerks(EPerkType perkType, float valueToModify) const;
+	float ModifyValueByPerks(EPerkModifiers perkType, float valueToModify) const;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 		
-	TMap<EPerkType, FPerkData> _activePerks;
+	TMap<EPerkModifiers, FPerkData> _activePerks;
 };

@@ -4,6 +4,7 @@
 
 // Brock
 #include "CraftingData.h"
+#include "FarmFPSUtilities.h"
 #include "ResourceInventory.h"
 
 UResourceConverterComponent::UResourceConverterComponent()
@@ -34,13 +35,13 @@ void UResourceConverterComponent::BeginPlay()
 	
 }
 
-bool UResourceConverterComponent::CanCreateResource(UResourceInventory* inputInventory, const FCraftingData& recipeToCraft) const
+bool UResourceConverterComponent::CanCreateResource(const UResourceInventory* inputInventory, const FCraftingData& recipeToCraft) const
 {
 	for (auto pair : recipeToCraft.RequiredResources)
 	{
-		EResourceType resourceType = pair.Key;
-		uint16 requiredAmount = pair.Value;
-		if (!inputInventory->HasResourceAmount(resourceType, requiredAmount))
+		FModifiedResourceValue resourceValue = pair.Key;
+		uint16 requiredAmount = FarmFPSUtilities::GetModifiedValueByPlayerPerks(this, resourceValue.Modifier, pair.Value);
+		if (!inputInventory->HasResourceAmount(resourceValue.ResourceType, requiredAmount))
 		{
 			return false;
 		}
@@ -56,23 +57,25 @@ void UResourceConverterComponent::ConvertAllResourcesPossible(UResourceInventory
 	{
 		for (auto pair : recipeToCraft.RequiredResources)
 		{
-			EResourceType resourceType = pair.Key;
-			uint16 requiredAmount = pair.Value;
-			inputInventory->RemoveResource(resourceType, requiredAmount * resourcesToCreate);
+			FModifiedResourceValue resourceValue = pair.Key;
+			uint16 requiredAmount = FarmFPSUtilities::GetModifiedValueByPlayerPerks(this, resourceValue.Modifier, pair.Value);
+			inputInventory->RemoveResource(resourceValue.ResourceType, requiredAmount * resourcesToCreate);
 		}
-		outputInventory->AddResource(recipeToCraft.ResourceProductType, resourcesToCreate* recipeToCraft.ResourceProductCount);
+
+		EResourceType outputResourceType = recipeToCraft.ResourceProduct.ResourceType;
+		outputInventory->AddResource(outputResourceType, resourcesToCreate * FarmFPSUtilities::GetModifiedValueByPlayerPerks(this, recipeToCraft.ResourceProduct.Modifier, recipeToCraft.ResourceProductCount));
 	}
 }
 
-int UResourceConverterComponent::GetMaxAmountOfResourceCanBeCrafted(UResourceInventory* inputInventory, const FCraftingData& recipeToCraft) const
+int UResourceConverterComponent::GetMaxAmountOfResourceCanBeCrafted(const UResourceInventory* inputInventory, const FCraftingData& recipeToCraft) const
 {
 	int maxCanMake = INT_MAX;
 	for (auto pair : recipeToCraft.RequiredResources)
 	{
-		EResourceType resourceType = pair.Key;
-		uint16 requiredAmount = pair.Value;
+		FModifiedResourceValue resourceValue = pair.Key;
+		uint16 requiredAmount = FarmFPSUtilities::GetModifiedValueByPlayerPerks(this, resourceValue.Modifier, pair.Value);
 
-		int timesCanConvert = inputInventory->GetResourceCount(resourceType) / requiredAmount;
+		int timesCanConvert = inputInventory->GetResourceCount(resourceValue.ResourceType) / requiredAmount;
 		if (timesCanConvert < maxCanMake)
 		{
 			maxCanMake = timesCanConvert;

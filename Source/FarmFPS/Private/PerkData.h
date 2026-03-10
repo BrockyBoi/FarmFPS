@@ -27,12 +27,15 @@ struct FPerkData
 };
 
 UENUM(BlueprintType)
-enum class EPerkType : uint8
+enum class EPerkModifiers : uint8
 {
 	MoveSpeed,
 	FireRate,
 	WaterEfficacy,
 	LightEfficacy,
 	MoreYield,
+	BreadPrice,
+	WheatNeededForBread,
+	MoneyNeededForUpgrades,
 	None
 };
