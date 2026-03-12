@@ -4,7 +4,10 @@
 
 // Brock
 #include "PerkManager.h"
+#include "PerkModifierTypeTags.h"
 #include "ResourceInventory.h"
+#include "ResourceTypeTags.h"
+
 
 UUpgradePurchaceLocation::UUpgradePurchaceLocation()
 {
@@ -53,11 +56,11 @@ bool UUpgradePurchaceLocation::AttemptUpgradePurchase(UPerkManager* perkManager,
 {
 	if (ensure(IsValid(perkManager)) && ensure(IsValid(inventory)))
 	{
-		float moneyNeeded = perkManager->ModifyValueByPerks(EPerkModifiers::MoneyNeededForUpgrades, _upgradeCost);
-		if (inventory->HasResourceAmount(EResourceType::Money, moneyNeeded))
+		float moneyNeeded = perkManager->ModifyValueByPerks(PerkModifierTypeTags::MoneyNeededForUpgrades, _upgradeCost);
+		if (inventory->HasResourceAmount(ResourceTypeTags::Money, moneyNeeded))
 		{
-			inventory->RemoveResource(EResourceType::Money, moneyNeeded);
-			perkManager->ModifyPerkData(_upgradeType, _perkUpgradeAmount);
+			inventory->RemoveResource(ResourceTypeTags::Money, moneyNeeded);
+			perkManager->ModifyPerkData(_modifierUpgrade, _perkUpgradeAmount);
 			_upgradeCost *= _upgradeCostMultiplier;
 			return true;
 		}

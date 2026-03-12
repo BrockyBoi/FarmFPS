@@ -18,12 +18,33 @@ UPerkManager* FarmFPSUtilities::GetPlayerPerkManager(const UObject* WorldContext
 	return nullptr;
 }
 
-float FarmFPSUtilities::GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, EPerkModifiers perkType, float valueToModify)
+float FarmFPSUtilities::GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, const FGameplayTag& perkTag, float valueToModify)
 {
+	if (perkTag == FGameplayTag::EmptyTag)
+	{
+		return valueToModify;
+	}
+
 	UPerkManager* perkManager = GetPlayerPerkManager(WorldContextObject);
 	if (ensure(IsValid(perkManager)))
 	{
-		return perkManager->ModifyValueByPerks(perkType, valueToModify);
+		return perkManager->ModifyValueByPerks(perkTag, valueToModify);
+	}
+
+	return 0.f;
+}
+
+float FarmFPSUtilities::GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, const FGameplayTagContainer& perkTags, float valueToModify)
+{
+	if (perkTags.IsEmpty())
+	{
+		return valueToModify;
+	}
+
+	UPerkManager* perkManager = GetPlayerPerkManager(WorldContextObject);
+	if (ensure(IsValid(perkManager)))
+	{
+		return perkManager->ModifyValueByPerks(perkTags, valueToModify);
 	}
 
 	return 0.f;

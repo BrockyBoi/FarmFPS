@@ -8,6 +8,7 @@
 
 // UE
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 
 // Generated
 #include "CraftingData.generated.h"
@@ -17,17 +18,22 @@ struct FModifiedResourceValue
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly)
-	EResourceType ResourceType;
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ResourceType."))
+	FGameplayTag ResourceTag;
 
-	UPROPERTY(EditDefaultsOnly)
-	EPerkModifiers Modifier;
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "PerkModifier."))
+	FGameplayTagContainer Modifiers;
 };
 
 // Provide a hash function so this strongly-typed enum can be used as a key in UE containers (TSet/TMap)
 FORCEINLINE uint32 GetTypeHash(const FModifiedResourceValue Value)
 {
-	return ::GetTypeHash(static_cast<uint8>(Value.ResourceType) + static_cast<uint8>(Value.Modifier));
+	int hash = GetTypeHash(Value.ResourceTag);
+	for (const FGameplayTag& tag : Value.Modifiers.GetGameplayTagArray())
+	{
+		hash += GetTypeHash(tag);
+	}
+	return hash;
 }
 
 USTRUCT(BlueprintType)

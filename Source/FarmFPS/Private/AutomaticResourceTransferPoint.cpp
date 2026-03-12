@@ -59,7 +59,7 @@ void UAutomaticResourceTransferPoint::OnComponentOverlap(UPrimitiveComponent* Ov
 			}
 			else
 			{
-				for (EResourceType resourceType : _resourcesAllowed)
+				for (const FGameplayTag& resourceType : _resourcesAllowed)
 				{
 					int resourceCount = inventory->GetResourceCount(resourceType);
 					if (resourceCount > 0)

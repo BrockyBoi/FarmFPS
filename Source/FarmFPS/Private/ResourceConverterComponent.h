@@ -5,6 +5,7 @@
 // UE
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameplayTagContainer.h"
 
 // Generated
 #include "ResourceConverterComponent.generated.h"

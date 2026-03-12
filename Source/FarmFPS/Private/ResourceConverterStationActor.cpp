@@ -24,13 +24,18 @@ AResourceConverterStationActor::AResourceConverterStationActor()
 void AResourceConverterStationActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	if (ensure(IsValid(_resourceInputPoint)) && ensure(IsValid(_resourceOutputPoint)) && ensure(IsValid(_inputInventory)))
 	{
 		_resourceInputPoint->SetInventory(_inputInventory);
 		_resourceOutputPoint->SetInventory(_outputInventory);
 
 		_inputInventory->OnResourceCountChanged.AddDynamic(this, &AResourceConverterStationActor::OnInputInventoryResourceCountChanged);
+	}
+
+	if (!ensure(_craftingRecipe.RequiredResources.Num() > 0))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s does not have any required resouces for recipe"), *GetName());
 	}
 }
 
@@ -44,7 +49,7 @@ void AResourceConverterStationActor::EndPlay(EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-void AResourceConverterStationActor::OnInputInventoryResourceCountChanged(EResourceType, int)
+void AResourceConverterStationActor::OnInputInventoryResourceCountChanged(const FGameplayTag&, int)
 {
 	_resourceConverter->TryConvertResources(_inputInventory, _outputInventory, _craftingRecipe);
 }

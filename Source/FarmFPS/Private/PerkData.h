@@ -25,17 +25,3 @@ struct FPerkData
 		MultiplicativeValue = 1.f;
 	}
 };
-
-UENUM(BlueprintType)
-enum class EPerkModifiers : uint8
-{
-	MoveSpeed,
-	FireRate,
-	WaterEfficacy,
-	LightEfficacy,
-	MoreYield,
-	BreadPrice,
-	WheatNeededForBread,
-	MoneyNeededForUpgrades,
-	None
-};

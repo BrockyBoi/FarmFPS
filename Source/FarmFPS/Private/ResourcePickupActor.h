@@ -8,6 +8,7 @@
 // UE
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameplayTagContainer.h"
 
 // Generated
 #include "ResourcePickupActor.generated.h"
@@ -61,8 +62,8 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* _staticMesh = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Crop Yield")
-	EResourceType _cropType;
+	UPROPERTY(EditDefaultsOnly, Category = "Crop Yield", meta = (Categories = "ResourceType."))
+	FGameplayTag _cropType;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Crop Yield")
 	uint16 _yieldAmount = 1;

@@ -8,6 +8,7 @@
 // UE
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameplayTagContainer.h"
 
 // Generated
 #include "AutomaticResourceTransferPoint.generated.h"
@@ -40,8 +41,8 @@ protected:
 
 	TWeakObjectPtr<UResourceInventory> _inventory = nullptr;
 
-	UPROPERTY(EditDefaultsOnly)
-	TArray<EResourceType> _resourcesAllowed;
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ResourceType."), meta = (EditCondition = "_givesResources == false", EditConditionHides))
+	FGameplayTagContainer _resourcesAllowed;
 
 	UPROPERTY(EditDefaultsOnly)
 	bool _givesResources = false;

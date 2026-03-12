@@ -8,6 +8,7 @@
 // UE
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameplayTagContainer.h"
 
 // Generated
 #include "PerkManager.generated.h"
@@ -20,17 +21,18 @@ class UPerkManager : public UActorComponent
 public:	
 	UPerkManager();
 
-	const FPerkData GetPerkData(EPerkModifiers PerkType) const;
+	const FPerkData GetPerkData(const FGameplayTag& perkTag) const;
 
-	void ModifyAdditiveValue(EPerkModifiers perkType, float valueChange);
-	void ModifyMultiplicativeValue(EPerkModifiers perkType, float valueToMultiplyBy);
-	void ModifyPerkData(EPerkModifiers perkType, const FPerkData& perkDataChange);
+	void ModifyAdditiveValue(const FGameplayTag& perkTag, float valueChange);
+	void ModifyMultiplicativeValue(const FGameplayTag& perkTag, float valueToMultiplyBy);
+	void ModifyPerkData(const FGameplayTag& perkTag, const FPerkData& perkDataChange);
 
-	float ModifyValueByPerks(EPerkModifiers perkType, float valueToModify) const;
+	float ModifyValueByPerks(const FGameplayTag& perkTag, float valueToModify) const;
+	float ModifyValueByPerks(const FGameplayTagContainer& perkTags, float valueToModify) const;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 		
-	TMap<EPerkModifiers, FPerkData> _activePerks;
+	TMap<FGameplayTag, FPerkData> _activePerks;
 };

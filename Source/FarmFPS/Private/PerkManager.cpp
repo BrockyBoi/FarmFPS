@@ -7,31 +7,45 @@ UPerkManager::UPerkManager()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-const FPerkData UPerkManager::GetPerkData(EPerkModifiers perkType) const
+const FPerkData UPerkManager::GetPerkData(const FGameplayTag& perkTag) const
 {
-	return _activePerks.Contains(perkType) ? _activePerks[perkType] : FPerkData();
+	return _activePerks.Contains(perkTag) ? _activePerks[perkTag] : FPerkData();
 }
 
-void UPerkManager::ModifyAdditiveValue(EPerkModifiers perkType, float valueChange)
+void UPerkManager::ModifyAdditiveValue(const FGameplayTag& perkTag, float valueChange)
 {
-	_activePerks.FindOrAdd(perkType).AdditiveValue += valueChange;
+	_activePerks.FindOrAdd(perkTag).AdditiveValue += valueChange;
 }
 
-void UPerkManager::ModifyMultiplicativeValue(EPerkModifiers perkType, float valueToMultiplyBy)
+void UPerkManager::ModifyMultiplicativeValue(const FGameplayTag& perkTag, float valueToMultiplyBy)
 {
-	_activePerks.FindOrAdd(perkType).MultiplicativeValue *= valueToMultiplyBy;
+	_activePerks.FindOrAdd(perkTag).MultiplicativeValue *= valueToMultiplyBy;
 }
 
-void UPerkManager::ModifyPerkData(EPerkModifiers perkType, const FPerkData& perkDataChange)
+void UPerkManager::ModifyPerkData(const FGameplayTag& perkTag, const FPerkData& perkDataChange)
 {
-	FPerkData& perkData = _activePerks.FindOrAdd(perkType);
+	FPerkData& perkData = _activePerks.FindOrAdd(perkTag);
 	perkData.AdditiveValue += perkDataChange.AdditiveValue;
 	perkData.MultiplicativeValue *= perkDataChange.MultiplicativeValue;
 }
 
-float UPerkManager::ModifyValueByPerks(EPerkModifiers perkType, float valueToModify) const
+float UPerkManager::ModifyValueByPerks(const FGameplayTag& perkTag, float valueToModify) const
 {
-	return (valueToModify + GetPerkData(perkType).AdditiveValue) * GetPerkData(perkType).MultiplicativeValue;
+	return (valueToModify + GetPerkData(perkTag).AdditiveValue) * GetPerkData(perkTag).MultiplicativeValue;
+}
+
+float UPerkManager::ModifyValueByPerks(const FGameplayTagContainer& perkTags, float valueToModify) const
+{
+	for (const FGameplayTag& perkTag : perkTags)
+	{
+		valueToModify += GetPerkData(perkTag).AdditiveValue;
+	}
+
+	for (const FGameplayTag& perkTag : perkTags)
+	{
+		valueToModify *= GetPerkData(perkTag).MultiplicativeValue;
+	}
+	return valueToModify;
 }
 
 void UPerkManager::BeginPlay()

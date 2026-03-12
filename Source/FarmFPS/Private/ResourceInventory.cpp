@@ -12,7 +12,7 @@ void UResourceInventory::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UResourceInventory::AddResource(EResourceType resourceType, uint16 amount)
+void UResourceInventory::AddResource(const FGameplayTag& resourceType, uint16 amount)
 {
 	if (amount > 0)
 	{
@@ -22,7 +22,7 @@ void UResourceInventory::AddResource(EResourceType resourceType, uint16 amount)
 	}
 }
 
-void UResourceInventory::RemoveResource(EResourceType resourceType, uint16 amount)
+void UResourceInventory::RemoveResource(const FGameplayTag& resourceType, uint16 amount)
 {
 	if (amount > 0)
 	{
@@ -35,7 +35,7 @@ void UResourceInventory::RemoveResource(EResourceType resourceType, uint16 amoun
 	}
 }
 
-void UResourceInventory::SetResourceAmount(EResourceType resourceType, uint16 newAmount)
+void UResourceInventory::SetResourceAmount(const FGameplayTag& resourceType, uint16 newAmount)
 {
 	CheckInitializeMap(resourceType);
 
@@ -58,12 +58,12 @@ void UResourceInventory::AddAllResourcesInInventory(UResourceInventory* otherInv
 	}
 }
 
-bool UResourceInventory::CanAddResource(EResourceType resourceType, uint16 amount) const
+bool UResourceInventory::CanAddResource(const FGameplayTag& resourceType, uint16 amount) const
 {
 	return GetResourceCount(resourceType) + amount <= GetResourceCap(resourceType);
 }
 
-int UResourceInventory::GetResourceCount(EResourceType resourceType) const
+int UResourceInventory::GetResourceCount(const FGameplayTag& resourceType) const
 {
 	if (_resourcesMap.Contains(resourceType))
 	{
@@ -73,21 +73,21 @@ int UResourceInventory::GetResourceCount(EResourceType resourceType) const
 	return 0;
 }
 
-bool UResourceInventory::HasResourceAmount(EResourceType cropType, int amount) const
+bool UResourceInventory::HasResourceAmount(const FGameplayTag& resourceType, int amount) const
 {
-	return GetResourceCount(cropType) >= amount;
+	return GetResourceCount(resourceType) >= amount;
 }
 
-uint16 UResourceInventory::GetResourceCap(EResourceType resourceType) const
+uint16 UResourceInventory::GetResourceCap(const FGameplayTag& resourceType) const
 {
 	return _resourceCaps.Contains(resourceType) ? _resourceCaps[resourceType] : 999;
 }
 
-void UResourceInventory::CheckInitializeMap(EResourceType cropType)
+void UResourceInventory::CheckInitializeMap(const FGameplayTag& resourceType)
 {
-	if (!_resourcesMap.Contains(cropType))
+	if (!_resourcesMap.Contains(resourceType))
 	{
-		_resourcesMap.Add(cropType, 0);
+		_resourcesMap.Add(resourceType, 0);
 	}
 }
 

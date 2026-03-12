@@ -5,6 +5,7 @@
 // Brock
 #include "CropComponent.h"
 #include "PerkManager.h"
+#include "PerkModifierTypeTags.h"
 
 // Sets default values
 ACropResourceProjectile::ACropResourceProjectile() : Super()
@@ -53,11 +54,11 @@ void ACropResourceProjectile::OnComponentOverlap(UPrimitiveComponent* Overlapped
 			{
 				if (_cropResourceType == ECropResourceType::Light)
 				{
-					cropComponent->AddLight(perkManager->ModifyValueByPerks(EPerkModifiers::LightEfficacy, _resourceAmount));
+					cropComponent->AddLight(perkManager->ModifyValueByPerks(PerkModifierTypeTags::LightEfficacy, _resourceAmount));
 				}
 				else if (_cropResourceType == ECropResourceType::Water)
 				{
-					cropComponent->AddWater(perkManager->ModifyValueByPerks(EPerkModifiers::WaterEfficacy, _resourceAmount));
+					cropComponent->AddWater(perkManager->ModifyValueByPerks(PerkModifierTypeTags::WaterEfficacy, _resourceAmount));
 				}
 			}
 		}

@@ -5,6 +5,7 @@
 // Brock
 #include "FarmFPSUtilities.h"
 #include "PerkManager.h"
+#include "PerkModifierTypeTags.h"
 #include "ResourcePickupActor.h"
 
 UCropComponent::UCropComponent()
@@ -41,13 +42,15 @@ void UCropComponent::BreakCrop()
 			return;
 		}
 
-		int countToDrop = perkManager->ModifyValueByPerks(EPerkModifiers::MoreYield, _cropData.NumberOfPickupsToDrop);
+		int countToDrop = perkManager->ModifyValueByPerks(PerkModifierTypeTags::MoreCropYield, _cropData.NumberOfPickupsToDrop);
 		for (int i = 0; i < countToDrop; i++)
 		{
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 			AResourcePickupActor* pickup = GetWorld()->SpawnActor<AResourcePickupActor>(_cropYieldPickupClass, GetOwner()->GetActorLocation() + FVector::UpVector * _yieldPickupSpawnHeight, FRotator::ZeroRotator, SpawnParams);
-			if (ensure(IsValid(pickup)))
+			
+			// Pickup may not be valid if immediately collected by player
+			if (IsValid(pickup))
 			{
 				UPrimitiveComponent* pickupCollider = pickup->FindComponentByClass<UPrimitiveComponent>();
 				if (IsValid(pickupCollider))

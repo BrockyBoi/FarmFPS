@@ -8,6 +8,7 @@
 // UE
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameplayTagContainer.h"
 
 // Generated
 #include "ResourceInventory.generated.h"
@@ -20,33 +21,33 @@ class UResourceInventory : public UActorComponent
 public:	
 	UResourceInventory();
 
-	void AddResource(EResourceType resourceType, uint16 yieldAmount);
-	void RemoveResource(EResourceType resourceType, uint16 yieldAmount);
-	void SetResourceAmount(EResourceType resourceType, uint16 newAmount);
+	void AddResource(const FGameplayTag& resourceType, uint16 yieldAmount);
+	void RemoveResource(const FGameplayTag& resourceType, uint16 yieldAmount);
+	void SetResourceAmount(const FGameplayTag& resourceType, uint16 newAmount);
 
 	void AddAllResourcesInInventory(UResourceInventory* otherInventory);
 
-	bool CanAddResource(EResourceType resourceType, uint16 amount) const;
+	bool CanAddResource(const FGameplayTag& resourceType, uint16 amount) const;
 
 	UFUNCTION(BlueprintPure)
-	int GetResourceCount(EResourceType resourceType) const;
+	int GetResourceCount(const FGameplayTag& resourceType) const;
 
 	UFUNCTION(BlueprintPure)
-	bool HasResourceAmount(EResourceType resourceType, int amount) const;
+	bool HasResourceAmount(const FGameplayTag& resourceType, int amount) const;
 
-	uint16 GetResourceCap(EResourceType resourceType) const;
+	uint16 GetResourceCap(const FGameplayTag& resourceType) const;
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnResourceCountChangedEvent, EResourceType, resourceType, int, newAmount);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnResourceCountChangedEvent, const FGameplayTag&, resourceType, int, newAmount);
 	FOnResourceCountChangedEvent OnResourceCountChanged;
 
 protected:
 	virtual void BeginPlay() override;		
 
 private:
-	void CheckInitializeMap(EResourceType cropType);
+	void CheckInitializeMap(const FGameplayTag& cropType);
 
-	TMap<EResourceType, uint16> _resourcesMap;
+	TMap<FGameplayTag, uint16> _resourcesMap;
 
 	UPROPERTY(EditDefaultsOnly)
-	TMap<EResourceType, uint16> _resourceCaps;
+	TMap<FGameplayTag, uint16> _resourceCaps;
 };

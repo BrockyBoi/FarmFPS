@@ -17,7 +17,8 @@ public class FarmFPS : ModuleRules
 			"AIModule",
 			"StateTreeModule",
 			"GameplayStateTreeModule",
-			"UMG",
+          "UMG",
+			"GameplayTags",
 			"Slate"
 		});
 
