@@ -13,8 +13,6 @@
 // Generated
 #include "UpgradePurchaceLocation.generated.h"
 
-#define PerkModifierCategory meta = (Categories = "PerkModifier.")
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UUpgradePurchaceLocation : public UActorComponent
 {
@@ -32,10 +30,10 @@ protected:
 
 	bool AttemptUpgradePurchase(class UPerkManager* perkManager, class UResourceInventory* inventory);
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Upgrade", PerkModifierCategory)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Upgrade", meta = (Categories = "PerkModifier."))
 	FGameplayTag _modifierUpgrade;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Upgrade", PerkModifierCategory)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Upgrade", meta = (Categories = "PerkModifier."))
 	float _upgradeCost;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Upgrade")
