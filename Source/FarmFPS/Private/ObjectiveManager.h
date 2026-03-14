@@ -24,11 +24,17 @@ public:
 	void IncrementObjectiveProgress(const FGameplayTag& objectiveTypeTag, const FGameplayTag& objectiveGoalTag, int amount = 1);
 	void AddObjective(FObjectiveData& objectiveData);
 
-	DECLARE_EVENT_TwoParams(UObjectiveManager, FOnObjectiveProgressUpdatedEvent, FObjectiveData&, int);
-	DECLARE_EVENT_OneParam(UObjectiveManager, FOnObjectiveCompletedEvent, FObjectiveData&);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnObjectiveProgressUpdatedEvent, FObjectiveData, objectiveData, int, newProgressCount);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnObjectiveCompletedEvent, FObjectiveData, objectiveData);
 
+	UPROPERTY(BlueprintAssignable)
 	FOnObjectiveProgressUpdatedEvent OnObjectiveProgressUpdated;
+
+	UPROPERTY(BlueprintAssignable)
 	FOnObjectiveCompletedEvent OnObjectiveCompleted;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnObjectiveCompletedEvent OnMainObjectiveCompleted;
 
 protected:
 	// Called when the game starts
@@ -38,6 +44,9 @@ protected:
 
 	TMap<FGameplayTag, TArray<FObjectiveData>> _objectivesMap;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Debug")
-	FObjectiveData _debugTestObjective;
+	UPROPERTY(EditDefaultsOnly)
+	TArray<FObjectiveData> _mainObjectives;
+	int _currentMainObjectiveIndex = 0;
+
+	FObjectiveData _currentMainObjective;
 };

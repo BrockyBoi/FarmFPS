@@ -43,6 +43,11 @@ public:
 		return _objectiveProgressTarget;
 	}
 
+	bool GetIsMainObjective() const
+	{
+		return _isMainObjective;
+	}
+
 	const FGameplayTag& GetObjectiveTypeTag() const
 	{
 		return _objectiveTypeTag;
@@ -63,16 +68,19 @@ public:
 		return !(*this == other);
 	}
 
-private:
-	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ObjectiveType."))
+protected:
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ObjectiveType."), BlueprintReadOnly)
 	FGameplayTag _objectiveTypeTag;
 
-	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ResourceType."))
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ResourceType."), BlueprintReadOnly)
 	FGameplayTagContainer _objectiveGoalTags;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int _objectiveProgressTarget = 0;
 
+	UPROPERTY(BlueprintReadOnly)
 	int _objectiveProgressCount = 0;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool _isMainObjective = false;
 };

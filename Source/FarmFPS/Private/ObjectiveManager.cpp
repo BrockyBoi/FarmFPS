@@ -11,7 +11,8 @@ void UObjectiveManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	AddObjective(_debugTestObjective);
+	_currentMainObjective = _mainObjectives.IsValidIndex(_currentMainObjectiveIndex) ? _mainObjectives[_currentMainObjectiveIndex] : FObjectiveData();
+	AddObjective(_currentMainObjective);
 }
 
 void UObjectiveManager::IncrementObjectiveProgress(const FGameplayTag& objectiveTypeTag, const FGameplayTag& objectiveGoalTag, int amount)
@@ -24,12 +25,30 @@ void UObjectiveManager::IncrementObjectiveProgress(const FGameplayTag& objective
 			if (objectiveData.GetObjectiveTypeTag() == objectiveTypeTag && objectiveData.GetObjectiveGoalTags().HasTag(objectiveGoalTag))
 			{
 				objectiveData.IncrementProgress(amount);
+
 				OnObjectiveProgressUpdated.Broadcast(objectiveData, objectiveData.GetProgressCount());
 
 				if (objectiveData.IsCompleted())
 				{
 					OnObjectiveCompleted.Broadcast(objectiveData);
+
 					objectivesToRemove.Add(objectiveData);
+
+					if (objectiveData == _currentMainObjective)
+					{
+						OnMainObjectiveCompleted.Broadcast(objectiveData);
+
+						_currentMainObjectiveIndex++;
+						if (_mainObjectives.IsValidIndex(_currentMainObjectiveIndex))
+						{
+							_currentMainObjective = _mainObjectives[_currentMainObjectiveIndex];
+							AddObjective(_currentMainObjective);
+						}
+						else
+						{
+							UE_LOG(LogTemp, Warning, TEXT("No more main objectives left in the list!"));
+						}
+					}
 				}
 			}
 		}

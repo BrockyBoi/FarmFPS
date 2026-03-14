@@ -35,6 +35,8 @@ public:
 	uint16 GetResourceCap(const FGameplayTag& resourceType) const;
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnResourceCountChangedEvent, const FGameplayTag&, resourceType, int, newAmount);
+	
+	UPROPERTY(BlueprintAssignable)
 	FOnResourceCountChangedEvent OnResourceCountChanged;
 
 protected:
