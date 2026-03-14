@@ -5,6 +5,8 @@
 // Brock
 #include "CraftingData.h"
 #include "FarmFPSUtilities.h"
+#include "ObjectiveManager.h"
+#include "ObjectiveTypeTags.h"
 #include "ResourceInventory.h"
 
 UResourceConverterComponent::UResourceConverterComponent()
@@ -60,8 +62,15 @@ void UResourceConverterComponent::ConvertAllResourcesPossible(UResourceInventory
 			inputInventory->RemoveResource(resourceValue.ResourceTag, requiredAmount * resourcesToCreate);
 		}
 
+		int outputCount = resourcesToCreate * FarmFPSUtilities::GetModifiedValueByPlayerPerks(this, recipeToCraft.ResourceProduct.Modifiers, recipeToCraft.ResourceProductCount);
 		FGameplayTag outputResourceType = recipeToCraft.ResourceProduct.ResourceTag;
-		outputInventory->AddResource(outputResourceType, resourcesToCreate * FarmFPSUtilities::GetModifiedValueByPlayerPerks(this, recipeToCraft.ResourceProduct.Modifiers, recipeToCraft.ResourceProductCount));
+		outputInventory->AddResource(outputResourceType, outputCount);
+
+		UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
+		if (ensure(IsValid(objectiveManager)))
+		{
+			objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::CraftResource, outputResourceType, outputCount);
+		}
 	}
 }
 

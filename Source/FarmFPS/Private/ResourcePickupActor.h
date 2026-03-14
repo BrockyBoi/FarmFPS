@@ -2,9 +2,6 @@
 
 #pragma once
 
-// Brock
-#include "ResourceData.h"
-
 // UE
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"

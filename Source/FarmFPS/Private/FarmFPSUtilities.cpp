@@ -3,10 +3,12 @@
 #include "FarmFPSUtilities.h"
 
 // Brock
+#include "ObjectiveManager.h"
 #include "PerkManager.h"
 
 // UE
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/GameStateBase.h"
 
 UPerkManager* FarmFPSUtilities::GetPlayerPerkManager(const UObject* WorldContextObject)
 {
@@ -15,6 +17,26 @@ UPerkManager* FarmFPSUtilities::GetPlayerPerkManager(const UObject* WorldContext
 	{
 		return playerController->GetPawn()->FindComponentByClass<UPerkManager>();
 	}
+	return nullptr;
+}
+
+UObjectiveManager* FarmFPSUtilities::GetObjectiveManager(const UObject* WorldContextObject)
+{
+	if (!ensure(IsValid(WorldContextObject)))
+	{
+		return nullptr;
+	}
+
+	AGameStateBase* gameState = WorldContextObject->GetWorld()->GetGameState();
+	if (ensure(IsValid(gameState)))
+	{
+		UObjectiveManager* objectiveManager = gameState->FindComponentByClass<UObjectiveManager>();
+		if (ensure(IsValid(objectiveManager)))
+		{
+			return objectiveManager;
+		}
+	}
+
 	return nullptr;
 }
 

@@ -2,11 +2,9 @@
 
 #pragma once
 
-// Brock
-#include "ResourceData.h"
-
 // UE
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 
 // Generated
 #include "CropData.generated.h"
@@ -38,8 +36,8 @@ struct FCropData
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	uint8 NumberOfPickupsToDrop;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	EResourceType ResourceType;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "ResourceType."))
+	FGameplayTag ResourceType;
 
 	FCropData()
 	{
@@ -48,6 +46,5 @@ struct FCropData
 		WaterNeeded = 100.0f;
 		LightNeeded = 100.0f;
 		NumberOfPickupsToDrop = 3;
-		ResourceType = EResourceType::Wheat;
 	}
 };

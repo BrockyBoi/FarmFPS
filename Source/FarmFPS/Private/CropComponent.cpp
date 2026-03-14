@@ -6,6 +6,8 @@
 #include "FarmFPSUtilities.h"
 #include "PerkManager.h"
 #include "PerkModifierTypeTags.h"
+#include "ObjectiveManager.h"
+#include "ObjectiveTypeTags.h"
 #include "ResourcePickupActor.h"
 
 UCropComponent::UCropComponent()
@@ -16,6 +18,12 @@ UCropComponent::UCropComponent()
 void UCropComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
+	if (ensure(IsValid(objectiveManager)))
+	{
+		objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::PlantCrop, _cropData.ResourceType);
+	}
 
 	AffectGrowth();
 }
@@ -58,6 +66,12 @@ void UCropComponent::BreakCrop()
 					pickupCollider->AddImpulse(FVector(FMath::RandRange(-100, 100), FMath::RandRange(-100, 100), 200.f), NAME_None, true);
 				}
 			}
+		}
+
+		UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
+		if (ensure(IsValid(objectiveManager)))
+		{
+			objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::FinishCrop, _cropData.ResourceType);
 		}
 
 		GetOwner()->Destroy();

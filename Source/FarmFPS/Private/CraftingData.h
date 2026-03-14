@@ -4,7 +4,6 @@
 
 // Brock
 #include "PerkData.h"
-#include "ResourceData.h"
 
 // UE
 #include "CoreMinimal.h"

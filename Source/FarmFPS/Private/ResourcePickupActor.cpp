@@ -3,6 +3,9 @@
 #include "ResourcePickupActor.h"
 
 //Brock
+#include "FarmFPSUtilities.h"
+#include "ObjectiveManager.h"
+#include "ObjectiveTypeTags.h"
 #include "ResourceInventory.h"
 
 // UE
@@ -79,6 +82,12 @@ void AResourcePickupActor::OnComponentOverlap(UPrimitiveComponent* OverlappedCom
 		if (IsValid(inventory) && inventory->CanAddResource(_cropType, _yieldAmount))
 		{
 			inventory->AddResource(_cropType, _yieldAmount);
+
+			UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
+			if (ensure(IsValid(objectiveManager)))
+			{
+				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::CollectResource, _cropType, _yieldAmount);
+			}
 
 			Destroy();
 		}

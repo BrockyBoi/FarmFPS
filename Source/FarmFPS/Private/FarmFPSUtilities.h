@@ -10,11 +10,13 @@
 #include "GameplayTagContainer.h"
 
 class UPerkManager;
+class UObjectiveManager;
 
 class FarmFPSUtilities
 {
 public:
 	static UPerkManager* GetPlayerPerkManager(const UObject* WorldContextObject);
+	static UObjectiveManager* GetObjectiveManager(const UObject* WorldContextObject);
 	static float GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, const FGameplayTagContainer& perkTags, float valueToModify);
 	static float GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, const FGameplayTag& perkTag, float valueToModify);
 };
