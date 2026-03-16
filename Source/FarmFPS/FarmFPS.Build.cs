@@ -9,6 +9,7 @@ public class FarmFPS : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.AddRange(new string[] {
+			"AIModule",
 			"Core",
 			"CoreUObject",
 			"Engine",
@@ -17,7 +18,7 @@ public class FarmFPS : ModuleRules
 			"AIModule",
 			"StateTreeModule",
 			"GameplayStateTreeModule",
-          "UMG",
+			"UMG",
 			"GameplayTags",
 			"Slate"
 		});

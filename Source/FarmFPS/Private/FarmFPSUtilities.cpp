@@ -3,12 +3,14 @@
 #include "FarmFPSUtilities.h"
 
 // Brock
+#include "BreadStand.h"
+#include "CustomerSpawnerManager.h"
 #include "ObjectiveManager.h"
 #include "PerkManager.h"
 
 // UE
-#include "Kismet/GameplayStatics.h"
 #include "GameFramework/GameStateBase.h"
+#include "Kismet/GameplayStatics.h"
 
 UPerkManager* FarmFPSUtilities::GetPlayerPerkManager(const UObject* WorldContextObject)
 {
@@ -34,6 +36,38 @@ UObjectiveManager* FarmFPSUtilities::GetObjectiveManager(const UObject* WorldCon
 		if (ensure(IsValid(objectiveManager)))
 		{
 			return objectiveManager;
+		}
+	}
+
+	return nullptr;
+}
+
+ABreadStand* FarmFPSUtilities::GetBreadStand(const UObject* WorldContextObject)
+{
+	TArray<AActor*> breadStands;
+	UGameplayStatics::GetAllActorsOfClass(WorldContextObject, ABreadStand::StaticClass(), breadStands);
+	if (ensure(breadStands.Num() > 0))
+	{
+		ABreadStand* breadStand = Cast<ABreadStand>(breadStands[0]);
+		return ensure(IsValid(breadStand)) ? breadStand : nullptr;
+	}
+	return nullptr;
+}
+
+UCustomerSpawnerManager* FarmFPSUtilities::GetCustomerSpawnerManager(const UObject* WorldContextObject)
+{
+	if (!ensure(IsValid(WorldContextObject)))
+	{
+		return nullptr;
+	}
+
+	AGameStateBase* gameState = WorldContextObject->GetWorld()->GetGameState();
+	if (ensure(IsValid(gameState)))
+	{
+		UCustomerSpawnerManager* customerSpawnerManager = gameState->FindComponentByClass<UCustomerSpawnerManager>();
+		if (ensure(IsValid(customerSpawnerManager)))
+		{
+			return customerSpawnerManager;
 		}
 	}
 

@@ -4,6 +4,7 @@
 
 //Brock
 #include "CraftingData.h"
+#include "InputOutputStationActor.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -17,35 +18,26 @@ class UResourceConverterComponent;
 class UResourceInventory;
 
 UCLASS()
-class AResourceConverterStationActor : public AActor
+class AResourceConverterStationActor : public AInputOutputStationActor
 {
 	GENERATED_BODY()
 	
 public:	
 	AResourceConverterStationActor();
+	void TryConvertAllResources();
+	void TryConvertLimitedAmount(int amountToCraft);
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
-	UFUNCTION()
-	void OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, int amount);
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UAutomaticResourceTransferPoint* _resourceInputPoint = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UAutomaticResourceTransferPoint* _resourceOutputPoint = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UResourceInventory* _inputInventory = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UResourceInventory* _outputInventory = nullptr;
+	virtual void OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, int amount) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UResourceConverterComponent* _resourceConverter = nullptr;
 
 	UPROPERTY(EditDefaultsOnly)
 	FCraftingData _craftingRecipe;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool _automaticallyConvertResources = true;
 };

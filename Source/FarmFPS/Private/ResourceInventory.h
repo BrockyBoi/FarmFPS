@@ -18,9 +18,12 @@ class UResourceInventory : public UActorComponent
 public:	
 	UResourceInventory();
 
-	void AddResource(const FGameplayTag& resourceType, uint16 yieldAmount);
-	void RemoveResource(const FGameplayTag& resourceType, uint16 yieldAmount);
-	void SetResourceAmount(const FGameplayTag& resourceType, uint16 newAmount);
+	UFUNCTION(BlueprintCallable)
+	void AddResource(const FGameplayTag& resourceType, int amount);
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveResource(const FGameplayTag& resourceType, int amount);
+	void SetResourceAmount(const FGameplayTag& resourceType, uint16 amount);
 
 	void AddAllResourcesInInventory(UResourceInventory* otherInventory);
 

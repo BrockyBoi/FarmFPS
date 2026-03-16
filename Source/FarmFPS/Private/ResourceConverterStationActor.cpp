@@ -7,31 +7,14 @@
 #include "ResourceConverterComponent.h"
 #include "ResourceInventory.h"
 
-AResourceConverterStationActor::AResourceConverterStationActor()
+AResourceConverterStationActor::AResourceConverterStationActor() : Super()
 {
-	PrimaryActorTick.bCanEverTick = false;
-
 	_resourceConverter = CreateDefaultSubobject<UResourceConverterComponent>("ResourceConverterComponent");
-
-	_resourceInputPoint = CreateDefaultSubobject<UAutomaticResourceTransferPoint>("ResourceInputPoint");
-	_resourceOutputPoint = CreateDefaultSubobject<UAutomaticResourceTransferPoint>("ResourceOutputPoint");
-
-	_inputInventory = CreateDefaultSubobject<UResourceInventory>("InputInventory");
-	_outputInventory = CreateDefaultSubobject<UResourceInventory>("OutputInventory");
 }
 
-// Called when the game starts or when spawned
 void AResourceConverterStationActor::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (ensure(IsValid(_resourceInputPoint)) && ensure(IsValid(_resourceOutputPoint)) && ensure(IsValid(_inputInventory)))
-	{
-		_resourceInputPoint->SetInventory(_inputInventory);
-		_resourceOutputPoint->SetInventory(_outputInventory);
-
-		_inputInventory->OnResourceCountChanged.AddDynamic(this, &AResourceConverterStationActor::OnInputInventoryResourceCountChanged);
-	}
 
 	if (!ensure(_craftingRecipe.RequiredResources.Num() > 0))
 	{
@@ -39,17 +22,26 @@ void AResourceConverterStationActor::BeginPlay()
 	}
 }
 
-void AResourceConverterStationActor::EndPlay(EEndPlayReason::Type EndPlayReason)
+void AResourceConverterStationActor::TryConvertAllResources()
 {
-	if (IsValid(_inputInventory))
+	if (ensure(IsValid(_resourceConverter)))
 	{
-		_inputInventory->OnResourceCountChanged.RemoveAll(this);
+		_resourceConverter->TryConvertAllResources(_inputInventory, _outputInventory, _craftingRecipe);
 	}
+}
 
-	Super::EndPlay(EndPlayReason);
+void AResourceConverterStationActor::TryConvertLimitedAmount(int amountToCraft)
+{
+	if (ensure(IsValid(_resourceConverter)))
+	{
+		_resourceConverter->TryConvertResources(_inputInventory, _outputInventory, _craftingRecipe, amountToCraft);
+	}
 }
 
 void AResourceConverterStationActor::OnInputInventoryResourceCountChanged(const FGameplayTag&, int)
 {
-	_resourceConverter->TryConvertResources(_inputInventory, _outputInventory, _craftingRecipe);
+	if (_automaticallyConvertResources)
+	{
+		TryConvertAllResources();
+	}
 }

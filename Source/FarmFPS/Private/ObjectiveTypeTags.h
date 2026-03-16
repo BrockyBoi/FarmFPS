@@ -10,4 +10,5 @@ namespace ObjectiveTypeTags
 	static const FGameplayTag CollectResource = FGameplayTag::RequestGameplayTag(FName("ObjectiveType.CollectResource"));
 	static const FGameplayTag FinishCrop = FGameplayTag::RequestGameplayTag(FName("ObjectiveType.FinishCrop"));
 	static const FGameplayTag PlantCrop = FGameplayTag::RequestGameplayTag(FName("ObjectiveType.PlantCrop"));
+	static const FGameplayTag SellBread = FGameplayTag::RequestGameplayTag(FName("ObjectiveType.SellBread"));
 };

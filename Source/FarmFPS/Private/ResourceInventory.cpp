@@ -12,7 +12,7 @@ void UResourceInventory::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UResourceInventory::AddResource(const FGameplayTag& resourceType, uint16 amount)
+void UResourceInventory::AddResource(const FGameplayTag& resourceType, int amount)
 {
 	if (amount > 0)
 	{
@@ -22,7 +22,7 @@ void UResourceInventory::AddResource(const FGameplayTag& resourceType, uint16 am
 	}
 }
 
-void UResourceInventory::RemoveResource(const FGameplayTag& resourceType, uint16 amount)
+void UResourceInventory::RemoveResource(const FGameplayTag& resourceType, int amount)
 {
 	if (amount > 0)
 	{
