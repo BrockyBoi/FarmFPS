@@ -49,4 +49,10 @@ void UCustomerSpawnerManager::AttemptSpawnCustomer()
 		{
 		}
 	}
+
+	if (ensure(IsValid(GetWorld())))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(_spawnTimer);
+		GetWorld()->GetTimerManager().SetTimer(_spawnTimer, this, &UCustomerSpawnerManager::AttemptSpawnCustomer, _spawnRate.GetModifiedValue(this), true);
+	}
 }

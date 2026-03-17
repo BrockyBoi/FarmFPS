@@ -19,14 +19,12 @@ struct FModifiedIntValue
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, meta = (Categories = "PerkModifier."))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "PerkModifier."))
 	FGameplayTagContainer Modifiers;
 
 	int GetModifiedValue(const UObject* WorldContextObject) const
 	{
-		int value = BaseValue;
-		FarmFPSUtilities::GetModifiedValueByPlayerPerks(WorldContextObject, Modifiers, value);
-		return value;
+		return FarmFPSUtilities::GetModifiedValueByPlayerPerks(WorldContextObject, Modifiers, BaseValue);
 	}
 
 	const int GetBaseValue() const
@@ -34,8 +32,8 @@ public:
 		return BaseValue;
 	}
 
-private:
-	UPROPERTY(EditDefaultsOnly)
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int BaseValue;
 };
 
@@ -45,14 +43,12 @@ struct FModifiedFloatValue
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, meta = (Categories = "PerkModifier."))
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "PerkModifier."), BlueprintReadOnly)
 	FGameplayTagContainer Modifiers;
 
 	float GetModifiedValue(const UObject* WorldContextObject) const
 	{
-		float value = BaseValue;
-		FarmFPSUtilities::GetModifiedValueByPlayerPerks(WorldContextObject, Modifiers, value);
-		return value;
+		return FarmFPSUtilities::GetModifiedValueByPlayerPerks(WorldContextObject, Modifiers, BaseValue);
 	}
 
 	const float GetBaseValue() const
@@ -60,8 +56,8 @@ public:
 		return BaseValue;
 	}
 
-private:
-	UPROPERTY(EditDefaultsOnly)
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float BaseValue;
 };
 
@@ -72,10 +68,10 @@ struct FModifiedResourceValue
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ResourceType."))
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ResourceType."), BlueprintReadOnly)
 	FGameplayTag ResourceTag;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FModifiedIntValue ModifiedIntValue;
 };
 
@@ -112,9 +108,9 @@ struct FCraftingData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, Category = "Input", BlueprintReadOnly)
 	TArray<FModifiedResourceValue> RequiredResources;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Output")
+	UPROPERTY(EditDefaultsOnly, Category = "Output", BlueprintReadOnly)
 	TArray<FModifiedResourceValue> ResourceProducts;
 };

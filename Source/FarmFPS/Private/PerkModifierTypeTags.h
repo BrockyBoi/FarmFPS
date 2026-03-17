@@ -12,5 +12,8 @@ namespace PerkModifierTypeTags
 	static const FGameplayTag BreadPrice = FGameplayTag::RequestGameplayTag(FName("PerkModifier.BreadPrice"));
 	static const FGameplayTag WheatNeededForBread = FGameplayTag::RequestGameplayTag(FName("PerkModifier.WheatNeededForBread"));
 	static const FGameplayTag MoneyNeededForUpgrades = FGameplayTag::RequestGameplayTag(FName("PerkModifier.MoneyNeededForUpgrades"));
+
+	static const FGameplayTag CustomerSpawnRateIncrease = FGameplayTag::RequestGameplayTag(FName("PerkModifier.CustomerSpawnRateIncrease"));
+	static const FGameplayTag MaxCustomerCount = FGameplayTag::RequestGameplayTag(FName("PerkModifier.MaxCustomerCount"));
 };
 

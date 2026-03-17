@@ -36,6 +36,7 @@ float UPerkManager::ModifyValueByPerks(const FGameplayTag& perkTag, float valueT
 
 float UPerkManager::ModifyValueByPerks(const FGameplayTagContainer& perkTags, float valueToModify) const
 {
+	float startingValue = valueToModify;
 	for (const FGameplayTag& perkTag : perkTags)
 	{
 		valueToModify += GetPerkData(perkTag).AdditiveValue;

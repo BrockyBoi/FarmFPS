@@ -2,6 +2,9 @@
 
 #pragma once
 
+// Brock
+#include "CraftingData.h"
+
 // UE
 #include "AIController.h"
 #include "CoreMinimal.h"
@@ -51,10 +54,10 @@ protected:
 	int _amountLeftToBuy = 0;
 
 	UPROPERTY(EditDefaultsOnly)
-	int _minCanDesire = 1;
+	FModifiedIntValue _minCanDesire;
 
 	UPROPERTY(EditDefaultsOnly)
-	int _maxCanDesire = 5;
+	FModifiedIntValue _maxCanDesire;
 
 	UPROPERTY(EditDefaultsOnly)
 	float _moveAcceptanceRadius = 5.f;

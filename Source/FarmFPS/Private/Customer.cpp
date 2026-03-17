@@ -24,7 +24,9 @@ void ACustomer::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	_amountDesired = FMath::RandRange(_minCanDesire, _maxCanDesire);
+	int modifiedMin = _minCanDesire.GetModifiedValue(this);
+	int modifiedMax = _maxCanDesire.GetModifiedValue(this);
+	_amountDesired = FMath::RandRange(modifiedMin, modifiedMax);
 	_amountLeftToBuy = _amountDesired;
 
 	_startLocation = GetActorLocation();
@@ -102,7 +104,7 @@ void ACustomer::AttemptBuyBreadAtFrontOfQueue()
 			_amountLeftToBuy -= amountCanBuy;
 			_breadStand->SetIsCurrentlySellingBreadToCustomer(false);
 
-			if (_amountLeftToBuy == 0)
+			if (_amountLeftToBuy <= 0)
 			{
 				_reachedSpotInQueue = false;
 				const FModifiedResourceValue priceData = _breadStand->GetPriceForResource(GetResourceDesired());
