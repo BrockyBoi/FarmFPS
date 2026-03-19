@@ -7,6 +7,7 @@
 // UE
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameplayTagContainer.h"
 
 // Generated
 #include "SeedProjectile.generated.h"
@@ -27,4 +28,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AActor> _cropActorClass;
+
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ResourceType."))
+	FGameplayTag _seedType;
 };

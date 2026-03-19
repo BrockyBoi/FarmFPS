@@ -21,7 +21,7 @@ class UPerkManager : public UActorComponent
 public:	
 	UPerkManager();
 
-	const FPerkData GetPerkData(const FGameplayTag& perkTag) const;
+	const FPerkData& GetPerkData(const FGameplayTag& perkTag) const;
 
 	void ModifyAdditiveValue(const FGameplayTag& perkTag, float valueChange);
 	void ModifyMultiplicativeValue(const FGameplayTag& perkTag, float valueToMultiplyBy);
@@ -29,6 +29,11 @@ public:
 
 	float ModifyValueByPerks(const FGameplayTag& perkTag, float valueToModify) const;
 	float ModifyValueByPerks(const FGameplayTagContainer& perkTags, float valueToModify) const;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPerkLevelChange, const FGameplayTag&, resourceType, const FPerkData&, perkData);
+
+	UPROPERTY(BlueprintAssignable)
+	FOnPerkLevelChange OnPerkLevelChange;
 
 protected:
 	// Called when the game starts

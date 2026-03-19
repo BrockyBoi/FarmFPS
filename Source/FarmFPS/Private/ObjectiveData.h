@@ -2,10 +2,11 @@
 
 #pragma once
 
+// UE
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 
-// Generteated
+// Generated
 #include "ObjectiveData.generated.h"
 
 USTRUCT(BlueprintType)

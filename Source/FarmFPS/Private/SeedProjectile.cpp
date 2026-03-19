@@ -1,7 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "SeedProjectile.h"
+
+// Brock
+#include "FarmingPlotComponent.h"
 
 // Sets default values
 ASeedProjectile::ASeedProjectile()
@@ -18,9 +20,13 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 {
 	if (ensure(IsValid(GetWorld())) && ensure(IsValid(_cropActorClass)))
 	{
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		GetWorld()->SpawnActor<AActor>(_cropActorClass, HitLocation, FRotator::ZeroRotator, SpawnParams);
+		UFarmingPlotComponent* farmPlot = Other->FindComponentByClass<UFarmingPlotComponent>();
+		if (IsValid(farmPlot) && farmPlot->GetAllowedSeedTypes().HasTag(_seedType))
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			GetWorld()->SpawnActor<AActor>(_cropActorClass, HitLocation, FRotator::ZeroRotator, SpawnParams);
+		}
 
 		Destroy();
 	}

@@ -3,7 +3,7 @@
 #pragma once
 
 // Brock
-#include "CraftingData.h"
+#include "ModifiedValueData.h"
 
 // UE
 #include "AIController.h"

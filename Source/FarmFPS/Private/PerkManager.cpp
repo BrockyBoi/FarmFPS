@@ -7,19 +7,23 @@ UPerkManager::UPerkManager()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-const FPerkData UPerkManager::GetPerkData(const FGameplayTag& perkTag) const
+const FPerkData& UPerkManager::GetPerkData(const FGameplayTag& perkTag) const
 {
-	return _activePerks.Contains(perkTag) ? _activePerks[perkTag] : FPerkData();
+	return _activePerks.Contains(perkTag) ? _activePerks[perkTag] : FPerkData::Empty;
 }
 
 void UPerkManager::ModifyAdditiveValue(const FGameplayTag& perkTag, float valueChange)
 {
 	_activePerks.FindOrAdd(perkTag).AdditiveValue += valueChange;
+
+	OnPerkLevelChange.Broadcast(perkTag, GetPerkData(perkTag));
 }
 
 void UPerkManager::ModifyMultiplicativeValue(const FGameplayTag& perkTag, float valueToMultiplyBy)
 {
 	_activePerks.FindOrAdd(perkTag).MultiplicativeValue *= valueToMultiplyBy;
+
+	OnPerkLevelChange.Broadcast(perkTag, GetPerkData(perkTag));
 }
 
 void UPerkManager::ModifyPerkData(const FGameplayTag& perkTag, const FPerkData& perkDataChange)
@@ -27,6 +31,8 @@ void UPerkManager::ModifyPerkData(const FGameplayTag& perkTag, const FPerkData& 
 	FPerkData& perkData = _activePerks.FindOrAdd(perkTag);
 	perkData.AdditiveValue += perkDataChange.AdditiveValue;
 	perkData.MultiplicativeValue *= perkDataChange.MultiplicativeValue;
+
+	OnPerkLevelChange.Broadcast(perkTag, GetPerkData(perkTag));
 }
 
 float UPerkManager::ModifyValueByPerks(const FGameplayTag& perkTag, float valueToModify) const

@@ -3,14 +3,11 @@
 #pragma once
 
 // Brock
-#include "AutomaticResourceTransferPoint.h"
-#include "CraftingData.h"
+#include "ModifiedValueData.h"
 #include "InputOutputStationActor.h"
-#include "ResourceInventory.h"
 
 // UE
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
 #include "GameplayTagContainer.h"
 
 // Generated

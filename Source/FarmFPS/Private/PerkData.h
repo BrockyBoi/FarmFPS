@@ -24,4 +24,6 @@ struct FPerkData
 		AdditiveValue = 0.f;
 		MultiplicativeValue = 1.f;
 	}
+
+	static FPerkData Empty;
 };

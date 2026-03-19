@@ -2,8 +2,11 @@
 
 #pragma once
 
+// UE
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+
+// Generated
 #include "CustomerQueue.generated.h"
 
 class ACustomer;
