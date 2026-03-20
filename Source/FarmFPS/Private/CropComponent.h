@@ -47,6 +47,8 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetLightLeft() const { return _cropData.LightNeeded - _currentLightLevel; }
 
+	bool IsCropReadyToBreak() const;
+
 	void BreakCrop();
 
 protected:
@@ -63,6 +65,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	float _yieldPickupSpawnHeight = 100.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool _breakCropOnFull = false;
 
 	float _currentWaterLevel = 0.f;
 	float _currentLightLevel = 0.f;

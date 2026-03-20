@@ -55,6 +55,13 @@ public:
 		return BaseValue;
 	}
 
+	FModifiedFloatValue& operator=(float value)
+	{
+		BaseValue = value;
+
+		return *this;
+	}
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float BaseValue;

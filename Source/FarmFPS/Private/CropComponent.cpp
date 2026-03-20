@@ -40,6 +40,11 @@ void UCropComponent::AddLight(float lightAmount)
 	AffectGrowth();
 }
 
+bool UCropComponent::IsCropReadyToBreak() const
+{
+	return _currentLightLevel >= _cropData.LightNeeded && _currentWaterLevel >= _cropData.WaterNeeded;
+}
+
 void UCropComponent::BreakCrop()
 {
 	if (ensure(IsValid(GetWorld())) && ensure(IsValid(GetOwner())) && ensure(IsValid(_cropYieldPickupClass)))
@@ -92,7 +97,7 @@ void UCropComponent::AffectGrowth()
 			cropMesh->SetWorldScale3D(FVector::One() * scaleAmount);
 		}
 
-		if (_currentLightLevel >= _cropData.LightNeeded && _currentWaterLevel >= _cropData.WaterNeeded)
+		if (_breakCropOnFull && IsCropReadyToBreak())
 		{
 			BreakCrop();
 		}

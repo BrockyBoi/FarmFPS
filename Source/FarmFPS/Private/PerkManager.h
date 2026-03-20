@@ -21,7 +21,7 @@ class UPerkManager : public UActorComponent
 public:	
 	UPerkManager();
 
-	const FPerkData& GetPerkData(const FGameplayTag& perkTag) const;
+	const FPerkData GetPerkData(const FGameplayTag& perkTag) const;
 
 	void ModifyAdditiveValue(const FGameplayTag& perkTag, float valueChange);
 	void ModifyMultiplicativeValue(const FGameplayTag& perkTag, float valueToMultiplyBy);

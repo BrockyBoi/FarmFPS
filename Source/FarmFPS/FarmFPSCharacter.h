@@ -2,15 +2,22 @@
 
 #pragma once
 
+// Brock
+#include "ModifiedValueData.h"
+
+// UE
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+
+// Generated
 #include "FarmFPSCharacter.generated.h"
 
 class UInputComponent;
 class USkeletalMeshComponent;
 class UCameraComponent;
 class UInputAction;
+class USphereComponent;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -37,6 +44,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category ="Input")
 	UInputAction* JumpAction;
 
+	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* GroundSlamAction;
+
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, Category ="Input")
 	UInputAction* MoveAction;
@@ -48,11 +59,33 @@ protected:
 	/** Mouse Look Input Action */
 	UPROPERTY(EditAnywhere, Category ="Input")
 	class UInputAction* MouseLookAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
+	FModifiedFloatValue _groundSlamDistanceThreshold;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
+	FModifiedFloatValue _groundSlamExplosionRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
+	float _groundSlamDashForce = 1000.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
+	float _timeToReachGround = .75f;
+
+	UPROPERTY(EditAnywhere)
+	USphereComponent* _groundSlamSphereCollider;
+
+	bool _startedGroundSlam = false;
 	
 public:
 	AFarmFPSCharacter();
 
 protected:
+	virtual void BeginPlay() override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
+
+	UFUNCTION()
+	void OnGroundSlamComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	/** Called from Input Actions for movement input */
 	void MoveInput(const FInputActionValue& Value);
@@ -76,10 +109,14 @@ protected:
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpEnd();
 
+	void DoGroundSlamStart();
+	void DoGroundSlamEnd();
+
 protected:
 
 	/** Set up input action bindings */
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
+	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode = 0) override;
 	
 
 public:

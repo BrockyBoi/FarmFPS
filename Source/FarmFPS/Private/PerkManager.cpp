@@ -7,9 +7,9 @@ UPerkManager::UPerkManager()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-const FPerkData& UPerkManager::GetPerkData(const FGameplayTag& perkTag) const
+const FPerkData UPerkManager::GetPerkData(const FGameplayTag& perkTag) const
 {
-	return _activePerks.Contains(perkTag) ? _activePerks[perkTag] : FPerkData::Empty;
+	return _activePerks.Contains(perkTag) ? _activePerks[perkTag] : FPerkData();
 }
 
 void UPerkManager::ModifyAdditiveValue(const FGameplayTag& perkTag, float valueChange)
