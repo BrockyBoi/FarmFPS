@@ -28,9 +28,9 @@ public:
 	void AttemptBuyBreadAtFrontOfQueue();
 
 	void FindSpotInQueue();
+	void MoveToBreadStand();
 	void MoveToNextSpotInQueue(const FVector& nextSpot);
 	void MoveOutOfMap();
-	virtual void Tick(float DeltaTime) override;
 
 	const FGameplayTag& GetResourceDesired() const { return _resourceDesired; }
 	const int GetAmountDesired() const { return _amountDesired; }
@@ -42,10 +42,17 @@ protected:
 	virtual void PossessedBy(AController* NewController) override;
 
 	UFUNCTION()
+	void OnMoveFinishedMovingToBreadStand(FAIRequestID RequestID, EPathFollowingResult::Type Result);
+	
+	UFUNCTION()
 	void OnMoveFinishedOutOfMap(FAIRequestID RequestID, EPathFollowingResult::Type Result);
 
 	UFUNCTION()
 	void OnMoveFinishedInQueue(FAIRequestID RequestID, EPathFollowingResult::Type Result);
+
+
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "CustomerType."))
+	FGameplayTag _customerType;
 
 	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ResourceType."))
 	FGameplayTag _resourceDesired;
@@ -61,6 +68,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	float _moveAcceptanceRadius = 5.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	FModifiedFloatValue _customerMoveSpeed = 600;
 
 	FVector _startLocation = FVector::ZeroVector;
 	FVector _nextDestination = FVector::ZeroVector;

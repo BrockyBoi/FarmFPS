@@ -21,6 +21,16 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "PerkModifier."))
 	FGameplayTagContainer Modifiers;
 
+	FModifiedIntValue()
+	{
+		BaseValue = 0;
+	}
+
+	FModifiedIntValue(int value)
+	{
+		BaseValue = value;
+	}
+
 	int GetModifiedValue(const UObject* WorldContextObject) const
 	{
 		return FarmFPSUtilities::GetModifiedValueByPlayerPerks(WorldContextObject, Modifiers, BaseValue);
@@ -44,6 +54,16 @@ struct FModifiedFloatValue
 public:
 	UPROPERTY(EditDefaultsOnly, meta = (Categories = "PerkModifier."), BlueprintReadOnly)
 	FGameplayTagContainer Modifiers;
+	
+	FModifiedFloatValue()
+	{
+		BaseValue = 0.f;
+	}
+
+	FModifiedFloatValue(float value)
+	{
+		BaseValue = value;
+	}
 
 	float GetModifiedValue(const UObject* WorldContextObject) const
 	{
@@ -53,13 +73,6 @@ public:
 	const float GetBaseValue() const
 	{
 		return BaseValue;
-	}
-
-	FModifiedFloatValue& operator=(float value)
-	{
-		BaseValue = value;
-
-		return *this;
 	}
 
 protected:

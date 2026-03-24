@@ -14,6 +14,24 @@
 
 class ACustomer;
 
+namespace CustomerTypeTags
+{
+	static const FGameplayTag StandardCustomer = FGameplayTag::RequestGameplayTag(FName("CustomerType.Standard"));
+	static const FGameplayTag GiantCustomer = FGameplayTag::RequestGameplayTag(FName("CustomerType.Giant"));
+}
+
+USTRUCT(BlueprintType)
+struct FCustomerSpawnData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<ACustomer> CustomerClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	FModifiedFloatValue SpawnChance = 0.f;
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class FARMFPS_API UCustomerSpawnerManager : public UActorComponent
 {
@@ -30,6 +48,9 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	const FGameplayTag& GetNextCustomerTypeToSpawn() const;
+	const TSubclassOf<ACustomer> GetNextCustomerSpawnClass(const FGameplayTag& customerType);
+
 	UFUNCTION()
 	void AttemptSpawnCustomer();
 
@@ -39,8 +60,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Spawn Amount")
 	FModifiedIntValue _totalCustomersAllowedOnScreenAtOnce;
 
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<ACustomer> _customerToSpawn;
+	UPROPERTY(EditDefaultsOnly, Category = "Customer Types")
+	FCustomerSpawnData _defaultCustomerSpawnData;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Customer Types")
+	FCustomerSpawnData _giantCustomerSpawnData;
 
 	int _currentCustomersOnScreen = 0;
 

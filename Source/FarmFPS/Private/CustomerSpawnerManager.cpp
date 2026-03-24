@@ -36,17 +36,46 @@ void UCustomerSpawnerManager::BeginPlay()
 	}
 }
 
+const FGameplayTag& UCustomerSpawnerManager::GetNextCustomerTypeToSpawn() const
+{
+	float randomValue = FMath::RandRange(0.f, 1.f);
+
+	if (_giantCustomerSpawnData.SpawnChance.GetModifiedValue(this) >= randomValue)
+	{
+		return CustomerTypeTags::GiantCustomer;
+	}
+
+	return CustomerTypeTags::StandardCustomer;
+}
+
+const TSubclassOf<ACustomer> UCustomerSpawnerManager::GetNextCustomerSpawnClass(const FGameplayTag& customerType)
+{
+	if (customerType.MatchesTag(CustomerTypeTags::GiantCustomer))
+	{
+		return _giantCustomerSpawnData.CustomerClass;
+	}
+
+	if (customerType.MatchesTag(CustomerTypeTags::StandardCustomer))
+	{
+		return _defaultCustomerSpawnData.CustomerClass;
+	}
+
+	return TSubclassOf<ACustomer>();
+}
+
 void UCustomerSpawnerManager::AttemptSpawnCustomer()
 {
 	if (IsRoomForNewCustomer())
 	{
-		_currentCustomersOnScreen++;
-
-		FActorSpawnParameters spawnParams;
-		//spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-		ACustomer* customer = GetWorld()->SpawnActor<ACustomer>(_customerToSpawn, _customerSpawnPoint, FRotator::ZeroRotator, spawnParams);
-		if (ensure(IsValid(customer)))
+		TSubclassOf<ACustomer> customerClass = GetNextCustomerSpawnClass(GetNextCustomerTypeToSpawn());
+		if (ensure(IsValid(customerClass)))
 		{
+			FActorSpawnParameters spawnParams;
+			ACustomer* customer = GetWorld()->SpawnActor<ACustomer>(customerClass, _customerSpawnPoint, FRotator::ZeroRotator, spawnParams);
+			if (ensure(IsValid(customer)))
+			{
+				_currentCustomersOnScreen++;
+			}
 		}
 	}
 

@@ -34,14 +34,28 @@ void UCustomerQueue::RemoveCustomerFromFrontOfQueue()
 	}
 }
 
-FVector UCustomerQueue::GetQueuePositionAtIndex(int index) const
+const FVector UCustomerQueue::GetCustomerQueuePosition(const ACustomer* searchingCustomer) const
 {
-	return ensure(IsValid(_queueStartPoint)) ? _queueStartPoint->GetComponentLocation() + (_queueDirection * index * _customerSpacing) : FVector();
+	if (_customerQueue.Contains(searchingCustomer))
+	{
+		int32 index = _customerQueue.IndexOfByPredicate([&](const ACustomer* customer)
+			{
+				return ensure(IsValid(customer)) && customer == searchingCustomer;
+			});
+
+		return GetQueuePositionAtIndex(index);
+	}
+	return FVector::ZeroVector;
 }
 
-FVector UCustomerQueue::GetEndQueuePosition() const
+const FVector UCustomerQueue::GetQueuePositionAtIndex(int index) const
 {
-	return ensure(IsValid(_queueStartPoint)) ? _queueStartPoint->GetComponentLocation() + (_queueDirection * _customerQueue.Num() * _customerSpacing) : FVector();
+	return ensure(IsValid(_queueStartPoint)) ? _queueStartPoint->GetComponentLocation() + (_queueDirection * index * _customerSpacing) : FVector::ZeroVector;
+}
+
+const FVector UCustomerQueue::GetEndQueuePosition() const
+{
+	return ensure(IsValid(_queueStartPoint)) ? _queueStartPoint->GetComponentLocation() + (_queueDirection * _customerQueue.Num() * _customerSpacing) : FVector::ZeroVector;
 }
 
 bool UCustomerQueue::IsAtFrontOfQueue(const ACustomer* Customer) const

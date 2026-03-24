@@ -54,7 +54,7 @@ void ACustomer::PossessedBy(AController* NewController)
 	if (ensure(IsValid(aiController)))
 	{
 		_aiController = aiController;
-		_aiController->ReceiveMoveCompleted.AddDynamic(this, &ACustomer::OnMoveFinishedMovingToBreadStand);
+		_aiController->ReceiveMoveCompleted.AddDynamic(this, &ACustomer::OnMoveFinishedInQueue);
 	}
 }
 
@@ -65,8 +65,6 @@ void ACustomer::OnMoveFinishedMovingToBreadStand(FAIRequestID RequestID, EPathFo
 		if (ensure(_customerQueue.IsValid()))
 		{
 			_customerQueue->AddCustomerToQueue(this);
-			_aiController->ReceiveMoveCompleted.RemoveAll(this);
-			_aiController->ReceiveMoveCompleted.AddDynamic(this, &ACustomer::OnMoveFinishedInQueue);
 			MoveToNextSpotInQueue(_customerQueue->GetCustomerQueuePosition(this));
 		}
 	}

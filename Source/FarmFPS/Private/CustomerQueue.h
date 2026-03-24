@@ -22,8 +22,9 @@ public:
 
 	void AddCustomerToQueue(ACustomer* Customer);
 	void RemoveCustomerFromFrontOfQueue();
-	FVector GetQueuePositionAtIndex(int index) const;
-	FVector GetEndQueuePosition() const;
+	const FVector GetCustomerQueuePosition(const ACustomer* searchingCustomer) const;
+	const FVector GetQueuePositionAtIndex(int index) const;
+	const FVector GetEndQueuePosition() const;
 	bool IsAtFrontOfQueue(const ACustomer* Customer) const;
 
 	ACustomer* GetFrontOfQueue() const;
