@@ -15,7 +15,7 @@
 UPerkManager* FarmFPSUtilities::GetPlayerPerkManager(const UObject* WorldContextObject)
 {
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(WorldContextObject, 0);
-	if (ensure(IsValid(playerController)) && ensure(IsValid(playerController->GetPawn())))
+;	if (ensure(IsValid(playerController)) && ensure(IsValid(playerController->GetPawn())))
 	{
 		return playerController->GetPawn()->FindComponentByClass<UPerkManager>();
 	}

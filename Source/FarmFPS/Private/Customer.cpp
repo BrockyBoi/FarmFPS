@@ -162,7 +162,7 @@ void ACustomer::MoveToBreadStand()
 	_reachedSpotInQueue = false;
 	if (ensure(IsValid(_aiController)))
 	{
-		_aiController->MoveToLocation(_nextDestination, _moveAcceptanceRadius * 10);
+		_aiController->MoveToLocation(_nextDestination, _moveAcceptanceRadius * 10, true, true, true);
 	}
 }
 
@@ -172,7 +172,7 @@ void ACustomer::MoveToNextSpotInQueue(const FVector& nextSpot)
 	_reachedSpotInQueue = false;
 	if (ensure(IsValid(_aiController)))
 	{
-		_aiController->MoveToLocation(_nextDestination, _moveAcceptanceRadius);
+		_aiController->MoveToLocation(_nextDestination, _moveAcceptanceRadius, true, true, true);
 	}
 }
 
@@ -181,6 +181,6 @@ void ACustomer::MoveOutOfMap()
 	if (ensure(IsValid(_aiController)))
 	{
 		_aiController->ReceiveMoveCompleted.AddDynamic(this, &ACustomer::OnMoveFinishedOutOfMap);
-		_aiController->MoveToLocation(_startLocation, _moveAcceptanceRadius);
+		_aiController->MoveToLocation(_startLocation, _moveAcceptanceRadius, true, true, true);
 	}
 }

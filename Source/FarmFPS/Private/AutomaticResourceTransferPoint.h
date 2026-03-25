@@ -38,7 +38,7 @@ protected:
 
 	TWeakObjectPtr<UResourceInventory> _inventory = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ResourceType."), meta = (EditCondition = "_givesResources == false", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ResourceType."), meta = (EditCondition = "_givesResources == false", EditConditionHides), BlueprintReadOnly)
 	FGameplayTagContainer _resourcesAllowed;
 
 	UPROPERTY(EditDefaultsOnly)
