@@ -16,6 +16,7 @@
 class UInputComponent;
 class USkeletalMeshComponent;
 class UCameraComponent;
+class AConstantCropAffectorArea;
 class UInputAction;
 class USphereComponent;
 struct FInputActionValue;
@@ -44,9 +45,17 @@ protected:
 	UPROPERTY(EditAnywhere, Category ="Input")
 	UInputAction* JumpAction;
 
-	/** Jump Input Action */
+	/** Ground Slam Input Action */
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* GroundSlamAction;
+
+	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* SpawnWaterAffectorAction;
+
+	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* SpawnLightAffectorAction;
 
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, Category ="Input")
@@ -71,6 +80,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
 	float _timeToReachGround = .75f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Affectors")
+	TSubclassOf<AConstantCropAffectorArea> _waterAffectorClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Affectors")
+	TSubclassOf<AConstantCropAffectorArea> _lightAffectorClass;
 
 	UPROPERTY(EditAnywhere)
 	USphereComponent* _groundSlamSphereCollider;
@@ -109,23 +124,22 @@ protected:
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpEnd();
 
+	void OnPressSpawnWaterAffector();
+	void OnPressSpawnLightAffector();
+
 	void DoGroundSlamStart();
 	void DoGroundSlamEnd();
 
 protected:
-
 	/** Set up input action bindings */
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode = 0) override;
-	
 
 public:
-
 	/** Returns the first person mesh **/
 	USkeletalMeshComponent* GetFirstPersonMesh() const { return FirstPersonMesh; }
 
 	/** Returns first person camera component **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
-
 };
 

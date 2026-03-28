@@ -29,10 +29,10 @@ protected:
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 	UFUNCTION()
-	virtual void OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, int amount);
+	virtual void OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, float amount);
 
 	UFUNCTION()
-	virtual void OnOutputInventoryResourceCountChanged(const FGameplayTag& resourceType, int amount);
+	virtual void OnOutputInventoryResourceCountChanged(const FGameplayTag& resourceType, float amount);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UAutomaticResourceTransferPoint* _resourceInputPoint = nullptr;

@@ -38,7 +38,7 @@ void AResourceConverterStationActor::TryConvertLimitedAmount(int amountToCraft)
 	}
 }
 
-void AResourceConverterStationActor::OnInputInventoryResourceCountChanged(const FGameplayTag&, int)
+void AResourceConverterStationActor::OnInputInventoryResourceCountChanged(const FGameplayTag&, float)
 {
 	if (_automaticallyConvertResources)
 	{

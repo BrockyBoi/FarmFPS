@@ -38,10 +38,10 @@ void AInputOutputStationActor::EndPlay(EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-void AInputOutputStationActor::OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, int amount)
+void AInputOutputStationActor::OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, float amount)
 {
 }
 
-void AInputOutputStationActor::OnOutputInventoryResourceCountChanged(const FGameplayTag& resourceType, int amount)
+void AInputOutputStationActor::OnOutputInventoryResourceCountChanged(const FGameplayTag& resourceType, float amount)
 {
 }

@@ -12,7 +12,7 @@ void UResourceInventory::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UResourceInventory::AddResource(const FGameplayTag& resourceType, int amount)
+void UResourceInventory::AddResource(const FGameplayTag& resourceType, float amount)
 {
 	if (amount > 0)
 	{
@@ -22,7 +22,17 @@ void UResourceInventory::AddResource(const FGameplayTag& resourceType, int amoun
 	}
 }
 
-void UResourceInventory::RemoveResource(const FGameplayTag& resourceType, int amount)
+void UResourceInventory::SetResourceCap(const FGameplayTag& resourceType, float cap)
+{
+	if (cap > 0)
+	{
+		CheckInitializeMap(resourceType);
+
+		_resourceCaps[resourceType] = cap;
+	}
+}
+
+void UResourceInventory::RemoveResource(const FGameplayTag& resourceType, float amount)
 {
 	if (amount > 0)
 	{
@@ -35,7 +45,7 @@ void UResourceInventory::RemoveResource(const FGameplayTag& resourceType, int am
 	}
 }
 
-void UResourceInventory::SetResourceAmount(const FGameplayTag& resourceType, uint16 newAmount)
+void UResourceInventory::SetResourceAmount(const FGameplayTag& resourceType, float newAmount)
 {
 	CheckInitializeMap(resourceType);
 
@@ -58,12 +68,12 @@ void UResourceInventory::AddAllResourcesInInventory(UResourceInventory* otherInv
 	}
 }
 
-bool UResourceInventory::CanAddResource(const FGameplayTag& resourceType, uint16 amount) const
+bool UResourceInventory::CanAddResource(const FGameplayTag& resourceType, float amount) const
 {
 	return GetResourceCount(resourceType) + amount <= GetResourceCap(resourceType);
 }
 
-int UResourceInventory::GetResourceCount(const FGameplayTag& resourceType) const
+float UResourceInventory::GetResourceCount(const FGameplayTag& resourceType) const
 {
 	if (_resourcesMap.Contains(resourceType))
 	{
@@ -73,14 +83,14 @@ int UResourceInventory::GetResourceCount(const FGameplayTag& resourceType) const
 	return 0;
 }
 
-bool UResourceInventory::HasResourceAmount(const FGameplayTag& resourceType, int amount) const
+bool UResourceInventory::HasResourceAmount(const FGameplayTag& resourceType, float amount) const
 {
 	return GetResourceCount(resourceType) >= amount;
 }
 
 uint16 UResourceInventory::GetResourceCap(const FGameplayTag& resourceType) const
 {
-	return _resourceCaps.Contains(resourceType) ? _resourceCaps[resourceType] : 999;
+	return _resourceCaps.Contains(resourceType)  && _resourceCaps[resourceType] > 0 ? _resourceCaps[resourceType] : 999;
 }
 
 void UResourceInventory::CheckInitializeMap(const FGameplayTag& resourceType)
@@ -88,6 +98,11 @@ void UResourceInventory::CheckInitializeMap(const FGameplayTag& resourceType)
 	if (!_resourcesMap.Contains(resourceType))
 	{
 		_resourcesMap.Add(resourceType, 0);
+	}
+
+	if (!_resourceCaps.Contains(resourceType))
+	{
+		_resourceCaps.Add(resourceType, 0);
 	}
 }
 

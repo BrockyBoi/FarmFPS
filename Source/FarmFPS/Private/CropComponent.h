@@ -8,11 +8,13 @@
 // UE
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameplayTagContainer.h"
 
 // Generated
 #include "CropComponent.generated.h"
 
 class AResourcePickupActor;
+class UResourceInventory;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UCropComponent : public UActorComponent
@@ -24,30 +26,33 @@ public:
 	UCropComponent();
 
 	UFUNCTION(BlueprintCallable)
-	void AddWater(float waterAmount);
+	void AddCropResourceValue(const FGameplayTag& resourceType, float amount);
 
-	UFUNCTION(BlueprintCallable)
-	void AddLight(float lightAmount);
-
-	UFUNCTION(BlueprintPure)
-	float GetCurrentWaterLevel() const { return _currentWaterLevel; }
+	UResourceInventory* GetResourceInventory() const { return _cropResourcesInventory; }
 
 	UFUNCTION(BlueprintPure)
-	float GetCurrentLightLevel() const { return _currentLightLevel; }
+	int GetCurrentWaterLevel() const;
 
 	UFUNCTION(BlueprintPure)
-	float GetWaterLeft() const { return _cropData.WaterNeeded - _currentWaterLevel; }
+	int GetCurrentLightLevel() const;
 
 	UFUNCTION(BlueprintPure)
-	float GetWaterPercentage() const { return _currentWaterLevel / _cropData.WaterNeeded; }
+	float GetWaterLeft() const { return _cropData.WaterNeeded - GetCurrentWaterLevel(); }
 
 	UFUNCTION(BlueprintPure)
-	float GetLightPercentage() const { return _currentLightLevel / _cropData.LightNeeded; }
+	float GetWaterPercentage() const { return GetCurrentWaterLevel() / (float)_cropData.WaterNeeded; }
 
 	UFUNCTION(BlueprintPure)
-	float GetLightLeft() const { return _cropData.LightNeeded - _currentLightLevel; }
+	float GetLightPercentage() const { return GetCurrentLightLevel() / (float)_cropData.LightNeeded; }
+
+	UFUNCTION(BlueprintPure)
+	float GetLightLeft() const { return _cropData.LightNeeded - GetCurrentLightLevel(); }
 
 	bool IsCropReadyToBreak() const;
+
+	DECLARE_MULTICAST_DELEGATE(FOnCropBreakEvent);
+
+	FOnCropBreakEvent OnCropBreak;
 
 	void BreakCrop();
 
@@ -57,8 +62,13 @@ protected:
 
 	void AffectGrowth();
 
+	UFUNCTION()
+	void OnBreakCropTimerEnd();
+
 	UPROPERTY(EditDefaultsOnly)
 	FCropData _cropData;
+
+	UResourceInventory* _cropResourcesInventory = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Crop Yield")
 	TSubclassOf<AResourcePickupActor> _cropYieldPickupClass;
@@ -69,6 +79,5 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	bool _breakCropOnFull = false;
 
-	float _currentWaterLevel = 0.f;
-	float _currentLightLevel = 0.f;
+	bool _isBroken = false;
 };

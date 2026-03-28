@@ -3,6 +3,7 @@
 #include "FarmFPSCharacter.h"
 
 // Brock
+#include "ConstantCropAffectorArea.h"
 #include "CropComponent.h"
 
 // UE
@@ -103,6 +104,9 @@ void AFarmFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFarmFPSCharacter::LookInput);
 		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &AFarmFPSCharacter::LookInput);
 
+		EnhancedInputComponent->BindAction(SpawnWaterAffectorAction, ETriggerEvent::Started, this, &AFarmFPSCharacter::OnPressSpawnWaterAffector);
+		EnhancedInputComponent->BindAction(SpawnLightAffectorAction, ETriggerEvent::Started, this, &AFarmFPSCharacter::OnPressSpawnLightAffector);
+
 		EnhancedInputComponent->BindAction(GroundSlamAction, ETriggerEvent::Started, this, &AFarmFPSCharacter::DoGroundSlamStart);
 		EnhancedInputComponent->BindAction(GroundSlamAction, ETriggerEvent::Completed, this, &AFarmFPSCharacter::DoGroundSlamEnd);
 	}
@@ -173,6 +177,24 @@ void AFarmFPSCharacter::DoJumpEnd()
 {
 	// pass StopJumping to the character
 	StopJumping();
+}
+
+void AFarmFPSCharacter::OnPressSpawnWaterAffector()
+{
+	if (ensure(IsValid(_waterAffectorClass)))
+	{
+		FActorSpawnParameters SpawnParams;
+		GetWorld()->SpawnActor<AConstantCropAffectorArea>(_waterAffectorClass, GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
+	}
+}
+
+void AFarmFPSCharacter::OnPressSpawnLightAffector()
+{
+	if (ensure(IsValid(_lightAffectorClass)))
+	{
+		FActorSpawnParameters SpawnParams;
+		GetWorld()->SpawnActor<AConstantCropAffectorArea>(_lightAffectorClass, GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
+	}
 }
 
 void AFarmFPSCharacter::DoGroundSlamStart()

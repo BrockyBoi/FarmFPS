@@ -3,7 +3,7 @@
 #pragma once
 
 // Brock
-#include "CropData.h"
+#include "ModifiedValueData.h"
 
 // Shooter
 #include "ShooterProjectile.h"
@@ -40,9 +40,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	USphereComponent* _cropCollider = nullptr;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Crop Resource")
-	ECropResourceType _cropResourceType;
+	UPROPERTY(EditDefaultsOnly, Category = "Crop Resource", meta = (Categories = "CropResourceType."))
+	FGameplayTag _cropResourceType;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Crop Resource")
-	float _resourceAmount = 1.f;
+	FModifiedFloatValue _resourceAmount = 1.f;
 };

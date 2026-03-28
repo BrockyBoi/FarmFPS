@@ -33,7 +33,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, int amount) override;
+	virtual void OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, float amount) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UCustomerQueue* _customerQueue;

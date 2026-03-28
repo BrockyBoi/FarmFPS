@@ -35,7 +35,7 @@ const FModifiedResourceValue ABreadStand::GetPriceForResource(const FGameplayTag
 	return FModifiedResourceValue();
 }
 
-void ABreadStand::OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, int amount)
+void ABreadStand::OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, float amount)
 {
 	if (_isCurrentlySellingBreadToCustomer)
 	{

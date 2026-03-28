@@ -8,7 +8,9 @@
 #include "PerkModifierTypeTags.h"
 #include "ObjectiveManager.h"
 #include "ObjectiveTypeTags.h"
+#include "ResourceInventory.h"
 #include "ResourcePickupActor.h"
+#include "ResourceTypeTags.h"
 
 UCropComponent::UCropComponent()
 {
@@ -25,28 +27,51 @@ void UCropComponent::BeginPlay()
 		objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::PlantCrop, _cropData.ResourceType);
 	}
 
+	if (ensure(IsValid(GetOwner())))
+	{
+		_cropResourcesInventory = GetOwner()->FindComponentByClass<UResourceInventory>();
+		if (ensure(IsValid(_cropResourcesInventory)))
+		{
+			_cropResourcesInventory->SetResourceCap(ResourceTypeTags::Water, _cropData.WaterNeeded);
+			_cropResourcesInventory->SetResourceCap(ResourceTypeTags::Light, _cropData.LightNeeded);
+		}
+	}
+
 	AffectGrowth();
 }
 
-void UCropComponent::AddWater(float waterAmount)
+void UCropComponent::AddCropResourceValue(const FGameplayTag& resourceType, float amount)
 {
-	_currentWaterLevel = FMath::Clamp(_currentWaterLevel + waterAmount, 0.f, _cropData.WaterNeeded);
-	AffectGrowth();
+	if (ensure(IsValid(_cropResourcesInventory)))
+	{
+		_cropResourcesInventory->AddResource(resourceType, amount);
+
+		AffectGrowth();
+	}
 }
 
-void UCropComponent::AddLight(float lightAmount)
+int UCropComponent::GetCurrentWaterLevel() const
 {
-	_currentLightLevel = FMath::Clamp(_currentLightLevel + lightAmount, 0.f, _cropData.LightNeeded);
-	AffectGrowth();
+	return ensure(IsValid(_cropResourcesInventory)) ? _cropResourcesInventory->GetResourceCount(ResourceTypeTags::Water) : 0;
+}
+
+int UCropComponent::GetCurrentLightLevel() const
+{
+	return ensure(IsValid(_cropResourcesInventory)) ? _cropResourcesInventory->GetResourceCount(ResourceTypeTags::Light) : 0;
 }
 
 bool UCropComponent::IsCropReadyToBreak() const
 {
-	return _currentLightLevel >= _cropData.LightNeeded && _currentWaterLevel >= _cropData.WaterNeeded;
+	return GetCurrentLightLevel() >= _cropData.LightNeeded && GetCurrentWaterLevel() >= _cropData.WaterNeeded;
 }
 
 void UCropComponent::BreakCrop()
 {
+	if (_isBroken)
+	{
+		return;
+	}
+
 	if (ensure(IsValid(GetWorld())) && ensure(IsValid(GetOwner())) && ensure(IsValid(_cropYieldPickupClass)))
 	{
 		UPerkManager* perkManager = FarmFPSUtilities::GetPlayerPerkManager(this);
@@ -54,6 +79,8 @@ void UCropComponent::BreakCrop()
 		{
 			return;
 		}
+
+		_isBroken = true;
 
 		int countToDrop = perkManager->ModifyValueByPerks(PerkModifierTypeTags::MoreCropYield, _cropData.NumberOfPickupsToDrop);
 		for (int i = 0; i < countToDrop; i++)
@@ -79,7 +106,14 @@ void UCropComponent::BreakCrop()
 			objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::FinishCrop, _cropData.ResourceType);
 		}
 
+		if (OnCropBreak.IsBound())
+		{
+			OnCropBreak.Broadcast();
+		}
+
 		GetOwner()->Destroy();
+		//FTimerHandle handle;
+		//GetWorld()->GetTimerManager().SetTimer(handle, this, &UCropComponent::OnBreakCropTimerEnd, .1f, false);
 	}
 }
 
@@ -87,8 +121,10 @@ void UCropComponent::AffectGrowth()
 {
 	if (ensure(IsValid(GetOwner())))
 	{
-		float waterGrowthRatio = _currentWaterLevel / _cropData.WaterNeeded;
-		float lightGrowthRatio = _currentLightLevel / _cropData.LightNeeded;
+		int water = GetCurrentWaterLevel();
+		int light = GetCurrentLightLevel();
+		float waterGrowthRatio = water / (float)_cropData.WaterNeeded;
+		float lightGrowthRatio = light / (float)_cropData.LightNeeded;
 		float scaleAmount = FMath::Lerp(_cropData.StartingScaleSize, _cropData.FinalScaleSize, (waterGrowthRatio + lightGrowthRatio) / 2);
 
 		UStaticMeshComponent* cropMesh = GetOwner()->FindComponentByClass<UStaticMeshComponent>();
@@ -102,5 +138,10 @@ void UCropComponent::AffectGrowth()
 			BreakCrop();
 		}
 	}
+}
+
+void UCropComponent::OnBreakCropTimerEnd()
+{
+	GetOwner()->Destroy();
 }
 

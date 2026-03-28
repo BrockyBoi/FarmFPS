@@ -19,25 +19,27 @@ public:
 	UResourceInventory();
 
 	UFUNCTION(BlueprintCallable)
-	void AddResource(const FGameplayTag& resourceType, int amount);
+	void AddResource(const FGameplayTag& resourceType, float amount);
+
+	void SetResourceCap(const FGameplayTag& resourceType, float cap);
 
 	UFUNCTION(BlueprintCallable)
-	void RemoveResource(const FGameplayTag& resourceType, int amount);
-	void SetResourceAmount(const FGameplayTag& resourceType, uint16 amount);
+	void RemoveResource(const FGameplayTag& resourceType, float amount);
+	void SetResourceAmount(const FGameplayTag& resourceType, float amount);
 
 	void AddAllResourcesInInventory(UResourceInventory* otherInventory);
 
-	bool CanAddResource(const FGameplayTag& resourceType, uint16 amount) const;
+	bool CanAddResource(const FGameplayTag& resourceType, float amount) const;
 
 	UFUNCTION(BlueprintPure)
-	int GetResourceCount(const FGameplayTag& resourceType) const;
+	float GetResourceCount(const FGameplayTag& resourceType) const;
 
 	UFUNCTION(BlueprintPure)
-	bool HasResourceAmount(const FGameplayTag& resourceType, int amount) const;
+	bool HasResourceAmount(const FGameplayTag& resourceType, float amount) const;
 
 	uint16 GetResourceCap(const FGameplayTag& resourceType) const;
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnResourceCountChangedEvent, const FGameplayTag&, resourceType, int, newAmount);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnResourceCountChangedEvent, const FGameplayTag&, resourceType, float, newAmount);
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnResourceCountChangedEvent OnResourceCountChanged;
@@ -48,8 +50,8 @@ protected:
 private:
 	void CheckInitializeMap(const FGameplayTag& cropType);
 
-	TMap<FGameplayTag, uint16> _resourcesMap;
+	TMap<FGameplayTag, float> _resourcesMap;
 
 	UPROPERTY(EditDefaultsOnly)
-	TMap<FGameplayTag, uint16> _resourceCaps;
+	TMap<FGameplayTag, float> _resourceCaps;
 };
