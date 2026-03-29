@@ -6,6 +6,7 @@
 #include "BreadStand.h"
 #include "CustomerQueue.h"
 #include "CustomerSpawnerManager.h"
+#include "DayNightCycleManager.h"
 #include "FarmFPSUtilities.h"
 #include "ObjectiveManager.h"
 #include "ObjectiveTypeTags.h"
@@ -44,6 +45,23 @@ void ACustomer::BeginPlay()
 	{
 		movement->MaxWalkSpeed = _customerMoveSpeed.GetModifiedValue(this);
 	}
+
+	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightCycle)))
+	{
+		dayNightCycle->OnDayEnd.AddUObject(this, &ACustomer::OnDayEnd);
+	}
+}
+
+void ACustomer::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (IsValid(dayNightCycle))
+	{
+		dayNightCycle->OnDayEnd.RemoveAll(this);
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 void ACustomer::PossessedBy(AController* NewController)
@@ -103,6 +121,11 @@ void ACustomer::OnMoveFinishedInQueue(FAIRequestID RequestID, EPathFollowingResu
 		FTimerHandle timerDel;
 		GetWorld()->GetTimerManager().SetTimer(timerDel, this, &ACustomer::FindSpotInQueue, 1.f, false);
 	}
+}
+
+void ACustomer::OnDayEnd()
+{
+	MoveOutOfMap();
 }
 
 void ACustomer::AttemptBuyBreadAtFrontOfQueue()

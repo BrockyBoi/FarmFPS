@@ -39,6 +39,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason);
+
 	virtual void PossessedBy(AController* NewController) override;
 
 	UFUNCTION()
@@ -50,6 +52,8 @@ protected:
 	UFUNCTION()
 	void OnMoveFinishedInQueue(FAIRequestID RequestID, EPathFollowingResult::Type Result);
 
+	UFUNCTION()
+	void OnDayEnd();
 
 	UPROPERTY(EditDefaultsOnly, meta = (Categories = "CustomerType."))
 	FGameplayTag _customerType;

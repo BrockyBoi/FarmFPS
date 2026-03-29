@@ -59,11 +59,17 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason);
 
 	void AffectGrowth();
 
 	UFUNCTION()
+	void OnDayEnd();
+
+	UFUNCTION()
 	void OnBreakCropTimerEnd();
+
+	void DestroyCrop();
 
 	UPROPERTY(EditDefaultsOnly)
 	FCropData _cropData;

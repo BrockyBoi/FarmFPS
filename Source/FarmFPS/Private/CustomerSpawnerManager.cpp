@@ -4,6 +4,8 @@
 
 // Brock
 #include "Customer.h"
+#include "DayNightCycleManager.h"
+#include "FarmFPSUtilities.h"
 
 UCustomerSpawnerManager::UCustomerSpawnerManager()
 {
@@ -13,6 +15,11 @@ UCustomerSpawnerManager::UCustomerSpawnerManager()
 bool UCustomerSpawnerManager::IsRoomForNewCustomer() const
 {
 	return _currentCustomersOnScreen < _totalCustomersAllowedOnScreenAtOnce.GetModifiedValue(this);
+}
+
+bool UCustomerSpawnerManager::IsSpawnTimerActive() const
+{
+	return ensure(IsValid(GetWorld())) ? GetWorld()->GetTimerManager().IsTimerActive(_spawnTimer) : false;
 }
 
 void UCustomerSpawnerManager::OnCustomerLeaveMap()
@@ -34,6 +41,25 @@ void UCustomerSpawnerManager::BeginPlay()
 	{
 		GetWorld()->GetTimerManager().SetTimer(_spawnTimer, this, &UCustomerSpawnerManager::AttemptSpawnCustomer, _spawnRate.GetModifiedValue(this), true);
 	}
+
+	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightCycle)))
+	{
+		dayNightCycle->OnDayBegin.AddUObject(this, &UCustomerSpawnerManager::OnDayBegin);
+		dayNightCycle->OnDayEnd.AddUObject(this, &UCustomerSpawnerManager::OnDayEnd);
+	}
+}
+
+void UCustomerSpawnerManager::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (IsValid(dayNightCycle))
+	{
+		dayNightCycle->OnDayBegin.RemoveAll(this);
+		dayNightCycle->OnDayEnd.RemoveAll(this);
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 const FGameplayTag& UCustomerSpawnerManager::GetNextCustomerTypeToSpawn() const
@@ -61,6 +87,22 @@ const TSubclassOf<ACustomer> UCustomerSpawnerManager::GetNextCustomerSpawnClass(
 	}
 
 	return TSubclassOf<ACustomer>();
+}
+
+void UCustomerSpawnerManager::OnDayBegin()
+{
+	if (ensure(IsValid(GetWorld())) && !IsSpawnTimerActive())
+	{
+		GetWorld()->GetTimerManager().SetTimer(_spawnTimer, this, &UCustomerSpawnerManager::AttemptSpawnCustomer, _spawnRate.GetModifiedValue(this), true);
+	}
+}
+
+void UCustomerSpawnerManager::OnDayEnd()
+{
+	if (ensure(IsValid(GetWorld())))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(_spawnTimer);
+	}
 }
 
 void UCustomerSpawnerManager::AttemptSpawnCustomer()

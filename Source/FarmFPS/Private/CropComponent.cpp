@@ -3,6 +3,7 @@
 #include "CropComponent.h"
 
 // Brock
+#include "DayNightCycleManager.h"
 #include "FarmFPSUtilities.h"
 #include "PerkManager.h"
 #include "PerkModifierTypeTags.h"
@@ -37,7 +38,24 @@ void UCropComponent::BeginPlay()
 		}
 	}
 
+	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightCycle)))
+	{
+		dayNightCycle->OnDayEnd.AddUObject(this, &UCropComponent::OnDayEnd);
+	}
+
 	AffectGrowth();
+}
+
+void UCropComponent::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (IsValid(dayNightCycle))
+	{
+		dayNightCycle->OnDayEnd.RemoveAll(this);
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 void UCropComponent::AddCropResourceValue(const FGameplayTag& resourceType, float amount)
@@ -111,9 +129,9 @@ void UCropComponent::BreakCrop()
 			OnCropBreak.Broadcast();
 		}
 
-		GetOwner()->Destroy();
-		//FTimerHandle handle;
-		//GetWorld()->GetTimerManager().SetTimer(handle, this, &UCropComponent::OnBreakCropTimerEnd, .1f, false);
+		//GetOwner()->Destroy();
+		FTimerHandle handle;
+		GetWorld()->GetTimerManager().SetTimer(handle, this, &UCropComponent::OnBreakCropTimerEnd, .1f, false);
 	}
 }
 
@@ -140,8 +158,21 @@ void UCropComponent::AffectGrowth()
 	}
 }
 
+void UCropComponent::OnDayEnd()
+{
+	DestroyCrop();
+}
+
 void UCropComponent::OnBreakCropTimerEnd()
 {
-	GetOwner()->Destroy();
+	DestroyCrop();
+}
+
+void UCropComponent::DestroyCrop()
+{
+	if (ensure(IsValid(GetOwner())))
+	{
+		GetOwner()->Destroy();
+	}
 }
 

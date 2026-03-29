@@ -2,6 +2,9 @@
 
 #include "ResourcePickupActor.h"
 
+// Modules
+#include "FarmFPSCharacter.h"
+
 //Brock
 #include "FarmFPSUtilities.h"
 #include "ObjectiveManager.h"
@@ -70,15 +73,15 @@ void AResourcePickupActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, _startingHeight + FMath::Sin(GetWorld()->GetTimeSeconds() * _bounceRate * _bounceVariance) * 10.f));
 	AddActorLocalRotation(FRotator(0.f, _rotationRate * DeltaTime * _rotationVariance, 0.f));
 }
 
 void AResourcePickupActor::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (IsValid(OtherActor))
+	AFarmFPSCharacter* player = Cast<AFarmFPSCharacter>(OtherActor);
+	if (IsValid(player))
 	{
-		UResourceInventory* inventory = OtherActor->FindComponentByClass<UResourceInventory>();
+		UResourceInventory* inventory = player->FindComponentByClass<UResourceInventory>();
 		if (IsValid(inventory) && inventory->CanAddResource(_cropType, _yieldAmount))
 		{
 			inventory->AddResource(_cropType, _yieldAmount);

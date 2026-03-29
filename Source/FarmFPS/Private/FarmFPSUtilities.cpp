@@ -5,6 +5,7 @@
 // Brock
 #include "BreadStand.h"
 #include "CustomerSpawnerManager.h"
+#include "DayNightCycleManager.h"
 #include "ObjectiveManager.h"
 #include "PerkManager.h"
 
@@ -68,6 +69,26 @@ UCustomerSpawnerManager* FarmFPSUtilities::GetCustomerSpawnerManager(const UObje
 		if (ensure(IsValid(customerSpawnerManager)))
 		{
 			return customerSpawnerManager;
+		}
+	}
+
+	return nullptr;
+}
+
+UDayNightCycleManager* FarmFPSUtilities::GetDayNightCycleManager(const UObject* WorldContextObject)
+{
+	if (!ensure(IsValid(WorldContextObject)))
+	{
+		return nullptr;
+	}
+
+	AGameStateBase* gameState = WorldContextObject->GetWorld()->GetGameState();
+	if (ensure(IsValid(gameState)))
+	{
+		UDayNightCycleManager* objectiveManager = gameState->FindComponentByClass<UDayNightCycleManager>();
+		if (ensure(IsValid(objectiveManager)))
+		{
+			return objectiveManager;
 		}
 	}
 

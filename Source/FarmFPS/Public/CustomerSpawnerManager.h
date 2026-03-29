@@ -43,13 +43,21 @@ public:
 	void OnCustomerLeaveMap();
 
 	bool IsRoomForNewCustomer() const;
+	bool IsSpawnTimerActive() const;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 	const FGameplayTag& GetNextCustomerTypeToSpawn() const;
 	const TSubclassOf<ACustomer> GetNextCustomerSpawnClass(const FGameplayTag& customerType);
+
+	UFUNCTION()
+	void OnDayBegin();
+	
+	UFUNCTION()
+	void OnDayEnd();
 
 	UFUNCTION()
 	void AttemptSpawnCustomer();
