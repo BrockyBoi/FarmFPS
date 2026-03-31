@@ -45,10 +45,15 @@ public:
 	FOnResourceCountChangedEvent OnResourceCountChanged;
 
 protected:
-	virtual void BeginPlay() override;		
+	virtual void BeginPlay() override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 private:
+	UFUNCTION()
+	void OnDayEnd();
+
 	void CheckInitializeMap(const FGameplayTag& cropType);
+	void ClearAllExceptMoney();
 
 	TMap<FGameplayTag, float> _resourcesMap;
 

@@ -1,7 +1,11 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-
 #include "ShooterWeapon.h"
+
+// Brock
+#include "ModifiedValueData.h"
+
+// UE
 #include "Kismet/KismetMathLibrary.h"
 #include "Engine/World.h"
 #include "ShooterProjectile.h"
@@ -91,6 +95,11 @@ void AShooterWeapon::DeactivateWeapon()
 
 void AShooterWeapon::StartFiring()
 {
+	if (CurrentBullets <= 0 || bIsReloading)
+	{
+		return;
+	}
+
 	// raise the firing flag
 	bIsFiring = true;
 
@@ -110,7 +119,6 @@ void AShooterWeapon::StartFiring()
 		{
 			GetWorld()->GetTimerManager().SetTimer(RefireTimer, this, &AShooterWeapon::Fire, TimeSinceLastShot, false);
 		}
-
 	}
 }
 
@@ -126,7 +134,7 @@ void AShooterWeapon::StopFiring()
 void AShooterWeapon::Fire()
 {
 	// ensure the player still wants to fire. They may have let go of the trigger
-	if (!bIsFiring)
+	if (!bIsFiring || CurrentBullets <= 0 || bIsReloading)
 	{
 		return;
 	}
@@ -151,6 +159,30 @@ void AShooterWeapon::Fire()
 		GetWorld()->GetTimerManager().SetTimer(RefireTimer, this, &AShooterWeapon::FireCooldownExpired, RefireRate, false);
 
 	}
+}
+
+void AShooterWeapon::StartReload()
+{
+	if (!bIsReloading)
+	{
+		bIsFiring = false;
+		bIsReloading = true;
+
+		CurrentBullets = 0;
+		WeaponOwner->UpdateWeaponHUD(CurrentBullets, MagazineSize);
+
+		GetWorld()->GetTimerManager().SetTimer(ReloadTimer, this, &AShooterWeapon::OnReloadFinish, ReloadTime.GetModifiedValue(this), false);
+	}
+}
+
+void AShooterWeapon::OnReloadFinish()
+{
+	bIsReloading = false;
+
+	CurrentBullets = MagazineSize;
+
+	// update the weapon HUD
+	WeaponOwner->UpdateWeaponHUD(CurrentBullets, MagazineSize);
 }
 
 void AShooterWeapon::FireCooldownExpired()
@@ -185,7 +217,7 @@ void AShooterWeapon::FireProjectile(const FVector& TargetLocation)
 	// if the clip is depleted, reload it
 	if (CurrentBullets <= 0)
 	{
-		CurrentBullets = MagazineSize;
+		StartReload();
 	}
 
 	// update the weapon HUD

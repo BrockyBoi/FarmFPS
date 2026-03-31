@@ -55,8 +55,9 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		// Switch weapon
 		EnhancedInputComponent->BindAction(SwitchWeaponAction, ETriggerEvent::Triggered, this, &AShooterCharacter::DoSwitchWeapon);
-	}
 
+		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AShooterCharacter::DoReload);
+	}
 }
 
 float AShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -163,6 +164,14 @@ void AShooterCharacter::DoSwitchWeapon()
 
 		// activate the new weapon
 		CurrentWeapon->ActivateWeapon();
+	}
+}
+
+void AShooterCharacter::DoReload()
+{
+	if (!IsDead() && OwnedWeapons.Num() > 1 && ensure(IsValid(CurrentWeapon)) && CurrentWeapon->GetBulletCount() > 0)
+	{
+		CurrentWeapon->StartReload();
 	}
 }
 

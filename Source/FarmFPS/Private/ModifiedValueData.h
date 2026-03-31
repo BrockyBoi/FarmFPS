@@ -13,7 +13,7 @@
 #include "ModifiedValueData.generated.h"
 
 USTRUCT(BlueprintType)
-struct FModifiedIntValue
+struct FARMFPS_API FModifiedIntValue
 {
 	GENERATED_BODY()
 
@@ -47,7 +47,7 @@ protected:
 };
 
 USTRUCT(BlueprintType)
-struct FModifiedFloatValue
+struct FARMFPS_API FModifiedFloatValue
 {
 	GENERATED_BODY()
 
@@ -82,7 +82,7 @@ protected:
 
 
 USTRUCT(BlueprintType)
-struct FModifiedResourceValue
+struct FARMFPS_API FModifiedResourceValue
 {
 	GENERATED_BODY()
 

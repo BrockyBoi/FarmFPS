@@ -2,6 +2,11 @@
 
 #include "ResourceInventory.h"
 
+// Brock
+#include "DayNightCycleManager.h"
+#include "FarmFPSUtilities.h"
+#include "ResourceTypeTags.h"
+
 UResourceInventory::UResourceInventory()
 {
 	PrimaryComponentTick.bCanEverTick = false;
@@ -10,6 +15,22 @@ UResourceInventory::UResourceInventory()
 void UResourceInventory::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightCycle)))
+	{
+		dayNightCycle->OnDayEnd.AddUObject(this, &UResourceInventory::OnDayEnd);
+	}
+}
+
+void UResourceInventory::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (IsValid(dayNightCycle))
+	{
+		dayNightCycle->OnDayEnd.RemoveAll(this);
+	}
+	Super::EndPlay(EndPlayReason);
 }
 
 void UResourceInventory::AddResource(const FGameplayTag& resourceType, float amount)
@@ -93,6 +114,11 @@ uint16 UResourceInventory::GetResourceCap(const FGameplayTag& resourceType) cons
 	return _resourceCaps.Contains(resourceType)  && _resourceCaps[resourceType] > 0 ? _resourceCaps[resourceType] : 999;
 }
 
+void UResourceInventory::OnDayEnd()
+{
+	ClearAllExceptMoney();
+}
+
 void UResourceInventory::CheckInitializeMap(const FGameplayTag& resourceType)
 {
 	if (!_resourcesMap.Contains(resourceType))
@@ -103,6 +129,18 @@ void UResourceInventory::CheckInitializeMap(const FGameplayTag& resourceType)
 	if (!_resourceCaps.Contains(resourceType))
 	{
 		_resourceCaps.Add(resourceType, 0);
+	}
+}
+
+void UResourceInventory::ClearAllExceptMoney()
+{
+	for (auto pair : _resourcesMap)
+	{
+		const FGameplayTag& resourceType = pair.Key;
+		if (!resourceType.MatchesTag(ResourceTypeTags::Money))
+		{
+			SetResourceAmount(resourceType, 0);
+		}
 	}
 }
 

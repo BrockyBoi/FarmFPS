@@ -6,6 +6,7 @@
 #include "FarmFPSCharacter.h"
 
 //Brock
+#include "DayNightCycleManager.h"
 #include "FarmFPSUtilities.h"
 #include "ObjectiveManager.h"
 #include "ObjectiveTypeTags.h"
@@ -52,6 +53,12 @@ void AResourcePickupActor::BeginPlay()
 	{
 		_capsuleCollider->OnComponentHit.AddDynamic(this, &AResourcePickupActor::OnCapsuleColliderHit);
 	}
+
+	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightCycle)))
+	{
+		dayNightCycle->OnDayEnd.AddUObject(this, &AResourcePickupActor::OnDayEnd);
+	}
 }
 
 void AResourcePickupActor::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -64,6 +71,12 @@ void AResourcePickupActor::EndPlay(EEndPlayReason::Type EndPlayReason)
 	if (IsValid(_capsuleCollider))
 	{
 		_capsuleCollider->OnComponentHit.RemoveAll(this);
+	}
+
+	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (IsValid(dayNightCycle))
+	{
+		dayNightCycle->OnDayEnd.RemoveAll(this);
 	}
 
 	Super::EndPlay(EndPlayReason);
@@ -103,5 +116,10 @@ void AResourcePickupActor::OnCapsuleColliderHit(UPrimitiveComponent* HitComp, AA
 	{
 		//_capsuleCollider->SetSimulatePhysics(false);
 	}
+}
+
+void AResourcePickupActor::OnDayEnd()
+{
+	Destroy();
 }
 

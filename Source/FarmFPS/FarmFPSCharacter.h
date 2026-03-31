@@ -20,6 +20,7 @@ class AConstantCropAffectorArea;
 class UInputAction;
 class USphereComponent;
 struct FInputActionValue;
+struct FPerkData;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -69,6 +70,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category ="Input")
 	class UInputAction* MouseLookAction;
 
+	class UPerkManager* _perkManager = nullptr;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
 	FModifiedFloatValue _groundSlamDistanceThreshold;
 
@@ -80,6 +83,15 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
 	float _timeToReachGround = .75f;
+
+	int _startingJumpCount = 0;
+	float _startingJumpHeight = 0;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Jump")
+	FModifiedIntValue _extraJumpCount = 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Jump")
+	FModifiedFloatValue _extraJumpHeight = 10.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Affectors")
 	TSubclassOf<AConstantCropAffectorArea> _waterAffectorClass;
@@ -98,6 +110,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
+
+	UFUNCTION()
+	void OnPerkLevelDataChanged(const FGameplayTag& perkType, const FPerkData& perkData);
 
 	UFUNCTION()
 	void OnGroundSlamComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

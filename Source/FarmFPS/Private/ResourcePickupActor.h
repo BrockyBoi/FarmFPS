@@ -38,6 +38,9 @@ protected:
 	UFUNCTION()
 	void OnCapsuleColliderHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	UFUNCTION()
+	void OnDayEnd();
+
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
 	float _rotationRate = 0.f;
 

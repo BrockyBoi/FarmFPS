@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "ModifiedValueData.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ShooterWeaponHolder.h"
@@ -85,14 +87,23 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Refire", meta = (ClampMin = 0, ClampMax = 5, Units = "s"))
 	float RefireRate = 0.5f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Reload")
+	FModifiedFloatValue ReloadTime = 1.5f;
+
 	/** Game time of last shot fired, used to enforce refire rate on semi auto */
 	float TimeOfLastShot = 0.0f;
 
 	/** If true, the weapon is currently firing */
 	bool bIsFiring = false;
 
+	/** If true, the weapon is currently reloading */
+	bool bIsReloading = false;
+
 	/** Timer to handle full auto refiring */
 	FTimerHandle RefireTimer;
+
+	/** Timer to handle full auto refiring */
+	FTimerHandle ReloadTimer;
 
 	/** Cast pawn pointer to the owner for AI perception system interactions */
 	TObjectPtr<APawn> PawnOwner;
@@ -142,10 +153,14 @@ public:
 	/** Stop firing this weapon */
 	void StopFiring();
 
+	virtual void StartReload();
+
 protected:
 
 	/** Fire the weapon */
 	virtual void Fire();
+
+	void OnReloadFinish();
 
 	/** Called when the refire rate time has passed while shooting semi auto weapons */
 	void FireCooldownExpired();

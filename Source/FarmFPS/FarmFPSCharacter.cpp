@@ -5,6 +5,7 @@
 // Brock
 #include "ConstantCropAffectorArea.h"
 #include "CropComponent.h"
+#include "PerkManager.h"
 
 // UE
 #include "Animation/AnimInstance.h"
@@ -43,6 +44,8 @@ AFarmFPSCharacter::AFarmFPSCharacter()
 	FirstPersonCameraComponent->FirstPersonFieldOfView = 70.0f;
 	FirstPersonCameraComponent->FirstPersonScale = 0.6f;
 
+	_perkManager = CreateDefaultSubobject<UPerkManager>(TEXT("PerkManager"));
+
 	// configure the character comps
 	GetMesh()->SetOwnerNoSee(true);
 	GetMesh()->FirstPersonPrimitiveType = EFirstPersonPrimitiveType::WorldSpaceRepresentation;
@@ -64,6 +67,13 @@ void AFarmFPSCharacter::BeginPlay()
 		_groundSlamSphereCollider->SetSphereRadius(_groundSlamExplosionRadius.GetModifiedValue(this));
 		_groundSlamSphereCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+
+	if (ensure(IsValid(_perkManager)))
+	{
+		_perkManager->OnPerkLevelChange.AddDynamic(this, &AFarmFPSCharacter::OnPerkLevelDataChanged);
+		_startingJumpCount = JumpMaxCount;
+		_startingJumpHeight = GetCharacterMovement()->JumpZVelocity;
+	}
 }
 
 void AFarmFPSCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -73,7 +83,18 @@ void AFarmFPSCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
 		_groundSlamSphereCollider->OnComponentBeginOverlap.RemoveAll(this);
 	}
 
+	if (IsValid(_perkManager))
+	{
+		_perkManager->OnPerkLevelChange.RemoveAll(this);
+	}
+
 	Super::EndPlay(EndPlayReason);
+}
+
+void AFarmFPSCharacter::OnPerkLevelDataChanged(const FGameplayTag& perkType, const FPerkData& perkData)
+{
+	JumpMaxCount = _startingJumpCount + _extraJumpCount.GetModifiedValue(this);
+	GetCharacterMovement()->JumpZVelocity = _startingJumpHeight + _extraJumpHeight.GetModifiedValue(this);
 }
 
 void AFarmFPSCharacter::OnGroundSlamComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

@@ -44,11 +44,5 @@ protected:
 	UPerkManager* _perkManager = nullptr;
 
 	UPROPERTY(EditDefaultsOnly)
-	FModifiedIntValue JumpCountModifier;
-
-	UPROPERTY(EditDefaultsOnly)
-	FModifiedFloatValue JumpHeightModifier;
-
-	UPROPERTY(EditDefaultsOnly)
 	FModifiedFloatValue PlayerPickupColliderSizeModifier;
 };
