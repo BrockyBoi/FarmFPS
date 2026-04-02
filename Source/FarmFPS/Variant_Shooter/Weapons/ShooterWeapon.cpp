@@ -163,7 +163,7 @@ void AShooterWeapon::Fire()
 
 void AShooterWeapon::StartReload()
 {
-	if (!bIsReloading)
+	if (!bIsReloading && CurrentBullets < MagazineSize)
 	{
 		bIsFiring = false;
 		bIsReloading = true;

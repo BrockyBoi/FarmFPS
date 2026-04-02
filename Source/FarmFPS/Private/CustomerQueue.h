@@ -33,7 +33,7 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	TArray<ACustomer*> _customerQueue;
+	TArray<TWeakObjectPtr<ACustomer>> _customerQueue;
 
 	UPROPERTY(BlueprintReadWrite)
 	USceneComponent* _queueStartPoint;

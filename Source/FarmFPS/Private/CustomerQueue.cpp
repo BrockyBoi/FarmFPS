@@ -26,8 +26,8 @@ void UCustomerQueue::RemoveCustomerFromFrontOfQueue()
 
 	for (int i = 0; i < _customerQueue.Num(); i++)
 	{
-		ACustomer* customer = _customerQueue[i];
-		if (IsValid(customer))
+		TWeakObjectPtr<ACustomer> customer = _customerQueue[i];
+		if (customer.IsValid())
 		{
 			customer->MoveToNextSpotInQueue(GetQueuePositionAtIndex(i));
 		}
@@ -38,9 +38,9 @@ const FVector UCustomerQueue::GetCustomerQueuePosition(const ACustomer* searchin
 {
 	if (_customerQueue.Contains(searchingCustomer))
 	{
-		int32 index = _customerQueue.IndexOfByPredicate([&](const ACustomer* customer)
+		int32 index = _customerQueue.IndexOfByPredicate([&, searchingCustomer](const TWeakObjectPtr<ACustomer> customer)
 			{
-				return ensure(IsValid(customer)) && customer == searchingCustomer;
+				return customer.IsValid() && customer == searchingCustomer;
 			});
 
 		return GetQueuePositionAtIndex(index);
@@ -65,5 +65,5 @@ bool UCustomerQueue::IsAtFrontOfQueue(const ACustomer* Customer) const
 
 ACustomer* UCustomerQueue::GetFrontOfQueue() const
 {
-	return !_customerQueue.IsEmpty() ? _customerQueue[0] : nullptr;
+	return !_customerQueue.IsEmpty() ? _customerQueue[0].Get() : nullptr;
 }

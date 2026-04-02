@@ -17,6 +17,14 @@
 class ABreadStand;
 class UCustomerQueue;
 
+enum class ECustomerState
+{
+	MovingToBreadStand,
+	MovingToSpotInQueue,
+	InQueue,
+	MovingOutOfMap
+};
+
 UCLASS()
 class ACustomer : public ACharacter
 {
@@ -85,5 +93,5 @@ protected:
 	UPROPERTY(Transient)
 	AAIController* _aiController = nullptr;
 
-	bool _reachedSpotInQueue = false;
+	ECustomerState _currentState = ECustomerState::MovingToBreadStand;
 };

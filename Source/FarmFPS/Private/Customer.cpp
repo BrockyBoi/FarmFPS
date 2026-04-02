@@ -33,13 +33,6 @@ void ACustomer::BeginPlay()
 
 	_startLocation = GetActorLocation();
 
-	_breadStand = FarmFPSUtilities::GetBreadStand(this);
-	if (ensure(_breadStand.IsValid()) && ensure(IsValid(_breadStand->GetCustomerQueue())))
-	{
-		_customerQueue = _breadStand->GetCustomerQueue();
-		MoveToBreadStand();
-	}
-
 	UCharacterMovementComponent* movement = FindComponentByClass<UCharacterMovementComponent>();
 	if (ensure(IsValid(movement)))
 	{
@@ -61,6 +54,11 @@ void ACustomer::EndPlay(EEndPlayReason::Type EndPlayReason)
 		dayNightCycle->OnDayEnd.RemoveAll(this);
 	}
 
+	if (IsValid(_aiController))
+	{
+		_aiController->ReceiveMoveCompleted.RemoveAll(this);
+	}
+
 	Super::EndPlay(EndPlayReason);
 }
 
@@ -72,7 +70,14 @@ void ACustomer::PossessedBy(AController* NewController)
 	if (ensure(IsValid(aiController)))
 	{
 		_aiController = aiController;
-		_aiController->ReceiveMoveCompleted.AddDynamic(this, &ACustomer::OnMoveFinishedMovingToBreadStand);
+
+		_breadStand = FarmFPSUtilities::GetBreadStand(this);
+		if (ensure(_breadStand.IsValid()) && ensure(IsValid(_breadStand->GetCustomerQueue())))
+		{
+			_customerQueue = _breadStand->GetCustomerQueue();
+		}
+
+		MoveToBreadStand();
 	}
 }
 
@@ -80,15 +85,15 @@ void ACustomer::OnMoveFinishedMovingToBreadStand(FAIRequestID RequestID, EPathFo
 {
 	if (Result == EPathFollowingResult::Success)
 	{
-		if (ensure(_customerQueue.IsValid()))
+		if (ensure(_customerQueue.IsValid()) && ensure(IsValid(_aiController)))
 		{
+			_currentState = ECustomerState::InQueue;
 			_customerQueue->AddCustomerToQueue(this);
-			_aiController->ReceiveMoveCompleted.RemoveAll(this);
-			_aiController->ReceiveMoveCompleted.AddDynamic(this, &ACustomer::OnMoveFinishedInQueue);
+
 			MoveToNextSpotInQueue(_customerQueue->GetCustomerQueuePosition(this));
 		}
 	}
-	else if (Result == EPathFollowingResult::Blocked)
+	else
 	{
 		FTimerHandle timerDel;
 		GetWorld()->GetTimerManager().SetTimer(timerDel, this, &ACustomer::MoveToBreadStand, 1.f, false);
@@ -113,7 +118,7 @@ void ACustomer::OnMoveFinishedInQueue(FAIRequestID RequestID, EPathFollowingResu
 {
 	if (Result == EPathFollowingResult::Success)
 	{
-		_reachedSpotInQueue = true;
+		_currentState = ECustomerState::InQueue;
 		AttemptBuyBreadAtFrontOfQueue();
 	}
 	else if (Result == EPathFollowingResult::Blocked)
@@ -130,7 +135,7 @@ void ACustomer::OnDayEnd()
 
 void ACustomer::AttemptBuyBreadAtFrontOfQueue()
 {
-	if (!_reachedSpotInQueue)
+	if (_currentState != ECustomerState::InQueue)
 	{
 		return;
 	}
@@ -154,7 +159,6 @@ void ACustomer::AttemptBuyBreadAtFrontOfQueue()
 
 			if (_amountLeftToBuy <= 0)
 			{
-				_reachedSpotInQueue = false;
 				const FModifiedResourceValue priceData = _breadStand->GetPriceForResource(GetResourceDesired());
 				const int price = priceData.ModifiedIntValue.GetModifiedValue(this);
 
@@ -181,29 +185,35 @@ void ACustomer::FindSpotInQueue()
 
 void ACustomer::MoveToBreadStand()
 {
-	_nextDestination = _breadStand->GetActorLocation();
-	_reachedSpotInQueue = false;
+	_currentState = ECustomerState::MovingToBreadStand;
+	_nextDestination = _breadStand->GetNextCustomerQueuePosition();
 	if (ensure(IsValid(_aiController)))
 	{
-		_aiController->MoveToLocation(_nextDestination, _moveAcceptanceRadius * 10, true, true, true);
+		_aiController->ReceiveMoveCompleted.RemoveAll(this);
+		_aiController->ReceiveMoveCompleted.AddDynamic(this, &ACustomer::OnMoveFinishedMovingToBreadStand);
+		_aiController->MoveToLocation(_nextDestination, _moveAcceptanceRadius * 10);
 	}
 }
 
 void ACustomer::MoveToNextSpotInQueue(const FVector& nextSpot)
 {
+	_currentState = ECustomerState::MovingToSpotInQueue;
 	_nextDestination = nextSpot;
-	_reachedSpotInQueue = false;
 	if (ensure(IsValid(_aiController)))
 	{
-		_aiController->MoveToLocation(_nextDestination, _moveAcceptanceRadius, true, true, true);
+		_aiController->ReceiveMoveCompleted.RemoveAll(this);
+		_aiController->ReceiveMoveCompleted.AddDynamic(this, &ACustomer::OnMoveFinishedInQueue);
+		_aiController->MoveToLocation(_nextDestination, _moveAcceptanceRadius);
 	}
 }
 
 void ACustomer::MoveOutOfMap()
 {
+	_currentState = ECustomerState::MovingOutOfMap;
 	if (ensure(IsValid(_aiController)))
 	{
+		_aiController->ReceiveMoveCompleted.RemoveAll(this);
 		_aiController->ReceiveMoveCompleted.AddDynamic(this, &ACustomer::OnMoveFinishedOutOfMap);
-		_aiController->MoveToLocation(_startLocation, _moveAcceptanceRadius, true, true, true);
+		_aiController->MoveToLocation(_startLocation, _moveAcceptanceRadius);
 	}
 }
