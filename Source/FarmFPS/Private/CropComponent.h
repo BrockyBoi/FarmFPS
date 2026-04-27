@@ -4,6 +4,7 @@
 
 // Brock
 #include "CropData.h"
+#include "ModifiedValueData.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -28,6 +29,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddCropResourceValue(const FGameplayTag& resourceType, float amount);
 
+	void DoDamageToCrop(int damageAmount);
+
 	UResourceInventory* GetResourceInventory() const { return _cropResourcesInventory; }
 
 	UFUNCTION(BlueprintPure)
@@ -48,18 +51,26 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetLightLeft() const { return _cropData.LightNeeded - GetCurrentLightLevel(); }
 
-	bool IsCropReadyToBreak() const;
+	UFUNCTION(BlueprintPure)
+	float GetCropCompletionPercentage() const;
+
+	UFUNCTION(BlueprintPure)
+	bool GetIsInPerfectTiming() const { return _isInPerfectTiming; }
+
+	bool IsLightAndWaterFull() const;
 
 	DECLARE_MULTICAST_DELEGATE(FOnCropBreakEvent);
 
 	FOnCropBreakEvent OnCropBreak;
 
-	void BreakCrop();
-
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason);
+
+	void OnLightAndWaterFilled();
+	void OnPerfectTimingEnd();
 
 	void AffectGrowth();
 
@@ -69,10 +80,17 @@ protected:
 	UFUNCTION()
 	void OnBreakCropTimerEnd();
 
+	void BreakCrop();
 	void DestroyCrop();
 
 	UPROPERTY(EditDefaultsOnly)
 	FCropData _cropData;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Crop Yield")
+	FModifiedFloatValue _perfectTimingYieldBonus = 1.5f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Crop Yield")
+	FModifiedFloatValue _perfectTimingDuration = 5.f;
 
 	UResourceInventory* _cropResourcesInventory = nullptr;
 
@@ -86,4 +104,16 @@ protected:
 	bool _breakCropOnFull = false;
 
 	bool _isBroken = false;
+
+	bool _hasStartedPerfectTiming = false;
+	bool _isInPerfectTiming = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	float _maxSizeModifierForPerfectTiming = 1.15f;
+
+	float _sinAngleInPerfectTiming = 270.f;
+
+	int _currentCropHealth = 0;
+
+	FTimerHandle _perfectTimingTimerHandle;
 };

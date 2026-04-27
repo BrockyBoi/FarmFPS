@@ -11,6 +11,7 @@
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "EnhancedInputComponent.h"
@@ -33,6 +34,9 @@ AFarmFPSCharacter::AFarmFPSCharacter()
 
 	_groundSlamSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Ground Slam Sphere Collider"));
 	_groundSlamSphereCollider->SetupAttachment(GetMesh());
+
+	_meleeCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Melee Collider"));
+	_meleeCollider->SetupAttachment(GetMesh());
 
 	// Create the Camera Component	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("First Person Camera"));
@@ -61,6 +65,13 @@ void AFarmFPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (ensure(IsValid(_meleeCollider)))
+	{
+		_meleeCollider->OnComponentBeginOverlap.AddDynamic(this, &AFarmFPSCharacter::OnMeleeComponentOverlap);
+		_meleeCollider->SetBoxExtent(_meleeColliderBounds);
+		_meleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
 	if (ensure(IsValid(_groundSlamSphereCollider)))
 	{
 		_groundSlamSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &AFarmFPSCharacter::OnGroundSlamComponentOverlap);
@@ -78,6 +89,11 @@ void AFarmFPSCharacter::BeginPlay()
 
 void AFarmFPSCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
+	if (IsValid(_meleeCollider))
+	{
+		_meleeCollider->OnComponentBeginOverlap.RemoveAll(this);
+	}
+
 	if (IsValid(_groundSlamSphereCollider))
 	{
 		_groundSlamSphereCollider->OnComponentBeginOverlap.RemoveAll(this);
@@ -95,6 +111,7 @@ void AFarmFPSCharacter::OnPerkLevelDataChanged(const FGameplayTag& perkType, con
 {
 	JumpMaxCount = _startingJumpCount + _extraJumpCount.GetModifiedValue(this);
 	GetCharacterMovement()->JumpZVelocity = _startingJumpHeight + _extraJumpHeight.GetModifiedValue(this);
+	_meleeCollider->SetBoxExtent(_meleeColliderBounds + FVector(_meleeScale.GetModifiedValue(this)));
 }
 
 void AFarmFPSCharacter::OnGroundSlamComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -102,9 +119,21 @@ void AFarmFPSCharacter::OnGroundSlamComponentOverlap(UPrimitiveComponent* Overla
 	if (IsValid(OtherActor))
 	{
 		UCropComponent* cropComponent = OtherActor->FindComponentByClass<UCropComponent>();
-		if (IsValid(cropComponent) && cropComponent->IsCropReadyToBreak())
+		if (IsValid(cropComponent) && cropComponent->IsLightAndWaterFull())
 		{
-			cropComponent->BreakCrop();
+			cropComponent->DoDamageToCrop(_groundSlamDamage.GetModifiedValue(this));
+		}
+	}
+}
+
+void AFarmFPSCharacter::OnMeleeComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (IsValid(OtherActor))
+	{
+		UCropComponent* cropComponent = OtherActor->FindComponentByClass<UCropComponent>();
+		if (IsValid(cropComponent) && cropComponent->IsLightAndWaterFull())
+		{
+			cropComponent->DoDamageToCrop(_meleeDamage.GetModifiedValue(this));
 		}
 	}
 }
@@ -127,6 +156,8 @@ void AFarmFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		EnhancedInputComponent->BindAction(SpawnWaterAffectorAction, ETriggerEvent::Started, this, &AFarmFPSCharacter::OnPressSpawnWaterAffector);
 		EnhancedInputComponent->BindAction(SpawnLightAffectorAction, ETriggerEvent::Started, this, &AFarmFPSCharacter::OnPressSpawnLightAffector);
+
+		EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Started, this, &AFarmFPSCharacter::DoMeleeStart);
 
 		EnhancedInputComponent->BindAction(GroundSlamAction, ETriggerEvent::Started, this, &AFarmFPSCharacter::DoGroundSlamStart);
 		EnhancedInputComponent->BindAction(GroundSlamAction, ETriggerEvent::Completed, this, &AFarmFPSCharacter::DoGroundSlamEnd);
@@ -218,9 +249,23 @@ void AFarmFPSCharacter::OnPressSpawnLightAffector()
 	}
 }
 
+void AFarmFPSCharacter::DoMeleeStart()
+{
+	_isMeleeing = true;
+	_groundSlamSphereCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	GetWorld()->GetTimerManager().SetTimer(_meleeTimerHandle, this, &AFarmFPSCharacter::DoMeleeEnd, _meleeDuration.GetModifiedValue(this), false);
+}
+
+void AFarmFPSCharacter::DoMeleeEnd()
+{
+	_isMeleeing = false;
+	_groundSlamSphereCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetWorld()->GetTimerManager().ClearTimer(_meleeTimerHandle);
+}
+
 void AFarmFPSCharacter::DoGroundSlamStart()
 {
-	if (_startedGroundSlam || GetCharacterMovement()->IsMovingOnGround())
+	if (_startedGroundSlam || GetCharacterMovement()->IsMovingOnGround() || GetIsMeleeing())
 	{
 		return;
 	}

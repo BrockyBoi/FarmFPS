@@ -3,6 +3,7 @@
 #include "ShooterWeapon.h"
 
 // Brock
+#include "FarmFPSCharacter.h"
 #include "ModifiedValueData.h"
 
 // UE
@@ -95,7 +96,9 @@ void AShooterWeapon::DeactivateWeapon()
 
 void AShooterWeapon::StartFiring()
 {
-	if (CurrentBullets <= 0 || bIsReloading)
+	AFarmFPSCharacter* CharacterOwner = Cast<AFarmFPSCharacter>(PawnOwner);
+
+	if (CurrentBullets <= 0 || bIsReloading || (ensure(IsValid(CharacterOwner)) && CharacterOwner->GetIsMeleeing()))
 	{
 		return;
 	}

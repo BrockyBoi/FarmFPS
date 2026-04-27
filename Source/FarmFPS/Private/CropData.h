@@ -21,6 +21,9 @@ struct FCropData
 	int LightNeeded;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int CropHealth;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float StartingScaleSize;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -38,6 +41,7 @@ struct FCropData
 		FinalScaleSize = 2.5f;
 		WaterNeeded = 100;
 		LightNeeded = 100;
+		CropHealth = 1;
 		NumberOfPickupsToDrop = 3;
 	}
 };

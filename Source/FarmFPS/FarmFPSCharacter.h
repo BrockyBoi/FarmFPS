@@ -13,12 +13,15 @@
 // Generated
 #include "FarmFPSCharacter.generated.h"
 
+class AConstantCropAffectorArea;
+
+class UBoxComponent;
+class UCameraComponent;
+class UInputAction;
 class UInputComponent;
 class USkeletalMeshComponent;
-class UCameraComponent;
-class AConstantCropAffectorArea;
-class UInputAction;
 class USphereComponent;
+
 struct FInputActionValue;
 struct FPerkData;
 
@@ -31,81 +34,18 @@ UCLASS(abstract)
 class AFarmFPSCharacter : public ACharacter
 {
 	GENERATED_BODY()
-
-	/** Pawn mesh: first person view (arms; seen only by self) */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* FirstPersonMesh;
-
-	/** First person camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FirstPersonCameraComponent;
-
-protected:
-
-	/** Jump Input Action */
-	UPROPERTY(EditAnywhere, Category ="Input")
-	UInputAction* JumpAction;
-
-	/** Ground Slam Input Action */
-	UPROPERTY(EditAnywhere, Category = "Input")
-	UInputAction* GroundSlamAction;
-
-	/** Jump Input Action */
-	UPROPERTY(EditAnywhere, Category = "Input")
-	UInputAction* SpawnWaterAffectorAction;
-
-	/** Jump Input Action */
-	UPROPERTY(EditAnywhere, Category = "Input")
-	UInputAction* SpawnLightAffectorAction;
-
-	/** Move Input Action */
-	UPROPERTY(EditAnywhere, Category ="Input")
-	UInputAction* MoveAction;
-
-	/** Look Input Action */
-	UPROPERTY(EditAnywhere, Category ="Input")
-	class UInputAction* LookAction;
-
-	/** Mouse Look Input Action */
-	UPROPERTY(EditAnywhere, Category ="Input")
-	class UInputAction* MouseLookAction;
-
-	class UPerkManager* _perkManager = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
-	FModifiedFloatValue _groundSlamDistanceThreshold;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
-	FModifiedFloatValue _groundSlamExplosionRadius;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
-	float _groundSlamDashForce = 1000.f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
-	float _timeToReachGround = .75f;
-
-	int _startingJumpCount = 0;
-	float _startingJumpHeight = 0;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Jump")
-	FModifiedIntValue _extraJumpCount = 1;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Jump")
-	FModifiedFloatValue _extraJumpHeight = 10.f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Affectors")
-	TSubclassOf<AConstantCropAffectorArea> _waterAffectorClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Affectors")
-	TSubclassOf<AConstantCropAffectorArea> _lightAffectorClass;
-
-	UPROPERTY(EditAnywhere)
-	USphereComponent* _groundSlamSphereCollider;
-
-	bool _startedGroundSlam = false;
 	
 public:
 	AFarmFPSCharacter();
+
+	UFUNCTION(BlueprintPure)
+	bool GetIsMeleeing() const { return _isMeleeing; }
+
+	/** Returns the first person mesh **/
+	USkeletalMeshComponent* GetFirstPersonMesh() const { return FirstPersonMesh; }
+
+	/** Returns first person camera component **/
+	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -116,6 +56,9 @@ protected:
 
 	UFUNCTION()
 	void OnGroundSlamComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnMeleeComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	/** Called from Input Actions for movement input */
 	void MoveInput(const FInputActionValue& Value);
@@ -142,19 +85,109 @@ protected:
 	void OnPressSpawnWaterAffector();
 	void OnPressSpawnLightAffector();
 
+	void DoMeleeStart();
+	void DoMeleeEnd();
 	void DoGroundSlamStart();
 	void DoGroundSlamEnd();
 
-protected:
 	/** Set up input action bindings */
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode = 0) override;
 
-public:
-	/** Returns the first person mesh **/
-	USkeletalMeshComponent* GetFirstPersonMesh() const { return FirstPersonMesh; }
+	/** Pawn mesh: first person view (arms; seen only by self) */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	USkeletalMeshComponent* FirstPersonMesh;
 
-	/** Returns first person camera component **/
-	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+	/** First person camera */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* FirstPersonCameraComponent;
+
+	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* JumpAction;
+
+	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* MeleeAction;
+
+	/** Ground Slam Input Action */
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* GroundSlamAction;
+
+	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* SpawnWaterAffectorAction;
+
+	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* SpawnLightAffectorAction;
+
+	/** Move Input Action */
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* MoveAction;
+
+	/** Look Input Action */
+	UPROPERTY(EditAnywhere, Category = "Input")
+	class UInputAction* LookAction;
+
+	/** Mouse Look Input Action */
+	UPROPERTY(EditAnywhere, Category = "Input")
+	class UInputAction* MouseLookAction;
+
+	class UPerkManager* _perkManager = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
+	FModifiedFloatValue _groundSlamDistanceThreshold;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
+	FModifiedFloatValue _groundSlamExplosionRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
+	float _groundSlamDashForce = 1000.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
+	float _timeToReachGround = .75f;
+
+	int _startingJumpCount = 0;
+	float _startingJumpHeight = 0;
+
+	bool _isMeleeing = false;
+
+	FTimerHandle _meleeTimerHandle;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Melee")
+	FModifiedIntValue _meleeDamage = 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Melee")
+	FVector _meleeColliderBounds = FVector(1.0f, 1.0f, 1.0f);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Melee")
+	FModifiedFloatValue _meleeScale = 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Melee")
+	FModifiedFloatValue _meleeDuration = 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
+	FModifiedIntValue _groundSlamDamage = 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Jump")
+	FModifiedIntValue _extraJumpCount = 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Jump")
+	FModifiedFloatValue _extraJumpHeight = 10.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Affectors")
+	TSubclassOf<AConstantCropAffectorArea> _waterAffectorClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Affectors")
+	TSubclassOf<AConstantCropAffectorArea> _lightAffectorClass;
+
+	UPROPERTY(EditAnywhere)
+	USphereComponent* _groundSlamSphereCollider;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* _meleeCollider;
+
+	bool _startedGroundSlam = false;
 };
 

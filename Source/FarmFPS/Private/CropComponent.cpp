@@ -15,7 +15,8 @@
 
 UCropComponent::UCropComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bStartWithTickEnabled = false;
 }
 
 void UCropComponent::BeginPlay()
@@ -47,6 +48,42 @@ void UCropComponent::BeginPlay()
 	AffectGrowth();
 }
 
+void UCropComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	if (ensure(IsValid(GetOwner())))
+	{
+		UStaticMeshComponent* cropMesh = GetOwner()->FindComponentByClass<UStaticMeshComponent>();
+		if (ensure(IsValid(cropMesh)))
+		{
+			if (_isInPerfectTiming)
+			{
+				float scale = FMath::Lerp(_cropData.FinalScaleSize, _cropData.FinalScaleSize * _maxSizeModifierForPerfectTiming, FMath::Sin(FMath::DegreesToRadians(_sinAngleInPerfectTiming)) + 1);
+				cropMesh->SetWorldScale3D(FVector::One() * scale);
+			}
+			else
+			{
+				FVector currentScale = cropMesh->GetRelativeScale3D();
+				if (currentScale.X > _cropData.FinalScaleSize)
+				{
+					cropMesh->SetWorldScale3D(currentScale * .995f);
+				}
+				else if (currentScale.X < _cropData.FinalScaleSize)
+				{
+					cropMesh->SetWorldScale3D(currentScale * 1.015f);
+				}
+
+				if ((currentScale - _cropData.FinalScaleSize).IsNearlyZero(.01))
+				{
+					cropMesh->SetWorldScale3D(FVector::One() * _cropData.FinalScaleSize);
+					SetComponentTickEnabled(false);
+				}
+			}
+		}
+
+		_sinAngleInPerfectTiming -= .75f;
+	}
+}
+
 void UCropComponent::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
 	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
@@ -58,6 +95,18 @@ void UCropComponent::EndPlay(EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
+void UCropComponent::OnLightAndWaterFilled()
+{
+	_isInPerfectTiming = true;
+	GetWorld()->GetTimerManager().SetTimer(_perfectTimingTimerHandle, this, &UCropComponent::OnPerfectTimingEnd, _perfectTimingDuration.GetModifiedValue(this), false);
+	SetComponentTickEnabled(true);
+}
+
+void UCropComponent::OnPerfectTimingEnd()
+{
+	_isInPerfectTiming = false;
+}
+
 void UCropComponent::AddCropResourceValue(const FGameplayTag& resourceType, float amount)
 {
 	if (ensure(IsValid(_cropResourcesInventory)))
@@ -65,6 +114,21 @@ void UCropComponent::AddCropResourceValue(const FGameplayTag& resourceType, floa
 		_cropResourcesInventory->AddResource(resourceType, amount);
 
 		AffectGrowth();
+
+		if (!_hasStartedPerfectTiming && IsLightAndWaterFull())
+		{
+			OnLightAndWaterFilled();
+			_hasStartedPerfectTiming = true;
+		}
+	}
+}
+
+void UCropComponent::DoDamageToCrop(int damageAmount)
+{
+	_currentCropHealth -= damageAmount;
+	if (_currentCropHealth <= 0)
+	{
+		BreakCrop();
 	}
 }
 
@@ -78,7 +142,16 @@ int UCropComponent::GetCurrentLightLevel() const
 	return ensure(IsValid(_cropResourcesInventory)) ? _cropResourcesInventory->GetResourceCount(ResourceTypeTags::Light) : 0;
 }
 
-bool UCropComponent::IsCropReadyToBreak() const
+float UCropComponent::GetCropCompletionPercentage() const
+{
+	int water = GetCurrentWaterLevel();
+	int light = GetCurrentLightLevel();
+	float waterGrowthRatio = water / (float)_cropData.WaterNeeded;
+	float lightGrowthRatio = light / (float)_cropData.LightNeeded;
+	return (waterGrowthRatio + lightGrowthRatio) / 2.0f;
+}
+
+bool UCropComponent::IsLightAndWaterFull() const
 {
 	return GetCurrentLightLevel() >= _cropData.LightNeeded && GetCurrentWaterLevel() >= _cropData.WaterNeeded;
 }
@@ -101,6 +174,15 @@ void UCropComponent::BreakCrop()
 		_isBroken = true;
 
 		int countToDrop = perkManager->ModifyValueByPerks(PerkModifierTypeTags::MoreCropYield, _cropData.NumberOfPickupsToDrop);
+		if (_isInPerfectTiming)
+		{
+			countToDrop = FMath::RoundToInt(countToDrop * _perfectTimingYieldBonus.GetModifiedValue(this));
+		}
+		else if (!IsLightAndWaterFull())
+		{
+			countToDrop = FMath::RoundToInt(countToDrop * GetCropCompletionPercentage());
+		}
+
 		for (int i = 0; i < countToDrop; i++)
 		{
 			FActorSpawnParameters SpawnParams;
@@ -139,11 +221,7 @@ void UCropComponent::AffectGrowth()
 {
 	if (ensure(IsValid(GetOwner())))
 	{
-		int water = GetCurrentWaterLevel();
-		int light = GetCurrentLightLevel();
-		float waterGrowthRatio = water / (float)_cropData.WaterNeeded;
-		float lightGrowthRatio = light / (float)_cropData.LightNeeded;
-		float scaleAmount = FMath::Lerp(_cropData.StartingScaleSize, _cropData.FinalScaleSize, (waterGrowthRatio + lightGrowthRatio) / 2);
+		float scaleAmount = FMath::Lerp(_cropData.StartingScaleSize, _cropData.FinalScaleSize, GetCropCompletionPercentage());
 
 		UStaticMeshComponent* cropMesh = GetOwner()->FindComponentByClass<UStaticMeshComponent>();
 		if (ensure(IsValid(cropMesh)))
@@ -151,7 +229,7 @@ void UCropComponent::AffectGrowth()
 			cropMesh->SetWorldScale3D(FVector::One() * scaleAmount);
 		}
 
-		if (_breakCropOnFull && IsCropReadyToBreak())
+		if (_breakCropOnFull && IsLightAndWaterFull())
 		{
 			BreakCrop();
 		}
