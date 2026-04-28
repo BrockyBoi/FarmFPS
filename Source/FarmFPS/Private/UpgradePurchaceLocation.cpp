@@ -3,6 +3,7 @@
 #include "UpgradePurchaceLocation.h"
 
 // Brock
+#include "DayNightCycleManager.h"
 #include "PerkManager.h"
 #include "PerkModifierTypeTags.h"
 #include "ResourceInventory.h"
@@ -22,6 +23,13 @@ void UUpgradePurchaceLocation::BeginPlay()
 	{
 		_overlappingComponent->OnComponentBeginOverlap.AddDynamic(this, &UUpgradePurchaceLocation::OnComponentOverlap);
 	}
+
+	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightCycle)))
+	{
+		dayNightCycle->OnDayBegin.AddUObject(this, &UUpgradePurchaceLocation::OnDayBegin);
+		dayNightCycle->OnDayEnd.AddUObject(this, &UUpgradePurchaceLocation::OnDayEnd);
+	}
 }
 
 void UUpgradePurchaceLocation::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -32,8 +40,24 @@ void UUpgradePurchaceLocation::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	}
 }
 
+void UUpgradePurchaceLocation::OnDayBegin()
+{
+	GetOwner()->SetActorHiddenInGame(true);
+}
+
+void UUpgradePurchaceLocation::OnDayEnd()
+{
+	GetOwner()->SetActorHiddenInGame(false);
+}
+
 void UUpgradePurchaceLocation::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (!ensure(IsValid(dayNightCycle)) || dayNightCycle->IsDay())
+	{
+		return;
+	}
+
 	if (IsValid(OtherActor) && IsValid(OtherComp))
 	{
 		UPerkManager* perkManager = OtherActor->FindComponentByClass<UPerkManager>();

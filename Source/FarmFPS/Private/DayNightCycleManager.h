@@ -23,8 +23,8 @@ public:
 	UDayNightCycleManager();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void StartDay();
-	void EndDay();
+	bool IsDay() const { return !_isDayOver; }
+	bool IsNight() const { return _isDayOver; }
 
 	DECLARE_MULTICAST_DELEGATE(FOnDayChange);
 
@@ -34,14 +34,23 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	void StartDay();
+	void EndDay();
+
 	UPROPERTY(EditDefaultsOnly)
 	FModifiedFloatValue _dayLength = 60.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float _timeToReachPeakMoon = 2.f;
 
 	UPROPERTY(EditDefaultsOnly)
 	float _timeUntilAutoStartNextDay = 10.f;
 
 	UPROPERTY(EditDefaultsOnly)
-	TWeakObjectPtr<ADirectionalLight> _directionalLight = nullptr;
+	TWeakObjectPtr<ADirectionalLight> _sunLight = nullptr;
+
+	UPROPERTY(EditDefaultsOnly)
+	TWeakObjectPtr<ADirectionalLight> _moonLight = nullptr;
 
 	float _timeElapsed = 0.f;
 	bool _isDayOver = false;

@@ -119,7 +119,7 @@ void AFarmFPSCharacter::OnGroundSlamComponentOverlap(UPrimitiveComponent* Overla
 	if (IsValid(OtherActor))
 	{
 		UCropComponent* cropComponent = OtherActor->FindComponentByClass<UCropComponent>();
-		if (IsValid(cropComponent) && cropComponent->IsLightAndWaterFull())
+		if (IsValid(cropComponent))
 		{
 			cropComponent->DoDamageToCrop(_groundSlamDamage.GetModifiedValue(this));
 		}
@@ -131,7 +131,7 @@ void AFarmFPSCharacter::OnMeleeComponentOverlap(UPrimitiveComponent* OverlappedC
 	if (IsValid(OtherActor))
 	{
 		UCropComponent* cropComponent = OtherActor->FindComponentByClass<UCropComponent>();
-		if (IsValid(cropComponent) && cropComponent->IsLightAndWaterFull())
+		if (IsValid(cropComponent))
 		{
 			cropComponent->DoDamageToCrop(_meleeDamage.GetModifiedValue(this));
 		}

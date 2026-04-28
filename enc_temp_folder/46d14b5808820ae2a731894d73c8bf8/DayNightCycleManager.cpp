@@ -57,11 +57,6 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 	if (_isDayOver && ensure(_moonLight.IsValid()))
 	{
-		if (_timeElapsed >= _timeToReachPeakMoon)
-		{
-			return;
-		}
-
 		_timeElapsed += DeltaTime;
 		float lerpedPitch = FMath::Lerp(0.f, 70.f, _timeElapsed / _timeToReachPeakMoon) + 180.f;
 

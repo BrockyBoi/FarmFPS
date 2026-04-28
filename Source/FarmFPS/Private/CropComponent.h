@@ -57,6 +57,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool GetIsInPerfectTiming() const { return _isInPerfectTiming; }
 
+	UFUNCTION(BlueprintPure)
 	bool IsLightAndWaterFull() const;
 
 	DECLARE_MULTICAST_DELEGATE(FOnCropBreakEvent);

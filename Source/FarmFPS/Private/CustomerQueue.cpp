@@ -20,6 +20,11 @@ void UCustomerQueue::AddCustomerToQueue(ACustomer* Customer)
 	_customerQueue.Add(Customer);
 }
 
+void UCustomerQueue::RemoveCustomerFromQueue(ACustomer* Customer)
+{
+	_customerQueue.Remove(Customer);
+}
+
 void UCustomerQueue::RemoveCustomerFromFrontOfQueue()
 {
 	_customerQueue.RemoveAt(0);

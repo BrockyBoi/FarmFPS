@@ -21,6 +21,7 @@ public:
 	UCustomerQueue();
 
 	void AddCustomerToQueue(ACustomer* Customer);
+	void RemoveCustomerFromQueue(ACustomer* Customer);
 	void RemoveCustomerFromFrontOfQueue();
 	const FVector GetCustomerQueuePosition(const ACustomer* searchingCustomer) const;
 	const FVector GetQueuePositionAtIndex(int index) const;

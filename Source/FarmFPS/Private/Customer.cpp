@@ -130,6 +130,11 @@ void ACustomer::OnMoveFinishedInQueue(FAIRequestID RequestID, EPathFollowingResu
 
 void ACustomer::OnDayEnd()
 {
+	if (ensure(_customerQueue.IsValid()))
+	{
+		_customerQueue->RemoveCustomerFromQueue(this);
+	}
+
 	MoveOutOfMap();
 }
 
@@ -140,7 +145,7 @@ void ACustomer::AttemptBuyBreadAtFrontOfQueue()
 		return;
 	}
 
-	if (!ensure(_breadStand.IsValid()) || !ensure(_customerQueue.IsValid()) || !_customerQueue->IsAtFrontOfQueue(this) || _breadStand->GetIsCurrentlySellingBreadToCustomer())
+	if (!ensure(_breadStand.IsValid()) || !ensure(_customerQueue.IsValid()) || !_customerQueue->IsAtFrontOfQueue(this) || !_breadStand->GetIsCurrentlySellingBreadToCustomer())
 	{
 		return;
 	}
@@ -157,18 +162,18 @@ void ACustomer::AttemptBuyBreadAtFrontOfQueue()
 			_amountLeftToBuy -= amountCanBuy;
 			_breadStand->SetIsCurrentlySellingBreadToCustomer(false);
 
+			const FModifiedResourceValue priceData = _breadStand->GetPriceForResource(GetResourceDesired());
+			const int price = priceData.ModifiedIntValue.GetModifiedValue(this);
+
+			_breadStand->GetOutputInventory()->AddResource(ResourceTypeTags::Money, GetAmountDesired() * price);
+			UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
+			if (ensure(IsValid(objectiveManager)))
+			{
+				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::SellBread, GetResourceDesired(), GetAmountDesired());
+			}
+
 			if (_amountLeftToBuy <= 0)
 			{
-				const FModifiedResourceValue priceData = _breadStand->GetPriceForResource(GetResourceDesired());
-				const int price = priceData.ModifiedIntValue.GetModifiedValue(this);
-
-				_breadStand->GetOutputInventory()->AddResource(ResourceTypeTags::Money, GetAmountDesired() * price);
-				UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
-				if (ensure(IsValid(objectiveManager)))
-				{
-					objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::SellBread, GetResourceDesired(), GetAmountDesired());
-				}
-
 				_customerQueue->RemoveCustomerFromFrontOfQueue();
 
 				_aiController->ReceiveMoveCompleted.RemoveAll(this);
