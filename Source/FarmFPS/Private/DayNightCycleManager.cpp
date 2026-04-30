@@ -40,7 +40,7 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (!_isDayOver && ensure(_sunLight.IsValid()))
+	if (GetCurrentDayState() == EDayState::Day && ensure(_sunLight.IsValid()))
 	{
 		_timeElapsed += DeltaTime;
 		float dayLength = _dayLength.GetModifiedValue(this);
@@ -55,7 +55,7 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 		}
 	}
 
-	if (_isDayOver && ensure(_moonLight.IsValid()))
+	if (GetCurrentDayState() == EDayState::MidNight && ensure(_moonLight.IsValid()))
 	{
 		if (_timeElapsed >= _timeToReachPeakMoon)
 		{
@@ -68,10 +68,36 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 		FRotator rotation(lerpedPitch, 0.f, 0.f);
 		_moonLight->SetActorRotation(rotation);
 	}
+
+	if (GetCurrentDayState() == EDayState::NightTransitionToDay && ensure(_moonLight.IsValid()))
+	{
+		if (_timeElapsed >= _timeToReachPeakMoon)
+		{
+			return;
+		}
+
+		_timeElapsed += DeltaTime;
+		float lerpedPitch = FMath::Lerp(70.f, 200.f, _timeElapsed / _timeToReachPeakMoon) + 180.f;
+
+		FRotator rotation(lerpedPitch, 0.f, 0.f);
+		_moonLight->SetActorRotation(rotation);
+
+		if (_timeElapsed >= _timeToReachPeakMoon)
+		{
+			StartDay();
+		}
+	}
+}
+
+void UDayNightCycleManager::TransitionToNextDay()
+{
+	_currentDayState = EDayState::NightTransitionToDay;
+	_timeElapsed = 0.f;
 }
 
 void UDayNightCycleManager::StartDay()
 {
+	_currentDayState = EDayState::Day;
 	if (OnDayBegin.IsBound())
 	{
 		OnDayBegin.Broadcast();
@@ -91,6 +117,7 @@ void UDayNightCycleManager::StartDay()
 
 void UDayNightCycleManager::EndDay()
 {
+	_currentDayState = EDayState::MidNight;
 	if (OnDayEnd.IsBound())
 	{
 		OnDayEnd.Broadcast();

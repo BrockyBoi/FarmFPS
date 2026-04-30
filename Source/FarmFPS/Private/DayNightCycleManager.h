@@ -12,6 +12,13 @@
 // Generated
 #include "DayNightCycleManager.generated.h"
 
+enum class EDayState : uint8
+{
+	Day,
+	MidNight,
+	NightTransitionToDay
+};
+
 class ADirectionalLight;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -25,6 +32,9 @@ public:
 
 	bool IsDay() const { return !_isDayOver; }
 	bool IsNight() const { return _isDayOver; }
+	EDayState GetCurrentDayState() const { return _currentDayState; }
+
+	void TransitionToNextDay();
 
 	DECLARE_MULTICAST_DELEGATE(FOnDayChange);
 
@@ -54,4 +64,6 @@ private:
 
 	float _timeElapsed = 0.f;
 	bool _isDayOver = false;
+
+	EDayState _currentDayState;
 };

@@ -4,6 +4,8 @@
 
 // Brock
 #include "CropComponent.h"
+#include "MoonHitBox.h"
+#include "ResourceTypeTags.h"
 
 // Sets default values
 ACropResourceProjectile::ACropResourceProjectile() : Super()
@@ -48,6 +50,14 @@ void ACropResourceProjectile::OnComponentOverlap(UPrimitiveComponent* Overlapped
 		if (IsValid(cropComponent))
 		{
 			cropComponent->AddCropResourceValue(_cropResourceType, _resourceAmount.GetModifiedValue(this));
+		}
+
+		UMoonHitBox* moonHitBox = OtherActor->FindComponentByClass<UMoonHitBox>();
+		if (_cropResourceType == ResourceTypeTags::Light && IsValid(moonHitBox))
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("Hit moon with light resource! %s"), *GetActorLocation().ToString()));
+			UE_LOG(LogTemp, Log, TEXT("Hit moon with light resource! %s"), *GetActorLocation().ToString());
+			moonHitBox->HitMoon();
 		}
 	}
 }
