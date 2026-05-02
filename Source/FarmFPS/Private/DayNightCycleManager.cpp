@@ -59,12 +59,12 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 	{
 		if (_timeElapsed >= _timeToReachPeakMoon)
 		{
-			_moonLight->SetActorRotation(FRotator(70.f, 0.f, 0.f));
+			_moonLight->SetActorRotation(FRotator(250.f, 0.f, 0.f));
 			return;
 		}
 
 		_timeElapsed += DeltaTime;
-		float lerpedPitch = FMath::Lerp(0.f, 70.f, _timeElapsed / _timeToReachPeakMoon) + 180.f;
+		float lerpedPitch = FMath::Lerp(0.f, 250.f, _timeElapsed / _timeToReachPeakMoon);
 
 		FRotator rotation(lerpedPitch, 0.f, 0.f);
 		_moonLight->SetActorRotation(rotation);
@@ -74,7 +74,7 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 	{
 		if (_timeElapsed >= _timeToReachPeakMoon)
 		{
-			_moonLight->SetActorRotation(FRotator(200.f, 0.f, 0.f));
+			_moonLight->SetActorRotation(FRotator(380.f, 0.f, 0.f));
 			return;
 		}
 
@@ -93,8 +93,8 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UDayNightCycleManager::TransitionToNextDay()
 {
-	_currentDayState = EDayState::NightTransitionToDay;
 	_timeElapsed = 0.f;
+	_currentDayState = EDayState::NightTransitionToDay;
 }
 
 void UDayNightCycleManager::StartDay()

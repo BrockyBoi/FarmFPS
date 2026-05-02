@@ -30,6 +30,7 @@ void UResourceInventory::EndPlay(EEndPlayReason::Type EndPlayReason)
 	{
 		dayNightCycle->OnDayEnd.RemoveAll(this);
 	}
+	_resourcesMap.Empty();
 	Super::EndPlay(EndPlayReason);
 }
 

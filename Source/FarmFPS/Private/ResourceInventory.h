@@ -55,6 +55,7 @@ private:
 	void CheckInitializeMap(const FGameplayTag& cropType);
 	void ClearAllExceptMoney();
 
+	UPROPERTY(VisibleAnywhere, Transient)
 	TMap<FGameplayTag, float> _resourcesMap;
 
 	UPROPERTY(EditDefaultsOnly)
