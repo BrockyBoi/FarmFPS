@@ -30,8 +30,8 @@ public:
 	UDayNightCycleManager();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	bool IsDay() const { return !_isDayOver; }
-	bool IsNight() const { return _isDayOver; }
+	bool IsDay() const { return _currentDayState == EDayState::Day; }
+	bool IsNight() const { return _currentDayState == EDayState::MidNight || _currentDayState == EDayState::NightTransitionToDay; }
 	EDayState GetCurrentDayState() const { return _currentDayState; }
 
 	void TransitionToNextDay();
@@ -63,7 +63,6 @@ private:
 	TWeakObjectPtr<ADirectionalLight> _moonLight = nullptr;
 
 	float _timeElapsed = 0.f;
-	bool _isDayOver = false;
 
 	EDayState _currentDayState;
 };

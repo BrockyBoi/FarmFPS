@@ -111,7 +111,7 @@ bool UResourceInventory::HasResourceAmount(const FGameplayTag& resourceType, flo
 
 uint16 UResourceInventory::GetResourceCap(const FGameplayTag& resourceType) const
 {
-	return _resourceCaps.Contains(resourceType)  && _resourceCaps[resourceType] > 0 ? _resourceCaps[resourceType] : _defaultResourceCap;
+	return _resourceCaps.Contains(resourceType)  && _resourceCaps[resourceType] > 0 ? _resourceCaps[resourceType] : 999;
 }
 
 void UResourceInventory::OnDayEnd()

@@ -58,8 +58,5 @@ private:
 	TMap<FGameplayTag, float> _resourcesMap;
 
 	UPROPERTY(EditDefaultsOnly)
-	int _defaultResourceCap = 99999;
-
-	UPROPERTY(EditDefaultsOnly)
 	TMap<FGameplayTag, float> _resourceCaps;
 };

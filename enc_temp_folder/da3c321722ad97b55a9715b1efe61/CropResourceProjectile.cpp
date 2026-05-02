@@ -55,6 +55,8 @@ void ACropResourceProjectile::OnComponentOverlap(UPrimitiveComponent* Overlapped
 		UMoonHitBox* moonHitBox = OtherActor->FindComponentByClass<UMoonHitBox>();
 		if (_cropResourceType == ResourceTypeTags::Light && IsValid(moonHitBox))
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("Hit moon with light resource! %s"), *GetActorLocation().ToString()));
+			UE_LOG(LogTemp, Log, TEXT("Hit moon with light resource! %s"), *GetActorLocation().ToString());
 			moonHitBox->HitMoon();
 		}
 	}

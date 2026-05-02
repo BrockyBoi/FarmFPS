@@ -59,7 +59,6 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 	{
 		if (_timeElapsed >= _timeToReachPeakMoon)
 		{
-			_moonLight->SetActorRotation(FRotator(70.f, 0.f, 0.f));
 			return;
 		}
 
@@ -74,7 +73,6 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 	{
 		if (_timeElapsed >= _timeToReachPeakMoon)
 		{
-			_moonLight->SetActorRotation(FRotator(200.f, 0.f, 0.f));
 			return;
 		}
 

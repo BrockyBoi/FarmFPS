@@ -145,7 +145,7 @@ void ACustomer::AttemptBuyBreadAtFrontOfQueue()
 		return;
 	}
 
-	if (!ensure(_breadStand.IsValid()) || !ensure(_customerQueue.IsValid()) || !_customerQueue->IsAtFrontOfQueue(this) || _breadStand->GetIsCurrentlySellingBreadToCustomer())
+	if (!ensure(_breadStand.IsValid()) || !ensure(_customerQueue.IsValid()) || !_customerQueue->IsAtFrontOfQueue(this) || !_breadStand->GetIsCurrentlySellingBreadToCustomer())
 	{
 		return;
 	}

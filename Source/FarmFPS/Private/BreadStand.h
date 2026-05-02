@@ -32,8 +32,11 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, float amount) override;
+	void OnDayBegin();
+	void OnDayEnd();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UCustomerQueue* _customerQueue;

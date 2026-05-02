@@ -73,10 +73,10 @@ void ABreadStand::OnInputInventoryResourceCountChanged(const FGameplayTag& resou
 
 void ABreadStand::OnDayBegin()
 {
-	//SetIsCurrentlySellingBreadToCustomer(true);
+	SetIsCurrentlySellingBreadToCustomer(true);
 }
 
 void ABreadStand::OnDayEnd()
 {
-	//SetIsCurrentlySellingBreadToCustomer(false);
+	SetIsCurrentlySellingBreadToCustomer(false);
 }
