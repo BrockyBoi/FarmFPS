@@ -27,12 +27,33 @@ public:
 	bool TryConvertAllResources(UResourceInventory* inputInventory, UResourceInventory* outputInventory, const FCraftingData& recipeToCraft);
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 	bool CanCreateResource(const UResourceInventory* inputInventory, const FCraftingData& recipeToCraft) const;
 	void ConvertLimitedResources(UResourceInventory* inputInventory, UResourceInventory* outputInventory, const FCraftingData& recipeToCraft, int amountToCraft);
 	void ConvertAllResourcesPossible(UResourceInventory* inputInventory, UResourceInventory* outputInventory, const FCraftingData& recipeToCraft);
 
 	int GetMaxAmountOfResourceCanBeCrafted(const UResourceInventory* inputInventory, const FCraftingData& recipeToCraft) const;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Crafting")
+	bool _shouldCraftImmediately = false;
+
+	float _currentCraftingTime = 0.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Crafting")
+	float _timePerCraft = 1.f;
+
+	bool _isConvertingResources = false;
+
+	TWeakObjectPtr<UResourceInventory> _currentOutputInventory = nullptr;
+
+	struct ResourcesToSpawnData
+	{
+		FGameplayTag ResourceType;
+		int AmountToSpawn;
+	};
+
+	TArray<ResourcesToSpawnData> _resourcesToSpawn;
 };

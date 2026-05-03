@@ -9,6 +9,7 @@
 #include "PerkModifierTypeTags.h"
 #include "ObjectiveManager.h"
 #include "ObjectiveTypeTags.h"
+#include "ResourceActorLookupComponent.h"
 #include "ResourceInventory.h"
 #include "ResourcePickupActor.h"
 #include "ResourceTypeTags.h"
@@ -43,6 +44,12 @@ void UCropComponent::BeginPlay()
 	if (ensure(IsValid(dayNightCycle)))
 	{
 		dayNightCycle->OnDayEnd.AddUObject(this, &UCropComponent::OnDayEnd);
+	}
+
+	UResourceActorLookupComponent* resourceActorLookup = FarmFPSUtilities::GetResourceActorLookupComponent(this);
+	if (ensure(IsValid(resourceActorLookup)))
+	{
+		_cropYieldPickupClass = resourceActorLookup->GetResourceActorForType(_cropData.ResourceType);
 	}
 
 	AffectGrowth();
@@ -163,10 +170,10 @@ void UCropComponent::BreakCrop()
 		return;
 	}
 
-	if (ensure(IsValid(GetWorld())) && ensure(IsValid(GetOwner())) && ensure(IsValid(_cropYieldPickupClass)))
+	if (ensure(IsValid(GetWorld())) && ensure(IsValid(GetOwner())))
 	{
 		UPerkManager* perkManager = FarmFPSUtilities::GetPlayerPerkManager(this);
-		if (!ensure(IsValid(perkManager)))
+		if (!ensure(IsValid(perkManager)) || !ensure(IsValid(_cropYieldPickupClass)))
 		{
 			return;
 		}

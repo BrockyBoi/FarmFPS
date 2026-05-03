@@ -26,6 +26,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 	UFUNCTION()
@@ -45,4 +46,20 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UResourceInventory* _outputInventory = nullptr;
+
+	float _currentSpawnTime = 0.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float _timeBetweenSpawns = .45f;
+
+	struct ResourcesToSpawnData
+	{
+		FGameplayTag ResourceType;
+		int AmountToSpawn;
+	};
+
+	TArray<ResourcesToSpawnData> _resourcesToSpawnFromInputInventory;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool _outputPhysicalObjectsFromInputInventory = false;
 };

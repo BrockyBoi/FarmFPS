@@ -12,6 +12,7 @@
 class ABreadStand;
 class UCustomerSpawnerManager;
 class UDayNightCycleManager;
+class UResourceActorLookupComponent;
 class UPerkManager;
 class UObjectiveManager;
 
@@ -23,6 +24,7 @@ public:
 	static ABreadStand* GetBreadStand(const UObject* WorldContextObject);
 	static UCustomerSpawnerManager* GetCustomerSpawnerManager(const UObject* WorldContextObject);
 	static UDayNightCycleManager* GetDayNightCycleManager(const UObject* WorldContextObject);
+	static UResourceActorLookupComponent* GetResourceActorLookupComponent(const UObject* WorldContextObject);
 	static float GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, const FGameplayTagContainer& perkTags, float valueToModify);
 	static float GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, const FGameplayTag& perkTag, float valueToModify);
 };

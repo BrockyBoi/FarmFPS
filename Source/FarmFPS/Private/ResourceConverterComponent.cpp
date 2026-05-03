@@ -11,7 +11,8 @@
 
 UResourceConverterComponent::UResourceConverterComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bStartWithTickEnabled = false;
 }
 
 void UResourceConverterComponent::BeginPlay()
@@ -19,12 +20,56 @@ void UResourceConverterComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
+void UResourceConverterComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	if (_resourcesToSpawn.Num() == 0 || !ensure(_currentOutputInventory.IsValid()))
+	{
+		SetComponentTickEnabled(false);
+		return;
+	}
+
+	if (_currentCraftingTime >= _timePerCraft)
+	{
+		for (int i = 0; i < _resourcesToSpawn.Num(); i++)
+		{
+			if (!ensure(_resourcesToSpawn.IsValidIndex(i)))
+			{
+				continue;
+			}
+
+			ResourcesToSpawnData& data = _resourcesToSpawn[i];
+			if (data.AmountToSpawn <= 0)
+			{
+				_resourcesToSpawn.RemoveAt(i);
+				continue;
+			}
+
+			data.AmountToSpawn -= 1;
+			_currentOutputInventory->AddResource(data.ResourceType, 1);
+		
+			UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
+			if (ensure(IsValid(objectiveManager)))
+			{
+				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::CraftResource, data.ResourceType, 1);
+			}
+		}
+		_currentCraftingTime = 0.f;
+	}
+
+	_currentCraftingTime += DeltaTime;
+}
+
+void UResourceConverterComponent::EndPlay(EEndPlayReason::Type EndPlayReason)
+{}
+
 bool UResourceConverterComponent::TryConvertResources(UResourceInventory* inputInventory, UResourceInventory* outputInventory, const FCraftingData& recipeToCraft, int amountToCraft)
 {
 	if (!ensure(IsValid(inputInventory)) || !ensure(IsValid(outputInventory)))
 	{
 		return false;
 	}
+
+	_currentOutputInventory = outputInventory;
 
 	if (!CanCreateResource(inputInventory, recipeToCraft))
 	{
@@ -41,6 +86,8 @@ bool UResourceConverterComponent::TryConvertAllResources(UResourceInventory* inp
 	{
 		return false;
 	}
+
+	_currentOutputInventory = outputInventory;
 
 	if (!CanCreateResource(inputInventory, recipeToCraft))
 	{
@@ -94,6 +141,12 @@ void UResourceConverterComponent::ConvertLimitedResources(UResourceInventory* in
 
 void UResourceConverterComponent::ConvertAllResourcesPossible(UResourceInventory* inputInventory, UResourceInventory* outputInventory, const FCraftingData& recipeToCraft)
 {
+	if (_isConvertingResources)
+	{
+		return;
+	}
+
+	_isConvertingResources = true;
 	int resourcesToCreate = GetMaxAmountOfResourceCanBeCrafted(inputInventory, recipeToCraft);
 	if (resourcesToCreate > 0)
 	{
@@ -108,15 +161,11 @@ void UResourceConverterComponent::ConvertAllResourcesPossible(UResourceInventory
 			FGameplayTag outputResourceType = value.ResourceTag;
 			int outputCount = resourcesToCreate * value.ModifiedIntValue.GetModifiedValue(this);
 
-			outputInventory->AddResource(outputResourceType, outputCount);
-
-			UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
-			if (ensure(IsValid(objectiveManager)))
-			{
-				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::CraftResource, outputResourceType, outputCount);
-			}
+			_resourcesToSpawn.Add({ outputResourceType, outputCount });
+			SetComponentTickEnabled(true);
 		}
 	}
+	_isConvertingResources = false;
 }
 
 int UResourceConverterComponent::GetMaxAmountOfResourceCanBeCrafted(const UResourceInventory* inputInventory, const FCraftingData& recipeToCraft) const

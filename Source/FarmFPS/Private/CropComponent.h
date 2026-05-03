@@ -95,7 +95,6 @@ protected:
 
 	UResourceInventory* _cropResourcesInventory = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Crop Yield")
 	TSubclassOf<AResourcePickupActor> _cropYieldPickupClass;
 
 	UPROPERTY(EditDefaultsOnly)

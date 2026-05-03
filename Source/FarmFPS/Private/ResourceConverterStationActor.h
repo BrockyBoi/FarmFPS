@@ -40,4 +40,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	bool _automaticallyConvertResources = true;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool _instantlyConvertResources = false;
 };

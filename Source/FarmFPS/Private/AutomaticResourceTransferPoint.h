@@ -25,6 +25,8 @@ public:
 	void SetGivesResources(bool givesResources);
 	void SetInventory(UResourceInventory* inventory);
 
+	UPrimitiveComponent* GetPlayerCollider() const { return _playerCollider; }
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

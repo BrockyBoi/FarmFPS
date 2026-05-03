@@ -2,9 +2,15 @@
 
 #include "InputOutputStationActor.h"
 
+// Brock
+#include "FarmFPSUtilities.h"
+#include "ResourceActorLookupComponent.h"
+#include "ResourcePickupActor.h"
+
 AInputOutputStationActor::AInputOutputStationActor()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = false;
 
 	_resourceInputPoint = CreateDefaultSubobject<UAutomaticResourceTransferPoint>("ResourceInputPoint");
 	_resourceOutputPoint = CreateDefaultSubobject<UAutomaticResourceTransferPoint>("ResourceOutputPoint");
@@ -27,6 +33,46 @@ void AInputOutputStationActor::BeginPlay()
 	}
 }
 
+void AInputOutputStationActor::Tick(float DeltaTime)
+{
+	if (_currentSpawnTime >= _timeBetweenSpawns)
+	{
+		if (_resourcesToSpawnFromInputInventory.Num() > 0 && ensure(IsValid(_resourceOutputPoint)))
+		{
+			for (int i = 0; i < _resourcesToSpawnFromInputInventory.Num(); i++)
+			{
+				ResourcesToSpawnData& data = _resourcesToSpawnFromInputInventory[i];
+				data.AmountToSpawn -= 1;
+				UResourceActorLookupComponent* lookupComponent = FarmFPSUtilities::GetResourceActorLookupComponent(this);
+				if (ensure(IsValid(lookupComponent)))
+				{
+					TSubclassOf<AResourcePickupActor> actorToSpawn = lookupComponent->GetResourceActorForType(data.ResourceType);
+					if (ensure(actorToSpawn))
+					{
+						FActorSpawnParameters SpawnParams;
+						SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+						AResourcePickupActor* pickup = GetWorld()->SpawnActor<AResourcePickupActor>(actorToSpawn, _resourceOutputPoint->GetPlayerCollider()->GetComponentLocation(), FRotator::ZeroRotator, SpawnParams);
+					}
+				}
+
+				if (data.AmountToSpawn <= 0)
+				{
+					_resourcesToSpawnFromInputInventory.RemoveAt(i);
+				}
+			}
+		}
+		else
+		{
+			SetActorTickEnabled(false);
+		}
+		_currentSpawnTime = 0.f;
+	}
+	else
+	{
+		_currentSpawnTime += DeltaTime;
+	}
+}
+
 void AInputOutputStationActor::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
 	if (IsValid(_inputInventory) && IsValid(_outputInventory))
@@ -40,8 +86,35 @@ void AInputOutputStationActor::EndPlay(EEndPlayReason::Type EndPlayReason)
 
 void AInputOutputStationActor::OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, float amount)
 {
+
 }
 
 void AInputOutputStationActor::OnOutputInventoryResourceCountChanged(const FGameplayTag& resourceType, float amount)
 {
+	if (amount <= 0)
+	{
+		return;
+	}
+
+	if (_outputPhysicalObjectsFromInputInventory)
+	{
+		bool foundResource = false;
+		for (auto& spawnData : _resourcesToSpawnFromInputInventory)
+		{
+			if (spawnData.ResourceType == resourceType)
+			{
+				spawnData.AmountToSpawn += amount;
+				foundResource = true;
+				break;
+			}
+		}
+
+		if (!foundResource)
+		{
+			_resourcesToSpawnFromInputInventory.Add({ resourceType, FMath::RoundToInt(amount) });
+			SetActorTickEnabled(true);
+		}
+
+		_outputInventory->SetResourceAmount(resourceType, 0);
+	}
 }

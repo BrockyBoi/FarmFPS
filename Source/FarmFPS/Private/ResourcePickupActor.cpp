@@ -161,6 +161,7 @@ void AResourcePickupActor::StartMovingTowardsPlayer()
 	_startingMovementLocation = GetActorLocation();
 	_isMovingToPlayer = true;
 	_capsuleCollider->SetSimulatePhysics(false);
+	_staticMesh->SetSimulatePhysics(false);
 }
 
 void AResourcePickupActor::OnDayEnd()

@@ -8,6 +8,7 @@
 #include "DayNightCycleManager.h"
 #include "ObjectiveManager.h"
 #include "PerkManager.h"
+#include "ResourceActorLookupComponent.h"
 
 // UE
 #include "GameFramework/GameStateBase.h"
@@ -89,6 +90,26 @@ UDayNightCycleManager* FarmFPSUtilities::GetDayNightCycleManager(const UObject* 
 		if (ensure(IsValid(objectiveManager)))
 		{
 			return objectiveManager;
+		}
+	}
+
+	return nullptr;
+}
+
+UResourceActorLookupComponent* FarmFPSUtilities::GetResourceActorLookupComponent(const UObject* WorldContextObject)
+{
+	if (!ensure(IsValid(WorldContextObject)))
+	{
+		return nullptr;
+	}
+
+	AGameStateBase* gameState = WorldContextObject->GetWorld()->GetGameState();
+	if (ensure(IsValid(gameState)))
+	{
+		UResourceActorLookupComponent* lookupComponent = gameState->FindComponentByClass<UResourceActorLookupComponent>();
+		if (ensure(IsValid(lookupComponent)))
+		{
+			return lookupComponent;
 		}
 	}
 
