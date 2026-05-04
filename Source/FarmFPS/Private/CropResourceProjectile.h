@@ -26,6 +26,8 @@ class ACropResourceProjectile : public AShooterProjectile
 public:	
 	// Sets default values for this actor's properties
 	ACropResourceProjectile();
+	FGameplayTag GetCropResourceType() const { return _cropResourceType; }
+	float GetCropResourceAmount(const UObject* worldObject) const { return _resourceAmount.GetModifiedValue(worldObject); }
 
 protected:
 	// Called when the game starts or when spawned

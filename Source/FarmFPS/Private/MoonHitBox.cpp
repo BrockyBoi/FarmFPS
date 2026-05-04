@@ -41,7 +41,7 @@ void UMoonHitBox::OnNightStart()
 void UMoonHitBox::HitMoon()
 {
 	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
-	if (IsValid(dayNightCycleManager) && dayNightCycleManager->IsNight())
+	if (_hitsLeft > 0 && IsValid(dayNightCycleManager) && dayNightCycleManager->GetCurrentDayState() == EDayState::MidNight)
 	{
 		_hitsLeft--;
 		if (_hitsLeft <= 0)

@@ -12,6 +12,9 @@ AInputOutputStationActor::AInputOutputStationActor()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = false;
 
+	USceneComponent* root = CreateDefaultSubobject<USceneComponent>("Root");
+	RootComponent = root;
+
 	_resourceInputPoint = CreateDefaultSubobject<UAutomaticResourceTransferPoint>("ResourceInputPoint");
 	_resourceOutputPoint = CreateDefaultSubobject<UAutomaticResourceTransferPoint>("ResourceOutputPoint");
 
@@ -35,25 +38,14 @@ void AInputOutputStationActor::BeginPlay()
 
 void AInputOutputStationActor::Tick(float DeltaTime)
 {
-	if (_currentSpawnTime >= _timeBetweenSpawns)
+	if (_currentSpawnTime >= GetTimeBetweenSpawns())
 	{
 		if (_resourcesToSpawnFromInputInventory.Num() > 0 && ensure(IsValid(_resourceOutputPoint)))
 		{
 			for (int i = 0; i < _resourcesToSpawnFromInputInventory.Num(); i++)
 			{
 				ResourcesToSpawnData& data = _resourcesToSpawnFromInputInventory[i];
-				data.AmountToSpawn -= 1;
-				UResourceActorLookupComponent* lookupComponent = FarmFPSUtilities::GetResourceActorLookupComponent(this);
-				if (ensure(IsValid(lookupComponent)))
-				{
-					TSubclassOf<AResourcePickupActor> actorToSpawn = lookupComponent->GetResourceActorForType(data.ResourceType);
-					if (ensure(actorToSpawn))
-					{
-						FActorSpawnParameters SpawnParams;
-						SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-						AResourcePickupActor* pickup = GetWorld()->SpawnActor<AResourcePickupActor>(actorToSpawn, _resourceOutputPoint->GetPlayerCollider()->GetComponentLocation(), FRotator::ZeroRotator, SpawnParams);
-					}
-				}
+				SpawnResource(data);
 
 				if (data.AmountToSpawn <= 0)
 				{
@@ -82,6 +74,32 @@ void AInputOutputStationActor::EndPlay(EEndPlayReason::Type EndPlayReason)
 	}
 
 	Super::EndPlay(EndPlayReason);
+}
+
+float AInputOutputStationActor::GetTimeBetweenSpawns() const
+{
+	return _defaultTimeBetweenSpawns.GetModifiedValue(this);
+}
+
+void AInputOutputStationActor::SpawnResource(ResourcesToSpawnData& data)
+{
+	data.AmountToSpawn -= 1;
+	UResourceActorLookupComponent* lookupComponent = FarmFPSUtilities::GetResourceActorLookupComponent(this);
+	if (ensure(IsValid(lookupComponent)))
+	{
+		TSubclassOf<AResourcePickupActor> actorToSpawn = lookupComponent->GetResourceActorForType(data.ResourceType);
+		if (ensure(actorToSpawn))
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			AResourcePickupActor* pickup = GetWorld()->SpawnActor<AResourcePickupActor>(actorToSpawn, _resourceOutputPoint->GetPlayerCollider()->GetComponentLocation(), FRotator::ZeroRotator, SpawnParams);
+
+			if (ensure(IsValid(pickup)) && ensure(IsValid(pickup->FindComponentByClass<UPrimitiveComponent>())))
+			{
+				pickup->FindComponentByClass<UPrimitiveComponent>()->AddImpulse(_launchVector);
+			}
+		}
+	}
 }
 
 void AInputOutputStationActor::OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, float amount)

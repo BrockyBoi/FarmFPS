@@ -4,6 +4,7 @@
 
 // Brock
 #include "AutomaticResourceTransferPoint.h"
+#include "ModifiedValueData.h"
 #include "ResourceInventory.h"
 
 // UE
@@ -29,6 +30,16 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
+	virtual float GetTimeBetweenSpawns() const;
+
+	struct ResourcesToSpawnData
+	{
+		FGameplayTag ResourceType;
+		int AmountToSpawn;
+	};
+
+	virtual void SpawnResource(ResourcesToSpawnData& data);
+
 	UFUNCTION()
 	virtual void OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, float amount);
 
@@ -47,16 +58,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UResourceInventory* _outputInventory = nullptr;
 
+	UPROPERTY(EditAnywhere)
+	FVector _launchVector;
+
 	float _currentSpawnTime = 0.f;
 
 	UPROPERTY(EditDefaultsOnly)
-	float _timeBetweenSpawns = .45f;
-
-	struct ResourcesToSpawnData
-	{
-		FGameplayTag ResourceType;
-		int AmountToSpawn;
-	};
+	FModifiedFloatValue _defaultTimeBetweenSpawns = .45f;
 
 	TArray<ResourcesToSpawnData> _resourcesToSpawnFromInputInventory;
 
