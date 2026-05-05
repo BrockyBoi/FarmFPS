@@ -95,8 +95,6 @@ protected:
 
 	UResourceInventory* _cropResourcesInventory = nullptr;
 
-	TSubclassOf<AResourcePickupActor> _cropYieldPickupClass;
-
 	UPROPERTY(EditDefaultsOnly)
 	float _yieldPickupSpawnHeight = 100.f;
 

@@ -3,16 +3,33 @@
 #include "FarmFPSUtilities.h"
 
 // Brock
+#include "ActorLookupComponent.h"
+#include "ActorPool.h"
 #include "BreadStand.h"
 #include "CustomerSpawnerManager.h"
 #include "DayNightCycleManager.h"
 #include "ObjectiveManager.h"
 #include "PerkManager.h"
-#include "ResourceActorLookupComponent.h"
 
 // UE
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
+
+AGameStateBase* FarmFPSUtilities::GetGameBaseState(const UObject* WorldContextObject)
+{
+	if (!ensure(IsValid(WorldContextObject)))
+	{
+		return nullptr;
+	}
+
+	AGameStateBase* gameState = WorldContextObject->GetWorld()->GetGameState();
+	if (ensure(IsValid(gameState)))
+	{
+		return gameState;
+	}
+
+	return nullptr;
+}
 
 UPerkManager* FarmFPSUtilities::GetPlayerPerkManager(const UObject* WorldContextObject)
 {
@@ -26,19 +43,15 @@ UPerkManager* FarmFPSUtilities::GetPlayerPerkManager(const UObject* WorldContext
 
 UObjectiveManager* FarmFPSUtilities::GetObjectiveManager(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)))
+	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
 	{
 		return nullptr;
 	}
 
-	AGameStateBase* gameState = WorldContextObject->GetWorld()->GetGameState();
-	if (ensure(IsValid(gameState)))
+	UObjectiveManager* objectiveManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UObjectiveManager>();
+	if (ensure(IsValid(objectiveManager)))
 	{
-		UObjectiveManager* objectiveManager = gameState->FindComponentByClass<UObjectiveManager>();
-		if (ensure(IsValid(objectiveManager)))
-		{
-			return objectiveManager;
-		}
+		return objectiveManager;
 	}
 
 	return nullptr;
@@ -58,19 +71,15 @@ ABreadStand* FarmFPSUtilities::GetBreadStand(const UObject* WorldContextObject)
 
 UCustomerSpawnerManager* FarmFPSUtilities::GetCustomerSpawnerManager(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)))
+	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
 	{
 		return nullptr;
 	}
 
-	AGameStateBase* gameState = WorldContextObject->GetWorld()->GetGameState();
-	if (ensure(IsValid(gameState)))
+	UCustomerSpawnerManager* customerSpawnerManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UCustomerSpawnerManager>();
+	if (ensure(IsValid(customerSpawnerManager)))
 	{
-		UCustomerSpawnerManager* customerSpawnerManager = gameState->FindComponentByClass<UCustomerSpawnerManager>();
-		if (ensure(IsValid(customerSpawnerManager)))
-		{
-			return customerSpawnerManager;
-		}
+		return customerSpawnerManager;
 	}
 
 	return nullptr;
@@ -78,39 +87,47 @@ UCustomerSpawnerManager* FarmFPSUtilities::GetCustomerSpawnerManager(const UObje
 
 UDayNightCycleManager* FarmFPSUtilities::GetDayNightCycleManager(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)))
+	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
 	{
 		return nullptr;
 	}
 
-	AGameStateBase* gameState = WorldContextObject->GetWorld()->GetGameState();
-	if (ensure(IsValid(gameState)))
+	UDayNightCycleManager* objectiveManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UDayNightCycleManager>();
+	if (ensure(IsValid(objectiveManager)))
 	{
-		UDayNightCycleManager* objectiveManager = gameState->FindComponentByClass<UDayNightCycleManager>();
-		if (ensure(IsValid(objectiveManager)))
-		{
-			return objectiveManager;
-		}
+		return objectiveManager;
 	}
 
 	return nullptr;
 }
 
-UResourceActorLookupComponent* FarmFPSUtilities::GetResourceActorLookupComponent(const UObject* WorldContextObject)
+UActorLookupComponent* FarmFPSUtilities::GetResourceActorLookupComponent(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)))
+	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
 	{
 		return nullptr;
 	}
 
-	AGameStateBase* gameState = WorldContextObject->GetWorld()->GetGameState();
-	if (ensure(IsValid(gameState)))
+	UActorLookupComponent* lookupComponent = GetGameBaseState(WorldContextObject)->FindComponentByClass<UActorLookupComponent>();
+	if (ensure(IsValid(lookupComponent)))
 	{
-		UResourceActorLookupComponent* lookupComponent = gameState->FindComponentByClass<UResourceActorLookupComponent>();
-		if (ensure(IsValid(lookupComponent)))
-		{
-			return lookupComponent;
-		}
+		return lookupComponent;
+	}
+
+	return nullptr;
+}
+
+UActorPool* FarmFPSUtilities::GetActorPool(const UObject* WorldContextObject)
+{
+	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
+	{
+		return nullptr;
+	}
+
+	UActorPool* actorPool = GetGameBaseState(WorldContextObject)->FindComponentByClass<UActorPool>();
+	if (ensure(IsValid(actorPool)))
+	{
+		return actorPool;
 	}
 
 	return nullptr;

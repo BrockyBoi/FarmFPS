@@ -3,9 +3,8 @@
 #include "InputOutputStationActor.h"
 
 // Brock
+#include "ActorPool.h"
 #include "FarmFPSUtilities.h"
-#include "ResourceActorLookupComponent.h"
-#include "ResourcePickupActor.h"
 
 AInputOutputStationActor::AInputOutputStationActor()
 {
@@ -84,20 +83,21 @@ float AInputOutputStationActor::GetTimeBetweenSpawns() const
 void AInputOutputStationActor::SpawnResource(ResourcesToSpawnData& data)
 {
 	data.AmountToSpawn -= 1;
-	UResourceActorLookupComponent* lookupComponent = FarmFPSUtilities::GetResourceActorLookupComponent(this);
-	if (ensure(IsValid(lookupComponent)))
-	{
-		TSubclassOf<AResourcePickupActor> actorToSpawn = lookupComponent->GetResourceActorForType(data.ResourceType);
-		if (ensure(actorToSpawn))
-		{
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			AResourcePickupActor* pickup = GetWorld()->SpawnActor<AResourcePickupActor>(actorToSpawn, _resourceOutputPoint->GetPlayerCollider()->GetComponentLocation(), FRotator::ZeroRotator, SpawnParams);
 
-			if (ensure(IsValid(pickup)) && ensure(IsValid(pickup->FindComponentByClass<UPrimitiveComponent>())))
+	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+	if (ensure(IsValid(actorPool)))
+	{
+		AActor* pooledActor = actorPool->GetActorFromPool(data.ResourceType, _resourceOutputPoint->GetPlayerCollider()->GetComponentLocation());
+		if (IsValid(pooledActor))
+		{
+			if (ensure(IsValid(pooledActor->FindComponentByClass<UPrimitiveComponent>())))
 			{
-				pickup->FindComponentByClass<UPrimitiveComponent>()->AddImpulse(_launchVector);
+				pooledActor->FindComponentByClass<UPrimitiveComponent>()->AddImpulse(_launchVector);
 			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to get pooled actor for resource type %s"), *data.ResourceType.ToString());
 		}
 	}
 }

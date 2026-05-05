@@ -3,6 +3,7 @@
 #include "ShooterWeapon.h"
 
 // Brock
+#include "ActorPool.h"
 #include "FarmFPSCharacter.h"
 #include "ModifiedValueData.h"
 
@@ -200,31 +201,39 @@ void AShooterWeapon::FireProjectile(const FVector& TargetLocation)
 	FTransform ProjectileTransform = CalculateProjectileSpawnTransform(TargetLocation);
 	
 	// spawn the projectile
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.TransformScaleMethod = ESpawnActorScaleMethod::OverrideRootScale;
-	SpawnParams.Owner = GetOwner();
-	SpawnParams.Instigator = PawnOwner;
+	//FActorSpawnParameters SpawnParams;
+	//SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	//SpawnParams.TransformScaleMethod = ESpawnActorScaleMethod::OverrideRootScale;
+	//SpawnParams.Owner = GetOwner();
+	//SpawnParams.Instigator = PawnOwner;
 
-	AShooterProjectile* Projectile = GetWorld()->SpawnActor<AShooterProjectile>(ProjectileClass, ProjectileTransform, SpawnParams);
+	//AShooterProjectile* Projectile = GetWorld()->SpawnActor<AShooterProjectile>(ProjectileClass, ProjectileTransform, SpawnParams);
 
-	// play the firing montage
-	WeaponOwner->PlayFiringMontage(FiringMontage);
-
-	// add recoil
-	WeaponOwner->AddWeaponRecoil(FiringRecoil);
-
-	// consume bullets
-	--CurrentBullets;
-
-	// if the clip is depleted, reload it
-	if (CurrentBullets <= 0)
+	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+	if (ensure(IsValid(actorPool)))
 	{
-		StartReload();
-	}
+		AShooterProjectile* Projectile = Cast<AShooterProjectile>(actorPool->GetActorFromPool(WeaponResourceType, ProjectileTransform));
+		if (ensure(IsValid(Projectile)))
+		{
+			// play the firing montage
+			WeaponOwner->PlayFiringMontage(FiringMontage);
 
-	// update the weapon HUD
-	WeaponOwner->UpdateWeaponHUD(CurrentBullets, MagazineSize);
+			// add recoil
+			WeaponOwner->AddWeaponRecoil(FiringRecoil);
+
+			// consume bullets
+			--CurrentBullets;
+
+			// if the clip is depleted, reload it
+			if (CurrentBullets <= 0)
+			{
+				StartReload();
+			}
+
+			// update the weapon HUD
+			WeaponOwner->UpdateWeaponHUD(CurrentBullets, MagazineSize);
+		}
+	}
 }
 
 FTransform AShooterWeapon::CalculateProjectileSpawnTransform(const FVector& TargetLocation) const

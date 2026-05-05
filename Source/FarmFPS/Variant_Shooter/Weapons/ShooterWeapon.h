@@ -40,6 +40,9 @@ protected:
 	/** Cast pointer to the weapon owner */
 	IShooterWeaponHolder* WeaponOwner;
 
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "CropResourceType,ResourceType"))
+	FGameplayTag WeaponResourceType;
+
 	/** Type of projectiles this weapon will shoot */
 	UPROPERTY(EditAnywhere, Category="Ammo")
 	TSubclassOf<AShooterProjectile> ProjectileClass;

@@ -3,13 +3,13 @@
 #include "CropComponent.h"
 
 // Brock
+#include "ActorPool.h"
 #include "DayNightCycleManager.h"
 #include "FarmFPSUtilities.h"
 #include "PerkManager.h"
 #include "PerkModifierTypeTags.h"
 #include "ObjectiveManager.h"
 #include "ObjectiveTypeTags.h"
-#include "ResourceActorLookupComponent.h"
 #include "ResourceInventory.h"
 #include "ResourcePickupActor.h"
 #include "ResourceTypeTags.h"
@@ -44,12 +44,6 @@ void UCropComponent::BeginPlay()
 	if (ensure(IsValid(dayNightCycle)))
 	{
 		dayNightCycle->OnDayEnd.AddUObject(this, &UCropComponent::OnDayEnd);
-	}
-
-	UResourceActorLookupComponent* resourceActorLookup = FarmFPSUtilities::GetResourceActorLookupComponent(this);
-	if (ensure(IsValid(resourceActorLookup)))
-	{
-		_cropYieldPickupClass = resourceActorLookup->GetResourceActorForType(_cropData.ResourceType);
 	}
 
 	AffectGrowth();
@@ -173,7 +167,7 @@ void UCropComponent::BreakCrop()
 	if (ensure(IsValid(GetWorld())) && ensure(IsValid(GetOwner())))
 	{
 		UPerkManager* perkManager = FarmFPSUtilities::GetPlayerPerkManager(this);
-		if (!ensure(IsValid(perkManager)) || !ensure(IsValid(_cropYieldPickupClass)))
+		if (!ensure(IsValid(perkManager)))
 		{
 			return;
 		}
@@ -190,19 +184,21 @@ void UCropComponent::BreakCrop()
 			countToDrop = FMath::RoundToInt(countToDrop * GetCropCompletionPercentage());
 		}
 
-		for (int i = 0; i < countToDrop; i++)
+		UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+		if (ensure(IsValid(actorPool)))
 		{
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			AResourcePickupActor* pickup = GetWorld()->SpawnActor<AResourcePickupActor>(_cropYieldPickupClass, GetOwner()->GetActorLocation() + FVector::UpVector * _yieldPickupSpawnHeight, FRotator::ZeroRotator, SpawnParams);
-			
-			// Pickup may not be valid if immediately collected by player
-			if (IsValid(pickup))
+			for (int i = 0; i < countToDrop; i++)
 			{
-				UPrimitiveComponent* pickupCollider = pickup->FindComponentByClass<UPrimitiveComponent>();
-				if (IsValid(pickupCollider))
+				AActor* pickup = actorPool->GetActorFromPool(_cropData.ResourceType, GetOwner()->GetActorLocation() + FVector::UpVector * _yieldPickupSpawnHeight);
+
+				// Pickup may not be valid if immediately collected by player
+				if (IsValid(pickup))
 				{
-					pickupCollider->AddImpulse(FVector(FMath::RandRange(-100, 100), FMath::RandRange(-100, 100), 200.f), NAME_None, true);
+					UPrimitiveComponent* pickupCollider = pickup->FindComponentByClass<UPrimitiveComponent>();
+					if (IsValid(pickupCollider))
+					{
+						pickupCollider->AddImpulse(FVector(FMath::RandRange(-100, 100), FMath::RandRange(-100, 100), 200.f), NAME_None, true);
+					}
 				}
 			}
 		}
@@ -255,9 +251,10 @@ void UCropComponent::OnBreakCropTimerEnd()
 
 void UCropComponent::DestroyCrop()
 {
-	if (ensure(IsValid(GetOwner())))
+	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+	if (ensure(IsValid(actorPool)))
 	{
-		GetOwner()->Destroy();
+		actorPool->AddActorToPool(_cropData.ResourceType, GetOwner());
 	}
 }
 
