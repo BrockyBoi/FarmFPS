@@ -5,7 +5,7 @@
 // Brock
 #include "ActorLookupComponent.h"
 #include "FarmFPSUtilities.h"
-#include "ResourcePickupActor.h"
+#include "PoolableActor.h"
 
 UActorPool::UActorPool()
 {
@@ -90,6 +90,12 @@ void UActorPool::AddActorToPool(const FGameplayTag& actorTag, AActor* actor)
 		_pooledActors[actorTag].Add(actor);
 		actor->SetActorEnableCollision(false);
 		actor->SetActorHiddenInGame(true);
+
+		IPoolableActor* poolableActor = Cast<IPoolableActor>(actor);
+		if (ensure(poolableActor))
+		{
+			poolableActor->AddActorToPool();
+		}
 	}
 }
 

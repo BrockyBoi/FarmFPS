@@ -6,6 +6,7 @@
 #include "FarmFPSCharacter.h"
 
 //Brock
+#include "ActorPool.h"
 #include "DayNightCycleManager.h"
 #include "FarmFPSUtilities.h"
 #include "ObjectiveManager.h"
@@ -36,9 +37,35 @@ AResourcePickupActor::AResourcePickupActor()
 	_playerCollider->SetGenerateOverlapEvents(true);
 }
 
-void AResourcePickupActor::BeginPlay()
+void AResourcePickupActor::AddActorToPool()
 {
-	Super::BeginPlay();
+	if (IsValid(_playerCollider))
+	{
+		_playerCollider->OnComponentBeginOverlap.RemoveAll(this);
+		_playerCollider->OnComponentEndOverlap.RemoveAll(this);
+	}
+
+	if (IsValid(_capsuleCollider))
+	{
+		_capsuleCollider->OnComponentHit.RemoveAll(this);
+	}
+
+	GetWorld()->GetTimerManager().ClearTimer(_pickupPreventionTimerHandle);
+
+	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (IsValid(dayNightCycle))
+	{
+		dayNightCycle->OnDayEnd.RemoveAll(this);
+	}
+}
+
+void AResourcePickupActor::RemoveFromPool()
+{
+	_isMovingToPlayer = false;
+	_isAllowedToBeCollected = false;
+
+	_capsuleCollider->SetSimulatePhysics(true);
+	_staticMesh->SetSimulatePhysics(true);
 
 	_startingHeight = GetActorLocation().Z;
 	_rotationVariance = FMath::RandRange(.9f, 1.f);
@@ -64,27 +91,13 @@ void AResourcePickupActor::BeginPlay()
 	}
 }
 
+void AResourcePickupActor::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 void AResourcePickupActor::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
-	if (IsValid(_playerCollider))
-	{
-		_playerCollider->OnComponentBeginOverlap.RemoveAll(this);
-		_playerCollider->OnComponentEndOverlap.RemoveAll(this);
-	}
-
-	if (IsValid(_capsuleCollider))
-	{
-		_capsuleCollider->OnComponentHit.RemoveAll(this);
-	}
-
-	GetWorld()->GetTimerManager().ClearTimer(_pickupPreventionTimerHandle);
-
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
-	if (IsValid(dayNightCycle))
-	{
-		dayNightCycle->OnDayEnd.RemoveAll(this);
-	}
-
 	Super::EndPlay(EndPlayReason);
 }
 
@@ -166,7 +179,11 @@ void AResourcePickupActor::StartMovingTowardsPlayer()
 
 void AResourcePickupActor::OnDayEnd()
 {
-	Destroy();
+	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+	if (ensure(IsValid(actorPool)))
+	{
+		actorPool->AddActorToPool(_cropType, this);
+	}
 }
 
 void AResourcePickupActor::AddResourcesToPlayerInventory(UResourceInventory* inventory)
@@ -181,6 +198,10 @@ void AResourcePickupActor::AddResourcesToPlayerInventory(UResourceInventory* inv
 			objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::CollectResource, _cropType, _yieldAmount);
 		}
 
-		Destroy();
+		UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+		if (ensure(IsValid(actorPool)))
+		{
+			actorPool->AddActorToPool(_cropType, this);
+		}
 	}
 }

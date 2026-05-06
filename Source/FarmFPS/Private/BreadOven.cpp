@@ -27,11 +27,11 @@ void ABreadOven::OnFireTargetOverlap(UPrimitiveComponent* OverlappedComponent, A
 	ACropResourceProjectile* cropProjectile = Cast<ACropResourceProjectile>(OtherActor);
 	if (IsValid(cropProjectile))
 	{
-		if (cropProjectile->GetCropResourceType() == ResourceTypeTags::Light)
+		if (cropProjectile->GetProjectileType() == ResourceTypeTags::Light)
 		{
 			_ovenHeat = FMath::Clamp(_ovenHeat + cropProjectile->GetCropResourceAmount(this), 0.f, 100.f);
 		}
-		else if (cropProjectile->GetCropResourceType() == ResourceTypeTags::Water)
+		else if (cropProjectile->GetProjectileType() == ResourceTypeTags::Water)
 		{
 			_ovenHeat = FMath::Clamp(_ovenHeat - cropProjectile->GetCropResourceAmount(this), 0.f, 100.f);
 		}

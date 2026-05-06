@@ -2,8 +2,15 @@
 
 #pragma once
 
+// Brock
+#include "PoolableActor.h"
+
+// UE
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameplayTagContainer.h"
+
+// Generated
 #include "ShooterProjectile.generated.h"
 
 class USphereComponent;
@@ -15,15 +22,28 @@ class UPrimitiveComponent;
  *  Simple projectile class for a first person shooter game
  */
 UCLASS(abstract)
-class FARMFPS_API AShooterProjectile : public AActor
+class FARMFPS_API AShooterProjectile : public AActor, public IPoolableActor
 {
 	GENERATED_BODY()
-	
-	/** Handles movement for the projectile */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	UProjectileMovementComponent* ProjectileMovement;
+
+public:
+
+	/** Constructor */
+	AShooterProjectile();
+
+	void AddActorToPool();
+	void RemoveFromPool();
+
+	const FGameplayTag& GetProjectileType() const { return ProjectileType; }
 
 protected:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "CropResourceType,ResourceType"))
+	FGameplayTag ProjectileType;
+
+	/** Handles movement for the projectile */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UProjectileMovementComponent* ProjectileMovement;
 
 	/** Provides collision detection for the projectile */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
@@ -75,13 +95,6 @@ protected:
 	/** Timer to handle deferred destruction of this projectile */
 	FTimerHandle DestructionTimer;
 
-public:	
-
-	/** Constructor */
-	AShooterProjectile();
-
-protected:
-	
 	/** Gameplay initialization */
 	virtual void BeginPlay() override;
 
@@ -90,8 +103,6 @@ protected:
 
 	/** Handles collision */
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
-
-protected:
 
 	/** Looks up actors within the explosion radius and damages them */
 	void ExplosionCheck(const FVector& ExplosionCenter);

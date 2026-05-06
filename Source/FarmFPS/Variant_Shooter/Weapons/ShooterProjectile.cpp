@@ -1,6 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-
 #include "ShooterProjectile.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -34,6 +33,18 @@ AShooterProjectile::AShooterProjectile()
 
 	// set the default damage type
 	HitDamageType = UDamageType::StaticClass();
+}
+
+void AShooterProjectile::AddActorToPool()
+{
+	if (ProjectileMovement)
+	{
+		ProjectileMovement->StopMovementImmediately();
+	}
+}
+
+void AShooterProjectile::RemoveFromPool()
+{
 }
 
 void AShooterProjectile::BeginPlay()

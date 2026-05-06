@@ -51,11 +51,11 @@ void ACropResourceProjectile::OnComponentOverlap(UPrimitiveComponent* Overlapped
 		UCropComponent* cropComponent = OtherActor->FindComponentByClass<UCropComponent>();
 		if (IsValid(cropComponent))
 		{
-			cropComponent->AddCropResourceValue(_cropResourceType, _resourceAmount.GetModifiedValue(this));
+			cropComponent->AddCropResourceValue(ProjectileType, _resourceAmount.GetModifiedValue(this));
 		}
 
 		UMoonHitBox* moonHitBox = OtherActor->FindComponentByClass<UMoonHitBox>();
-		if (_cropResourceType == ResourceTypeTags::Light && IsValid(moonHitBox))
+		if (ProjectileType == ResourceTypeTags::Light && IsValid(moonHitBox))
 		{
 			moonHitBox->HitMoon();
 		}
@@ -67,6 +67,6 @@ void ACropResourceProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Oth
 	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(actorPool)))
 	{
-		actorPool->AddActorToPool(_cropResourceType, this);
+		actorPool->AddActorToPool(ProjectileType, this);
 	}
 }

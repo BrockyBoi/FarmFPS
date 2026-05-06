@@ -26,7 +26,6 @@ class ACropResourceProjectile : public AShooterProjectile
 public:	
 	// Sets default values for this actor's properties
 	ACropResourceProjectile();
-	FGameplayTag GetCropResourceType() const { return _cropResourceType; }
 	float GetCropResourceAmount(const UObject* worldObject) const { return _resourceAmount.GetModifiedValue(worldObject); }
 
 protected:
@@ -41,9 +40,6 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	USphereComponent* _cropCollider = nullptr;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Crop Resource", meta = (Categories = "CropResourceType."))
-	FGameplayTag _cropResourceType;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Crop Resource")
 	FModifiedFloatValue _resourceAmount = 1.f;

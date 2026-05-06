@@ -26,12 +26,12 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 	{
 		UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
 		UFarmingPlotComponent* farmPlot = Other->FindComponentByClass<UFarmingPlotComponent>();
-		if (IsValid(farmPlot) && farmPlot->GetAllowedSeedTypes().HasTag(_seedType) && IsValid(dayNightCycle) && dayNightCycle->IsDay())
+		if (IsValid(farmPlot) && farmPlot->GetAllowedSeedTypes().HasTag(ProjectileType) && IsValid(dayNightCycle) && dayNightCycle->IsDay())
 		{
-			actorPool->GetActorFromPool(_seedType, HitLocation);
+			actorPool->GetActorFromPool(ProjectileType, HitLocation);
 		}
 
-		actorPool->AddActorToPool(_seedType, this);
+		actorPool->AddActorToPool(ProjectileType, this);
 	}
 }
 

@@ -2,6 +2,9 @@
 
 #pragma once
 
+// Brock
+#include "PoolableActor.h"
+
 // UE
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
@@ -16,13 +19,15 @@ class UResourceInventory;
 class USphereComponent;
 
 UCLASS()
-class AResourcePickupActor : public AActor
+class AResourcePickupActor : public AActor, public IPoolableActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
 	AResourcePickupActor();
+	void AddActorToPool();
+	void RemoveFromPool();
 
 protected:
 	// Called when the game starts or when spawned
