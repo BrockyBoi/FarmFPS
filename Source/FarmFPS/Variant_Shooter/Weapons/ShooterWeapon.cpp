@@ -212,7 +212,7 @@ void AShooterWeapon::FireProjectile(const FVector& TargetLocation)
 	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(actorPool)))
 	{
-		AShooterProjectile* Projectile = Cast<AShooterProjectile>(actorPool->GetActorFromPool(WeaponResourceType, ProjectileTransform));
+		AShooterProjectile* Projectile = Cast<AShooterProjectile>(actorPool->GetActorFromPool(WeaponResourceType, ProjectileTransform, EPooledActorType::Projectile));
 		if (ensure(IsValid(Projectile)))
 		{
 			// play the firing montage

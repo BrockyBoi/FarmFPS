@@ -182,7 +182,7 @@ void AResourcePickupActor::OnDayEnd()
 	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(actorPool)))
 	{
-		actorPool->AddActorToPool(_cropType, this);
+		actorPool->AddActorToPool(_cropType, this, EPooledActorType::ResourcePickup);
 	}
 }
 
@@ -201,7 +201,7 @@ void AResourcePickupActor::AddResourcesToPlayerInventory(UResourceInventory* inv
 		UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
 		if (ensure(IsValid(actorPool)))
 		{
-			actorPool->AddActorToPool(_cropType, this);
+			actorPool->AddActorToPool(_cropType, this, EPooledActorType::ResourcePickup);
 		}
 	}
 }

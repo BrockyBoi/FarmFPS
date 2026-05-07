@@ -18,12 +18,12 @@ class UPoolableActor : public UInterface
 };
 
 /* Actual Interface declaration. */
-class IPoolableActor
+class FARMFPS_API IPoolableActor
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	void AddActorToPool();
-	void RemoveFromPool();
+	virtual void AddActorToPool() = 0;
+	virtual void RemoveFromPool() = 0;
 };

@@ -51,38 +51,7 @@ void UCropComponent::BeginPlay()
 
 void UCropComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	if (ensure(IsValid(GetOwner())))
-	{
-		UStaticMeshComponent* cropMesh = GetOwner()->FindComponentByClass<UStaticMeshComponent>();
-		if (ensure(IsValid(cropMesh)))
-		{
-			if (_isInPerfectTiming)
-			{
-				float scale = FMath::Lerp(_cropData.FinalScaleSize, _cropData.FinalScaleSize * _maxSizeModifierForPerfectTiming, FMath::Sin(FMath::DegreesToRadians(_sinAngleInPerfectTiming)) + 1);
-				cropMesh->SetWorldScale3D(FVector::One() * scale);
-			}
-			else
-			{
-				FVector currentScale = cropMesh->GetRelativeScale3D();
-				if (currentScale.X > _cropData.FinalScaleSize)
-				{
-					cropMesh->SetWorldScale3D(currentScale * .995f);
-				}
-				else if (currentScale.X < _cropData.FinalScaleSize)
-				{
-					cropMesh->SetWorldScale3D(currentScale * 1.015f);
-				}
-
-				if ((currentScale - _cropData.FinalScaleSize).IsNearlyZero(.01))
-				{
-					cropMesh->SetWorldScale3D(FVector::One() * _cropData.FinalScaleSize);
-					SetComponentTickEnabled(false);
-				}
-			}
-		}
-
-		_sinAngleInPerfectTiming -= .75f;
-	}
+	ShowPerfectTimingVisuals();
 }
 
 void UCropComponent::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -189,7 +158,7 @@ void UCropComponent::BreakCrop()
 		{
 			for (int i = 0; i < countToDrop; i++)
 			{
-				AActor* pickup = actorPool->GetActorFromPool(_cropData.ResourceType, GetOwner()->GetActorLocation() + FVector::UpVector * _yieldPickupSpawnHeight);
+				AActor* pickup = actorPool->GetActorFromPool(_cropData.ResourceType, GetOwner()->GetActorLocation() + FVector::UpVector * _yieldPickupSpawnHeight, EPooledActorType::ResourcePickup);
 
 				// Pickup may not be valid if immediately collected by player
 				if (IsValid(pickup))
@@ -239,6 +208,42 @@ void UCropComponent::AffectGrowth()
 	}
 }
 
+void UCropComponent::ShowPerfectTimingVisuals()
+{
+	if (ensure(IsValid(GetOwner())))
+	{
+		UStaticMeshComponent* cropMesh = GetOwner()->FindComponentByClass<UStaticMeshComponent>();
+		if (ensure(IsValid(cropMesh)))
+		{
+			if (_isInPerfectTiming)
+			{
+				float scale = FMath::Lerp(_cropData.FinalScaleSize, _cropData.FinalScaleSize * _maxSizeModifierForPerfectTiming, FMath::Sin(FMath::DegreesToRadians(_sinAngleInPerfectTiming)) + 1);
+				cropMesh->SetWorldScale3D(FVector::One() * scale);
+			}
+			else
+			{
+				FVector currentScale = cropMesh->GetRelativeScale3D();
+				if (currentScale.X > _cropData.FinalScaleSize)
+				{
+					cropMesh->SetWorldScale3D(currentScale * .995f);
+				}
+				else if (currentScale.X < _cropData.FinalScaleSize)
+				{
+					cropMesh->SetWorldScale3D(currentScale * 1.015f);
+				}
+
+				if ((currentScale - _cropData.FinalScaleSize).IsNearlyZero(.01))
+				{
+					cropMesh->SetWorldScale3D(FVector::One() * _cropData.FinalScaleSize);
+					SetComponentTickEnabled(false);
+				}
+			}
+		}
+
+		_sinAngleInPerfectTiming -= .75f;
+	}
+}
+
 void UCropComponent::OnDayEnd()
 {
 	DestroyCrop();
@@ -254,7 +259,7 @@ void UCropComponent::DestroyCrop()
 	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(actorPool)))
 	{
-		actorPool->AddActorToPool(_cropData.ResourceType, GetOwner());
+		actorPool->AddActorToPool(_cropData.ResourceType, GetOwner(), EPooledActorType::Crop);
 	}
 }
 

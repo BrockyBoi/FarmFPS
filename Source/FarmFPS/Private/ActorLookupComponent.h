@@ -2,6 +2,9 @@
 
 #pragma once
 
+// Brock
+#include "PooledActorTypes.h"
+
 // UE
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
@@ -10,6 +13,10 @@
 // Generated
 #include "ActorLookupComponent.generated.h"
 
+class ACrop;
+class AResourcePickupActor;
+class AShooterProjectile;
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UActorLookupComponent : public UActorComponent
 {
@@ -17,18 +24,28 @@ class UActorLookupComponent : public UActorComponent
 
 public:	
 	UActorLookupComponent();
-	TSubclassOf<AActor> GetActorForType(const FGameplayTag& resourceType) const;
+
+	TSubclassOf<AActor> GetActorReference(const FGameplayTag& actorTag, EPooledActorType actorType) const;
 
 protected:
 	virtual void BeginPlay() override;	
 	void InitializeMapFromTables();
 
 private:
-	mutable TMap<FGameplayTag, TSubclassOf<AActor>> _actorTypeToActorMap;
+
+	TSubclassOf<AResourcePickupActor> GetResourceActor(const FGameplayTag& resourceType) const;
+	TSubclassOf<AShooterProjectile> GetProjectileActor(const FGameplayTag& resourceType) const;
+	TSubclassOf<AActor> GetCropActor(const FGameplayTag& cropType) const;
 
 	UPROPERTY(EditDefaultsOnly)
 	UDataTable* _resourceActorTable;
+	TMap<FGameplayTag, TSubclassOf<AResourcePickupActor>> _resourceActorMap;
 
 	UPROPERTY(EditDefaultsOnly)
 	UDataTable* _projectileActorTable;
+	TMap<FGameplayTag, TSubclassOf<AShooterProjectile>> _projectileActorMap;
+
+	UPROPERTY(EditDefaultsOnly)
+	UDataTable* _cropActorTable;
+	TMap<FGameplayTag, TSubclassOf<ACrop>> _cropActorMap;
 };

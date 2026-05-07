@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "ShooterProjectile.h"
+
+#include "ActorPool.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/Character.h"
@@ -10,6 +12,7 @@
 #include "GameFramework/Controller.h"
 #include "Engine/OverlapResult.h"
 #include "Engine/World.h"
+#include "FarmFPSUtilities.h"
 #include "TimerManager.h"
 
 AShooterProjectile::AShooterProjectile()
@@ -45,6 +48,7 @@ void AShooterProjectile::AddActorToPool()
 
 void AShooterProjectile::RemoveFromPool()
 {
+	ProjectileMovement->Velocity = GetActorForwardVector() * ProjectileMovement->InitialSpeed;
 }
 
 void AShooterProjectile::BeginPlay()
@@ -81,15 +85,13 @@ void AShooterProjectile::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Ot
 
 	if (bExplodeOnHit)
 	{
-		
 		// apply explosion damage centered on the projectile
 		ExplosionCheck(GetActorLocation());
-
-	} else {
-
+	} 
+	else 
+	{
 		// single hit projectile. Process the collided actor
 		ProcessHit(Other, OtherComp, Hit.ImpactPoint, -Hit.ImpactNormal);
-
 	}
 
 	// pass control to BP for any extra effects
@@ -100,10 +102,14 @@ void AShooterProjectile::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Ot
 	{
 		GetWorld()->GetTimerManager().SetTimer(DestructionTimer, this, &AShooterProjectile::OnDeferredDestruction, DeferredDestructionTime, false);
 
-	} else {
-
-		// destroy the projectile right away
-		Destroy();
+	} 
+	else 
+	{
+		UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+		if (ensure(IsValid(actorPool)))
+		{
+			actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
+		}
 	}
 }
 
@@ -173,6 +179,9 @@ void AShooterProjectile::ProcessHit(AActor* HitActor, UPrimitiveComponent* HitCo
 
 void AShooterProjectile::OnDeferredDestruction()
 {
-	// destroy this actor
-	Destroy();
+	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+	if (ensure(IsValid(actorPool)))
+	{
+		actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
+	}
 }

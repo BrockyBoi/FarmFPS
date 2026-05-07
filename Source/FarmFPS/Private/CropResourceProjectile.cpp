@@ -4,7 +4,7 @@
 
 // Brock
 #include "ActorPool.h"
-#include "CropComponent.h"
+#include "Crop.h"
 #include "FarmFPSUtilities.h"
 #include "MoonHitBox.h"
 #include "ResourceTypeTags.h"
@@ -48,10 +48,10 @@ void ACropResourceProjectile::OnComponentOverlap(UPrimitiveComponent* Overlapped
 {
 	if (ensure(IsValid(OtherActor)))
 	{
-		UCropComponent* cropComponent = OtherActor->FindComponentByClass<UCropComponent>();
-		if (IsValid(cropComponent))
+		ACrop* crop = Cast<ACrop>(OtherActor);
+		if (IsValid(crop))
 		{
-			cropComponent->AddCropResourceValue(ProjectileType, _resourceAmount.GetModifiedValue(this));
+			crop->AddCropResourceValue(ProjectileType, _resourceAmount.GetModifiedValue(this));
 		}
 
 		UMoonHitBox* moonHitBox = OtherActor->FindComponentByClass<UMoonHitBox>();
@@ -67,6 +67,6 @@ void ACropResourceProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Oth
 	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(actorPool)))
 	{
-		actorPool->AddActorToPool(ProjectileType, this);
+		actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
 	}
 }

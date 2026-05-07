@@ -4,9 +4,11 @@
 
 // Brock
 #include "ActorPool.h"
+#include "Crop.h"
 #include "DayNightCycleManager.h"
 #include "FarmingPlotComponent.h"
 #include "FarmFPSUtilities.h"
+#include "ResourcePickupActor.h"
 
 // Sets default values
 ASeedProjectile::ASeedProjectile()
@@ -26,12 +28,16 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 	{
 		UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
 		UFarmingPlotComponent* farmPlot = Other->FindComponentByClass<UFarmingPlotComponent>();
-		if (IsValid(farmPlot) && farmPlot->GetAllowedSeedTypes().HasTag(ProjectileType) && IsValid(dayNightCycle) && dayNightCycle->IsDay())
+		if (IsValid(farmPlot) && farmPlot->GetAllowedSeedTypes().HasTag(_cropType) && IsValid(dayNightCycle) && dayNightCycle->IsDay())
 		{
-			actorPool->GetActorFromPool(ProjectileType, HitLocation);
+			ACrop* crop = Cast<ACrop>(actorPool->GetActorFromPool(_cropType, HitLocation, EPooledActorType::Crop));
+			if (ensure(IsValid(crop)))
+			{
+
+			}
 		}
 
-		actorPool->AddActorToPool(ProjectileType, this);
+		actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
 	}
 }
 

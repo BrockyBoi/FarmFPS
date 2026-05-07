@@ -87,7 +87,7 @@ void AInputOutputStationActor::SpawnResource(ResourcesToSpawnData& data)
 	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(actorPool)))
 	{
-		AActor* pooledActor = actorPool->GetActorFromPool(data.ResourceType, _resourceOutputPoint->GetPlayerCollider()->GetComponentLocation());
+		AActor* pooledActor = actorPool->GetActorFromPool(data.ResourceType, _resourceOutputPoint->GetPlayerCollider()->GetComponentLocation(), EPooledActorType::ResourcePickup);
 		if (IsValid(pooledActor))
 		{
 			if (ensure(IsValid(pooledActor->FindComponentByClass<UPrimitiveComponent>())))

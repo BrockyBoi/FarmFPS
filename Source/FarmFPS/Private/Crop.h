@@ -5,6 +5,7 @@
 // Brock
 #include "CropData.h"
 #include "ModifiedValueData.h"
+#include "PoolableActor.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -12,19 +13,19 @@
 #include "GameplayTagContainer.h"
 
 // Generated
-#include "CropComponent.generated.h"
+#include "Crop.generated.h"
 
 class AResourcePickupActor;
 class UResourceInventory;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UCropComponent : public UActorComponent
+UCLASS()
+class ACrop : public AActor, public IPoolableActor
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
-	UCropComponent();
+	ACrop();
 
 	UFUNCTION(BlueprintCallable)
 	void AddCropResourceValue(const FGameplayTag& resourceType, float amount);
@@ -32,6 +33,9 @@ public:
 	void DoDamageToCrop(int damageAmount);
 
 	UResourceInventory* GetResourceInventory() const { return _cropResourcesInventory; }
+
+	void AddActorToPool();
+	void RemoveFromPool();
 
 	UFUNCTION(BlueprintPure)
 	int GetCurrentWaterLevel() const;
@@ -67,7 +71,7 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason);
 
 	void OnLightAndWaterFilled();
