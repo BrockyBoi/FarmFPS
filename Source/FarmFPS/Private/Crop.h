@@ -81,6 +81,9 @@ protected:
 
 	void ShowPerfectTimingVisuals();
 
+	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
+	void Cosmetic_OnResourceAdded();
+
 	UFUNCTION()
 	void OnDayEnd();
 
@@ -111,6 +114,7 @@ protected:
 
 	bool _hasStartedPerfectTiming = false;
 	bool _isInPerfectTiming = false;
+	bool _hasPerfectTimingPeriodEnded = false;
 
 	UPROPERTY(EditDefaultsOnly)
 	float _maxSizeModifierForPerfectTiming = 1.15f;

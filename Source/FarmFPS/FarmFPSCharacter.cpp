@@ -4,7 +4,7 @@
 
 // Brock
 #include "ConstantCropAffectorArea.h"
-#include "CropComponent.h"
+#include "Crop.h"
 #include "PerkManager.h"
 
 // UE
@@ -118,10 +118,10 @@ void AFarmFPSCharacter::OnGroundSlamComponentOverlap(UPrimitiveComponent* Overla
 {
 	if (IsValid(OtherActor))
 	{
-		UCropComponent* cropComponent = OtherActor->FindComponentByClass<UCropComponent>();
-		if (IsValid(cropComponent))
+		ACrop* crop = Cast<ACrop>(OtherActor);
+		if (IsValid(crop))
 		{
-			cropComponent->DoDamageToCrop(_groundSlamDamage.GetModifiedValue(this));
+			crop->DoDamageToCrop(_groundSlamDamage.GetModifiedValue(this));
 		}
 	}
 }
@@ -130,10 +130,10 @@ void AFarmFPSCharacter::OnMeleeComponentOverlap(UPrimitiveComponent* OverlappedC
 {
 	if (IsValid(OtherActor))
 	{
-		UCropComponent* cropComponent = OtherActor->FindComponentByClass<UCropComponent>();
-		if (IsValid(cropComponent))
+		ACrop* crop = Cast<ACrop>(OtherActor);
+		if (IsValid(crop))
 		{
-			cropComponent->DoDamageToCrop(_meleeDamage.GetModifiedValue(this));
+			crop->DoDamageToCrop(_meleeDamage.GetModifiedValue(this));
 		}
 	}
 }

@@ -21,6 +21,7 @@ class UObjectiveManager;
 class FarmFPSUtilities
 {
 public:
+	static AActor* GetPlayerCharacter(const UObject* WorldContextObject);
 	static AGameStateBase* GetGameBaseState(const UObject* WorldContextObject);
 	static UPerkManager* GetPlayerPerkManager(const UObject* WorldContextObject);
 	static UObjectiveManager* GetObjectiveManager(const UObject* WorldContextObject);

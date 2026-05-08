@@ -43,12 +43,18 @@ void AShooterProjectile::AddActorToPool()
 	if (ProjectileMovement)
 	{
 		ProjectileMovement->StopMovementImmediately();
+		ProjectileMovement->Deactivate();
 	}
 }
 
 void AShooterProjectile::RemoveFromPool()
 {
-	ProjectileMovement->Velocity = GetActorForwardVector() * ProjectileMovement->InitialSpeed;
+	if (ProjectileMovement)
+	{
+		ProjectileMovement->Velocity = GetActorForwardVector() * ProjectileMovement->InitialSpeed;
+		ProjectileMovement->UpdateComponentVelocity();
+		ProjectileMovement->Activate(true);
+	}
 }
 
 void AShooterProjectile::BeginPlay()

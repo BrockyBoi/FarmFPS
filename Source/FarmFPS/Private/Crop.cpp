@@ -23,8 +23,6 @@ ACrop::ACrop()
 void ACrop::BeginPlay()
 {
 	Super::BeginPlay();
-
-
 }
 
 void ACrop::Tick(float DeltaTime)
@@ -34,8 +32,6 @@ void ACrop::Tick(float DeltaTime)
 
 void ACrop::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
-
-
 	Super::EndPlay(EndPlayReason);
 }
 
@@ -64,6 +60,8 @@ void ACrop::AddCropResourceValue(const FGameplayTag& resourceType, float amount)
 			OnLightAndWaterFilled();
 			_hasStartedPerfectTiming = true;
 		}
+
+		Cosmetic_OnResourceAdded();
 	}
 }
 
@@ -78,6 +76,7 @@ void ACrop::DoDamageToCrop(int damageAmount)
 
 void ACrop::AddActorToPool()
 {
+	_isInPerfectTiming = _hasPerfectTimingPeriodEnded = false;
 	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycle))
 	{
@@ -88,6 +87,8 @@ void ACrop::AddActorToPool()
 void ACrop::RemoveFromPool()
 {
 	_isBroken = false;
+	_isInPerfectTiming = _hasPerfectTimingPeriodEnded = false;
+	_sinAngleInPerfectTiming = 270.f;
 
 	UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
 	if (ensure(IsValid(objectiveManager)))
@@ -219,6 +220,11 @@ void ACrop::AffectGrowth()
 
 void ACrop::ShowPerfectTimingVisuals()
 {
+	if (!_isInPerfectTiming && !_hasPerfectTimingPeriodEnded)
+	{
+		return;
+	}
+
 	UStaticMeshComponent* cropMesh = FindComponentByClass<UStaticMeshComponent>();
 	if (ensure(IsValid(cropMesh)))
 	{
@@ -227,7 +233,7 @@ void ACrop::ShowPerfectTimingVisuals()
 			float scale = FMath::Lerp(_cropData.FinalScaleSize, _cropData.FinalScaleSize * _maxSizeModifierForPerfectTiming, FMath::Sin(FMath::DegreesToRadians(_sinAngleInPerfectTiming)) + 1);
 			cropMesh->SetWorldScale3D(FVector::One() * scale);
 		}
-		else
+		else if (_hasPerfectTimingPeriodEnded)
 		{
 			FVector currentScale = cropMesh->GetRelativeScale3D();
 			if (currentScale.X > _cropData.FinalScaleSize)

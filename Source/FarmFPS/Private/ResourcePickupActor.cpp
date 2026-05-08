@@ -39,6 +39,11 @@ AResourcePickupActor::AResourcePickupActor()
 
 void AResourcePickupActor::AddActorToPool()
 {
+	_isMovingToPlayer = false;
+	_isAllowedToBeCollected = false;
+	_timeMovedToPlayer = 0;
+	_characterToMoveTo = nullptr;
+
 	if (IsValid(_playerCollider))
 	{
 		_playerCollider->OnComponentBeginOverlap.RemoveAll(this);
@@ -65,7 +70,6 @@ void AResourcePickupActor::RemoveFromPool()
 	_isAllowedToBeCollected = false;
 
 	_capsuleCollider->SetSimulatePhysics(true);
-	_staticMesh->SetSimulatePhysics(true);
 
 	_startingHeight = GetActorLocation().Z;
 	_rotationVariance = FMath::RandRange(.9f, 1.f);
@@ -162,6 +166,12 @@ void AResourcePickupActor::OnCapsuleColliderHit(UPrimitiveComponent* HitComp, AA
 void AResourcePickupActor::OnPickupPreventionTimerEnd()
 {
 	_isAllowedToBeCollected = true;
+	
+	AFarmFPSCharacter* player = Cast<AFarmFPSCharacter>(FarmFPSUtilities::GetPlayerCharacter(this));
+	if (ensure(IsValid(_playerCollider)) && ensure(IsValid(player)) && _playerCollider->IsOverlappingActor(player))
+	{
+		_characterToMoveTo = player;
+	}
 
 	if (_characterToMoveTo.IsValid())
 	{
@@ -174,7 +184,7 @@ void AResourcePickupActor::StartMovingTowardsPlayer()
 	_startingMovementLocation = GetActorLocation();
 	_isMovingToPlayer = true;
 	_capsuleCollider->SetSimulatePhysics(false);
-	_staticMesh->SetSimulatePhysics(false);
+	//_staticMesh->SetSimulatePhysics(false);
 }
 
 void AResourcePickupActor::OnDayEnd()

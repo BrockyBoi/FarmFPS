@@ -45,6 +45,11 @@ AActor* UActorPool::GetActorFromPool(const FGameplayTag& actorTag, const FTransf
 		SpawnNewActor(actorTag, spawnTransform, actorType);
 	}
 
+	if (!ensure(!mapReference[actorTag].IsEmpty()))
+	{
+		return nullptr;
+	}
+
 	AActor* pooledActor = mapReference[actorTag].Pop();
 	if (ensure(IsValid(pooledActor)))
 	{
@@ -74,6 +79,11 @@ AActor* UActorPool::GetActorFromPool(const FGameplayTag& actorTag, const FVector
 	if (mapReference[actorTag].IsEmpty())
 	{
 		SpawnNewActor(actorTag, spawnLocation, actorType);
+	}
+
+	if (!ensure(!mapReference[actorTag].IsEmpty()))
+	{
+		return nullptr;
 	}
 
 	AActor* pooledActor = mapReference[actorTag].Pop();

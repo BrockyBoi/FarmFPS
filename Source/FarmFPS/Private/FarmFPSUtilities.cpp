@@ -15,6 +15,17 @@
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 
+AActor* FarmFPSUtilities::GetPlayerCharacter(const UObject* WorldContextObject)
+{
+	APlayerController* playerController = UGameplayStatics::GetPlayerController(WorldContextObject, 0);
+	if (ensure(IsValid(playerController)) && ensure(IsValid(playerController->GetPawn())))
+	{
+		return playerController->GetPawn();
+	}
+
+	return nullptr;
+}
+
 AGameStateBase* FarmFPSUtilities::GetGameBaseState(const UObject* WorldContextObject)
 {
 	if (!ensure(IsValid(WorldContextObject)))
@@ -33,11 +44,11 @@ AGameStateBase* FarmFPSUtilities::GetGameBaseState(const UObject* WorldContextOb
 
 UPerkManager* FarmFPSUtilities::GetPlayerPerkManager(const UObject* WorldContextObject)
 {
-	APlayerController* playerController = UGameplayStatics::GetPlayerController(WorldContextObject, 0);
-;	if (ensure(IsValid(playerController)) && ensure(IsValid(playerController->GetPawn())))
+	if (ensure(IsValid(GetPlayerCharacter(WorldContextObject))))
 	{
-		return playerController->GetPawn()->FindComponentByClass<UPerkManager>();
+		return GetPlayerCharacter(WorldContextObject)->FindComponentByClass<UPerkManager>();
 	}
+
 	return nullptr;
 }
 
