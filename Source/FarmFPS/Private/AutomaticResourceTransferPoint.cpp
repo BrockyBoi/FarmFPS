@@ -1,11 +1,13 @@
-#include "AutomaticResourceTransferPoint.h"
-#include "AutomaticResourceTransferPoint.h"
 // Fill out your copyright notice in the Description page of Project Settings.
+
 
 #include "AutomaticResourceTransferPoint.h"
 
 // Brock
+#include "ActorPool.h"
+#include "FarmFPSUtilities.h"
 #include "ResourceInventory.h"
+#include "ResourcePickupActor.h"
 
 // UE
 #include "Components/PrimitiveComponent.h"
@@ -50,22 +52,41 @@ void UAutomaticResourceTransferPoint::OnComponentOverlap(UPrimitiveComponent* Ov
 {
 	if (IsValid(OtherActor))
 	{
-		UResourceInventory* inventory = OtherActor->FindComponentByClass<UResourceInventory>();
-		if (IsValid(inventory) && ensure(_inventory.IsValid()))
+		if (_needsToOverlapPlayer)
 		{
-			if (_givesResources)
+			UResourceInventory* inventory = OtherActor->FindComponentByClass<UResourceInventory>();
+			if (IsValid(inventory) && ensure(_inventory.IsValid()))
 			{
-				inventory->AddAllResourcesInInventory(_inventory.Get());
-			}
-			else
-			{
-				for (const FGameplayTag& resourceType : _resourcesAllowed)
+				if (_givesResources)
 				{
-					int resourceCount = inventory->GetResourceCount(resourceType);
-					if (resourceCount > 0)
+					inventory->AddAllResourcesInInventory(_inventory.Get());
+				}
+				else
+				{
+					for (const FGameplayTag& resourceType : _resourcesAllowed)
 					{
-						_inventory->AddResource(resourceType, resourceCount);
-						inventory->RemoveResource(resourceType, resourceCount);
+						int resourceCount = inventory->GetResourceCount(resourceType);
+						if (resourceCount > 0)
+						{
+							_inventory->AddResource(resourceType, resourceCount);
+							inventory->RemoveResource(resourceType, resourceCount);
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			AResourcePickupActor* resourcePickup = Cast<AResourcePickupActor>(OtherActor);
+			if (IsValid(resourcePickup) && ensure(_inventory.IsValid()) && _resourcesAllowed.HasTag(resourcePickup->GetResourceType()))
+			{
+				if (!_givesResources)
+				{
+					_inventory->AddResource(resourcePickup->GetResourceType(), 1);
+					UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+					if (ensure(IsValid(actorPool)))
+					{
+						actorPool->AddActorToPool(resourcePickup->GetResourceType(), resourcePickup, EPooledActorType::ResourcePickup);
 					}
 				}
 			}

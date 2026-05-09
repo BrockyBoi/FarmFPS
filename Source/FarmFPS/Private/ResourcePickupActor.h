@@ -29,6 +29,8 @@ public:
 	void AddActorToPool();
 	void RemoveFromPool();
 
+	const FGameplayTag& GetResourceType() const { return _cropType; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

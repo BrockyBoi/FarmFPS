@@ -37,8 +37,6 @@ void AInputOutputStationActor::BeginPlay()
 
 void AInputOutputStationActor::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-
 	if (_currentSpawnTime >= GetTimeBetweenSpawns())
 	{
 		if (_resourcesToSpawnFromInputInventory.Num() > 0 && ensure(IsValid(_resourceOutputPoint)))

@@ -45,4 +45,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	bool _givesResources = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool _needsToOverlapPlayer = false;
 };
