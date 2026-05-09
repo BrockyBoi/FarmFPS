@@ -3,9 +3,14 @@
 #include "FarmFPSCharacter.h"
 
 // Brock
+#include "ActorPool.h"
 #include "ConstantCropAffectorArea.h"
 #include "Crop.h"
+#include "FarmFPSUtilities.h"
 #include "PerkManager.h"
+#include "PlayerInventoryItemSelector.h"
+#include "ResourceInventory.h"
+#include "ResourceTypeTags.h"
 
 // UE
 #include "Animation/AnimInstance.h"
@@ -49,6 +54,8 @@ AFarmFPSCharacter::AFarmFPSCharacter()
 	FirstPersonCameraComponent->FirstPersonScale = 0.6f;
 
 	_perkManager = CreateDefaultSubobject<UPerkManager>(TEXT("PerkManager"));
+	_inventory = CreateDefaultSubobject<UResourceInventory>(TEXT("Inventory"));
+	_itemSelector = CreateDefaultSubobject<UPlayerInventoryItemSelector>(TEXT("Item Selector"));
 
 	// configure the character comps
 	GetMesh()->SetOwnerNoSee(true);
@@ -84,6 +91,11 @@ void AFarmFPSCharacter::BeginPlay()
 		_perkManager->OnPerkLevelChange.AddDynamic(this, &AFarmFPSCharacter::OnPerkLevelDataChanged);
 		_startingJumpCount = JumpMaxCount;
 		_startingJumpHeight = GetCharacterMovement()->JumpZVelocity;
+	}
+
+	if (ensure(IsValid(_inventory)) && ensure(IsValid(_itemSelector)))
+	{
+		_itemSelector->SetPlayerInventory(_inventory);
 	}
 }
 
@@ -161,6 +173,9 @@ void AFarmFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		EnhancedInputComponent->BindAction(GroundSlamAction, ETriggerEvent::Started, this, &AFarmFPSCharacter::DoGroundSlamStart);
 		EnhancedInputComponent->BindAction(GroundSlamAction, ETriggerEvent::Completed, this, &AFarmFPSCharacter::DoGroundSlamEnd);
+
+		EnhancedInputComponent->BindAction(SelectInventoryItemAction, ETriggerEvent::Triggered, this, &AFarmFPSCharacter::DoSelectInventoryItem);
+		EnhancedInputComponent->BindAction(ThrowInventoryItemAction, ETriggerEvent::Triggered, this, &AFarmFPSCharacter::ThrowInventoryItem);
 	}
 	else
 	{
@@ -197,6 +212,46 @@ void AFarmFPSCharacter::LookInput(const FInputActionValue& Value)
 	// pass the axis values to the aim input
 	DoAim(LookAxisVector.X, LookAxisVector.Y);
 
+}
+
+void AFarmFPSCharacter::DoSelectInventoryItem(const FInputActionValue& Value)
+{
+	if (Value.Get<float>() > 0.0f)
+	{
+		_itemSelector->IncreaseIndex();
+	}
+	else if (Value.Get<float>() < 0.0f)
+	{
+		_itemSelector->DecreaseIndex();
+	}
+}
+
+void AFarmFPSCharacter::ThrowInventoryItem()
+{
+	if (ensure(IsValid(_itemSelector)) && ensure(IsValid(_inventory)))
+	{
+		FGameplayTag currentResource = _itemSelector->GetCurrentSelectedItemType();
+		if (currentResource != ResourceTypeTags::None)
+		{
+			if (ensure(_inventory->HasResourceAmount(currentResource, 1)))
+			{
+				_inventory->RemoveResource(currentResource, 1);
+				UActorPool* pool = FarmFPSUtilities::GetActorPool(this);
+				if (ensure(IsValid(pool)))
+				{
+					const FVector spawnLocation = GetActorLocation() + (GetActorForwardVector() * 100.f) + FVector(0.f, 0.f, 50.f);
+					AActor* thrownItem = pool->GetActorFromPool(currentResource, spawnLocation, EPooledActorType::ResourcePickup);
+					if (ensure(IsValid(thrownItem)))
+					{
+						if (UPrimitiveComponent* primitiveComponent = Cast<UPrimitiveComponent>(thrownItem->GetRootComponent()))
+						{
+							primitiveComponent->AddImpulse(GetActorForwardVector() * _throwForce.GetModifiedValue(this));
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 void AFarmFPSCharacter::DoAim(float Yaw, float Pitch)

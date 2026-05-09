@@ -19,6 +19,8 @@ class UBoxComponent;
 class UCameraComponent;
 class UInputAction;
 class UInputComponent;
+class UPlayerInventoryItemSelector;
+class UResourceInventory;
 class USkeletalMeshComponent;
 class USphereComponent;
 
@@ -66,6 +68,12 @@ protected:
 	/** Called from Input Actions for looking input */
 	void LookInput(const FInputActionValue& Value);
 
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	void DoSelectInventoryItem(const FInputActionValue& Value);
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	void ThrowInventoryItem();
+
 	/** Handles aim inputs from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoAim(float Yaw, float Pitch);
@@ -106,6 +114,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* JumpAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* ThrowInventoryItemAction;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* SelectInventoryItemAction;
+
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* MeleeAction;
@@ -134,7 +148,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	class UInputAction* MouseLookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	class UPerkManager* _perkManager = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	UResourceInventory* _inventory = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	UPlayerInventoryItemSelector* _itemSelector = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
 	FModifiedFloatValue _groundSlamDistanceThreshold;
@@ -175,6 +196,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Jump")
 	FModifiedFloatValue _extraJumpHeight = 10.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Throw")
+	FModifiedFloatValue _throwForce = 1000.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Affectors")
 	TSubclassOf<AConstantCropAffectorArea> _waterAffectorClass;

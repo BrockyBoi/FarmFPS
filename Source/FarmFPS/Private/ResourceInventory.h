@@ -39,6 +39,8 @@ public:
 
 	uint16 GetResourceCap(const FGameplayTag& resourceType) const;
 
+	const TMap<FGameplayTag, float>& GetResourcesMap() const { return _resourcesMap; }
+
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnResourceCountChangedEvent, const FGameplayTag&, resourceType, float, newAmount);
 	
 	UPROPERTY(BlueprintAssignable)

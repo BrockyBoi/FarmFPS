@@ -2,6 +2,11 @@
 
 
 #include "ShooterCharacter.h"
+
+// Brock
+#include "PlayerInventoryItemSelector.h"
+#include "ResourceInventory.h"
+
 #include "ShooterWeapon.h"
 #include "EnhancedInputComponent.h"
 #include "Components/InputComponent.h"
@@ -17,6 +22,8 @@ AShooterCharacter::AShooterCharacter()
 {
 	// create the noise emitter component
 	PawnNoiseEmitter = CreateDefaultSubobject<UPawnNoiseEmitterComponent>(TEXT("Pawn Noise Emitter"));
+
+
 
 	// configure movement
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 600.0f, 0.0f);
