@@ -2,8 +2,13 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+// Brock
 #include "ResourcePickupActor.h"
+
+// UE
+#include "CoreMinimal.h"
+
+// Generated
 #include "WaterMelonPickupActor.generated.h"
 
 /**

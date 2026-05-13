@@ -24,20 +24,22 @@ class AResourcePickupActor : public AActor, public IPoolableActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AResourcePickupActor();
-	void AddActorToPool();
-	void RemoveFromPool();
+	virtual void AddActorToPool();
+	virtual void RemoveFromPool();
+
+	void SetIsBeingThrownByPlayer(bool isBeingThrown) { _isBeingThrownByPlayer = isBeingThrown; }
 
 	const FGameplayTag& GetResourceType() const { return _cropType; }
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
+	bool CanBeCollectedByPlayer() const;
+	virtual void OnThrownOnGround();
+
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 protected:
@@ -48,7 +50,7 @@ protected:
 	void OnComponentOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UFUNCTION()
-	void OnCapsuleColliderHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void OnGroundHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	void OnPickupPreventionTimerEnd();
 
@@ -58,6 +60,8 @@ protected:
 	void OnDayEnd();
 
 	void AddResourcesToPlayerInventory(UResourceInventory* inventory);
+
+	bool _isBeingThrownByPlayer = false;
 
 	bool _isMovingToPlayer = false;
 
@@ -76,7 +80,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	float _timeCannotMoveToPlayerAfterSpawn = .5f;
 
-	bool _isAllowedToBeCollected = false;
+	bool _isPreventionTimeOver = false;
 
 	UPROPERTY(EditDefaultsOnly)
 	float _timeToMoveToPlayer = 1.5f;
@@ -84,7 +88,6 @@ protected:
 	float _timeMovedToPlayer = 0.f;
 
 	FTimerHandle _pickupPreventionTimerHandle;
-
 
 	FVector _startingMovementLocation = FVector::ZeroVector;
 	TWeakObjectPtr<APawn> _characterToMoveTo;
@@ -103,4 +106,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Crop Yield")
 	uint16 _yieldAmount = 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> _onCollectResourceSound = nullptr;
 };

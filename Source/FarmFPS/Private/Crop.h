@@ -74,6 +74,9 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason);
 
+	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
+	void Cosmetic_OnRemovedFromPool();
+
 	void OnLightAndWaterFilled();
 	void OnPerfectTimingEnd();
 
@@ -118,6 +121,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	float _maxSizeModifierForPerfectTiming = 1.15f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> _onBreakCropSound;
 
 	float _sinAngleInPerfectTiming = 270.f;
 

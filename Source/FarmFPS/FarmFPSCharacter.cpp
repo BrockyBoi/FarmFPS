@@ -9,6 +9,7 @@
 #include "FarmFPSUtilities.h"
 #include "PerkManager.h"
 #include "PlayerInventoryItemSelector.h"
+#include "ResourcePickupActor.h"
 #include "ResourceInventory.h"
 #include "ResourceTypeTags.h"
 
@@ -240,9 +241,10 @@ void AFarmFPSCharacter::ThrowInventoryItem()
 				if (ensure(IsValid(pool)))
 				{
 					const FVector spawnLocation = GetActorLocation() + (GetActorForwardVector() * 100.f) + FVector(0.f, 0.f, 50.f);
-					AActor* thrownItem = pool->GetActorFromPool(currentResource, spawnLocation, EPooledActorType::ResourcePickup);
+					AResourcePickupActor* thrownItem = Cast<AResourcePickupActor>(pool->GetActorFromPool(currentResource, spawnLocation, EPooledActorType::ResourcePickup));
 					if (ensure(IsValid(thrownItem)))
 					{
+						thrownItem->SetIsBeingThrownByPlayer(true);
 						if (UPrimitiveComponent* primitiveComponent = Cast<UPrimitiveComponent>(thrownItem->GetRootComponent()))
 						{
 							primitiveComponent->AddImpulse(GetActorForwardVector() * _throwForce.GetModifiedValue(this));

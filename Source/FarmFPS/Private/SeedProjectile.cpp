@@ -10,6 +10,9 @@
 #include "FarmFPSUtilities.h"
 #include "ResourcePickupActor.h"
 
+// UE
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values
 ASeedProjectile::ASeedProjectile()
 {
@@ -35,10 +38,13 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 			{
 
 			}
+
+			if (ensure(IsValid(_onSeedPlantedSound)))
+			{
+				UGameplayStatics::SpawnSoundAtLocation(this, _onSeedPlantedSound, GetActorLocation());
+			}
 		}
 
 		actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
 	}
 }
-
-

@@ -9,6 +9,7 @@
 
 // UE
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "ShooterProjectile.h"
 #include "ShooterWeaponHolder.h"
@@ -151,6 +152,11 @@ void AShooterWeapon::Fire()
 
 	// make noise so the AI perception system can hear us
 	MakeNoise(ShotLoudness, PawnOwner, PawnOwner->GetActorLocation(), ShotNoiseRange, ShotNoiseTag);
+
+	if (ensure(IsValid(_onShootSound)))
+	{
+		UGameplayStatics::SpawnSoundAtLocation(this, _onShootSound, GetActorLocation());
+	}
 
 	// are we full auto?
 	if (bFullAuto)

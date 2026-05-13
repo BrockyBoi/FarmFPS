@@ -31,4 +31,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Seed")
 	FGameplayTag _cropType;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> _onSeedPlantedSound;
 };

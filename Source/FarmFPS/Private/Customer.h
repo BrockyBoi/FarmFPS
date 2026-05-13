@@ -69,6 +69,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ResourceType."))
 	FGameplayTag _resourceDesired;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> _onBoughtBreadSound;
+
 	int _amountDesired = 0;
 	int _amountLeftToBuy = 0;
 

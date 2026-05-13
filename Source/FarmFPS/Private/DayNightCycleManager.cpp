@@ -3,8 +3,10 @@
 #include "DayNightCycleManager.h"
 
 // UE
+#include "Components/AudioComponent.h"
 #include "EngineUtils.h"
 #include "Engine/DirectionalLight.h"
+#include "Kismet/GameplayStatics.h"
 
 UDayNightCycleManager::UDayNightCycleManager()
 {
@@ -68,16 +70,16 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 		FRotator rotation(lerpedPitch, 0.f, 0.f);
 		_moonLight->SetActorRotation(rotation);
+
+		if (_timeElapsed >= _timeToReachPeakMoon)
+		{
+			_musicAudioComponent->SetSound(_nightTimeMusic);
+			_musicAudioComponent->FadeIn(0.5f, 1.f);
+		}
 	}
 
 	if (GetCurrentDayState() == EDayState::NightTransitionToDay && ensure(_moonLight.IsValid()))
 	{
-		if (_timeElapsed >= _timeToReachPeakMoon)
-		{
-			_moonLight->SetActorRotation(FRotator(380.f, 0.f, 0.f));
-			return;
-		}
-
 		_timeElapsed += DeltaTime;
 		float lerpedPitch = FMath::Lerp(70.f, 200.f, _timeElapsed / _timeToReachPeakMoon) + 180.f;
 
@@ -93,6 +95,8 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UDayNightCycleManager::TransitionToNextDay()
 {
+	UGameplayStatics::SpawnSound2D(this, _onNightEndSound);
+	_musicAudioComponent->FadeOut(0.5f, 0.f);
 	_timeElapsed = 0.f;
 	_currentDayState = EDayState::NightTransitionToDay;
 }
@@ -113,10 +117,28 @@ void UDayNightCycleManager::StartDay()
 		FRotator rotation(90.f, 0.f, 0.f);
 		_sunLight->SetActorRotation(rotation);
 	}
+
+	if (ensure(IsValid(_onDayStartSound)) && ensure(IsValid(_daytimeMusic)))
+	{
+		if (!IsValid(_musicAudioComponent))
+		{
+			_musicAudioComponent = UGameplayStatics::SpawnSound2D(this, _daytimeMusic);
+		}
+		else
+		{
+			_musicAudioComponent->SetSound(_daytimeMusic);
+			_musicAudioComponent->FadeIn(0.5f, 1.f);
+			_musicAudioComponent->Play();
+		}
+	}
+
+	UGameplayStatics::SpawnSound2D(this, _onDayStartSound);
 }
 
 void UDayNightCycleManager::EndDay()
 {
+	_musicAudioComponent->FadeOut(2.f, 0.f);
+
 	_currentDayState = EDayState::MidNight;
 	if (OnDayEnd.IsBound())
 	{
@@ -136,5 +158,7 @@ void UDayNightCycleManager::EndDay()
 
 	FTimerHandle timerHandle;
 	//GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &UDayNightCycleManager::StartDay, _timeUntilAutoStartNextDay, false);
+
+	UGameplayStatics::SpawnSound2D(this, _onDayEndSound);
 }
 

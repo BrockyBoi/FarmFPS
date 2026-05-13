@@ -93,6 +93,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Reload")
 	FModifiedFloatValue ReloadTime = 1.5f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> _onShootSound;
+
 	/** Game time of last shot fired, used to enforce refire rate on semi auto */
 	float TimeOfLastShot = 0.0f;
 

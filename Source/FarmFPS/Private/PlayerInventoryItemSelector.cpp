@@ -4,6 +4,7 @@
 
 // Brock
 #include "ResourceInventory.h"
+#include "ResourceTypeTags.h"
 
 UPlayerInventoryItemSelector::UPlayerInventoryItemSelector()
 {
@@ -69,6 +70,11 @@ void UPlayerInventoryItemSelector::SetPlayerInventory(UResourceInventory* player
 
 void UPlayerInventoryItemSelector::OnResourceChanged(const FGameplayTag& resourceType, float newAmount)
 {
+	if (resourceType == ResourceTypeTags::Money)
+	{
+		return;
+	}
+
 	const int startingItemTypeCount = _currentInventoryItemTypes.Num();
 
 	if (_currentInventoryItemTypes.Contains(resourceType) && newAmount <= 0)

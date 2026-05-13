@@ -62,6 +62,23 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TWeakObjectPtr<ADirectionalLight> _moonLight = nullptr;
 
+	TObjectPtr<UAudioComponent> _musicAudioComponent = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> _onDayStartSound = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> _onDayEndSound = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> _daytimeMusic = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> _nightTimeMusic = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> _onNightEndSound = nullptr;
+
 	float _timeElapsed = 0.f;
 
 	EDayState _currentDayState;

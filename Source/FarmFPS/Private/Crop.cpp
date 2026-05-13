@@ -14,6 +14,9 @@
 #include "ResourcePickupActor.h"
 #include "ResourceTypeTags.h"
 
+// UE
+#include "Kismet/GameplayStatics.h"
+
 ACrop::ACrop()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -89,6 +92,8 @@ void ACrop::RemoveFromPool()
 	_isBroken = false;
 	_isInPerfectTiming = _hasPerfectTimingPeriodEnded = false;
 	_sinAngleInPerfectTiming = 270.f;
+
+	Cosmetic_OnRemovedFromPool();
 
 	UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
 	if (ensure(IsValid(objectiveManager)))
@@ -199,6 +204,11 @@ void ACrop::BreakCrop()
 		//GetOwner()->Destroy();
 		FTimerHandle handle;
 		GetWorld()->GetTimerManager().SetTimer(handle, this, &ACrop::OnBreakCropTimerEnd, .1f, false);
+
+		if (ensure(IsValid(_onBreakCropSound)))
+		{
+			UGameplayStatics::SpawnSoundAtLocation(this, _onBreakCropSound, GetActorLocation());
+		}
 	}
 }
 

@@ -16,6 +16,7 @@
 // UE
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 AResourcePickupActor::AResourcePickupActor()
 {
@@ -40,7 +41,7 @@ AResourcePickupActor::AResourcePickupActor()
 void AResourcePickupActor::AddActorToPool()
 {
 	_isMovingToPlayer = false;
-	_isAllowedToBeCollected = false;
+	_isPreventionTimeOver = false;
 	_timeMovedToPlayer = 0;
 	_characterToMoveTo = nullptr;
 
@@ -67,7 +68,8 @@ void AResourcePickupActor::AddActorToPool()
 void AResourcePickupActor::RemoveFromPool()
 {
 	_isMovingToPlayer = false;
-	_isAllowedToBeCollected = false;
+	_isPreventionTimeOver = false;
+	_isBeingThrownByPlayer = false;
 
 	_capsuleCollider->SetSimulatePhysics(true);
 
@@ -85,7 +87,7 @@ void AResourcePickupActor::RemoveFromPool()
 
 	if (ensure(IsValid(_capsuleCollider)))
 	{
-		_capsuleCollider->OnComponentHit.AddDynamic(this, &AResourcePickupActor::OnCapsuleColliderHit);
+		_capsuleCollider->OnComponentHit.AddDynamic(this, &AResourcePickupActor::OnGroundHit);
 	}
 
 	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
@@ -103,6 +105,16 @@ void AResourcePickupActor::BeginPlay()
 void AResourcePickupActor::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+}
+
+bool AResourcePickupActor::CanBeCollectedByPlayer() const
+{
+	return _isPreventionTimeOver && !_isBeingThrownByPlayer;
+}
+
+void AResourcePickupActor::OnThrownOnGround()
+{
+	// Base empty
 }
 
 void AResourcePickupActor::Tick(float DeltaTime)
@@ -135,7 +147,7 @@ void AResourcePickupActor::OnComponentOverlap(UPrimitiveComponent* OverlappedCom
 		{
 			_characterToMoveTo = player;
 
-			if (_isAllowedToBeCollected)
+			if (CanBeCollectedByPlayer())
 			{
 				StartMovingTowardsPlayer();
 			}
@@ -148,27 +160,27 @@ void AResourcePickupActor::OnComponentOverlapEnd(UPrimitiveComponent* Overlapped
 	AFarmFPSCharacter* player = Cast<AFarmFPSCharacter>(OtherActor);
 	if (IsValid(player))
 	{
-		if (!_isAllowedToBeCollected)
+		if (!CanBeCollectedByPlayer())
 		{
 			_characterToMoveTo = nullptr;
 		}
 	}
 }
 
-void AResourcePickupActor::OnCapsuleColliderHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AResourcePickupActor::OnGroundHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (ensure(IsValid(_capsuleCollider)))
+	if (ensure(IsValid(OtherActor)))
 	{
-		//_capsuleCollider->SetSimulatePhysics(false);
+		_isBeingThrownByPlayer = false;
 	}
 }
 
 void AResourcePickupActor::OnPickupPreventionTimerEnd()
 {
-	_isAllowedToBeCollected = true;
+	_isPreventionTimeOver = true;
 	
 	AFarmFPSCharacter* player = Cast<AFarmFPSCharacter>(FarmFPSUtilities::GetPlayerCharacter(this));
-	if (ensure(IsValid(_playerCollider)) && ensure(IsValid(player)) && _playerCollider->IsOverlappingActor(player))
+	if (ensure(IsValid(_playerCollider)) && ensure(IsValid(player)) && _playerCollider->IsOverlappingActor(player) && CanBeCollectedByPlayer())
 	{
 		_characterToMoveTo = player;
 	}
@@ -212,6 +224,11 @@ void AResourcePickupActor::AddResourcesToPlayerInventory(UResourceInventory* inv
 		if (ensure(IsValid(actorPool)))
 		{
 			actorPool->AddActorToPool(_cropType, this, EPooledActorType::ResourcePickup);
+		}
+
+		if (ensure(IsValid(_onCollectResourceSound)))
+		{
+			UGameplayStatics::SpawnSoundAtLocation(this, _onCollectResourceSound, GetActorLocation());
 		}
 	}
 }

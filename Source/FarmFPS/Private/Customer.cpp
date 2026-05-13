@@ -15,6 +15,7 @@
 
 // UE
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Navigation/PathFollowingComponent.h"
 
 ACustomer::ACustomer()
@@ -177,6 +178,12 @@ void ACustomer::AttemptBuyBreadAtFrontOfQueue()
 				_customerQueue->RemoveCustomerFromFrontOfQueue();
 
 				_aiController->ReceiveMoveCompleted.RemoveAll(this);
+
+				if (IsValid(_onBoughtBreadSound))
+				{
+					UGameplayStatics::SpawnSoundAtLocation(this, _onBoughtBreadSound, GetActorLocation());
+				}
+
 				MoveOutOfMap();
 			}
 		}
