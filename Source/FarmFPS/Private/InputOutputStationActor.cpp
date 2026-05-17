@@ -19,6 +19,9 @@ AInputOutputStationActor::AInputOutputStationActor()
 
 	_inputInventory = CreateDefaultSubobject<UResourceInventory>("InputInventory");
 	_outputInventory = CreateDefaultSubobject<UResourceInventory>("OutputInventory");
+
+	_resourceEndPoint = CreateDefaultSubobject<USceneComponent>("ResourceEndPoint");
+	_resourceEndPoint->AttachToComponent(root, FAttachmentTransformRules::KeepRelativeTransform);
 }
 
 void AInputOutputStationActor::BeginPlay()
@@ -28,7 +31,10 @@ void AInputOutputStationActor::BeginPlay()
 	if (ensure(IsValid(_resourceInputPoint)) && ensure(IsValid(_resourceOutputPoint)) && ensure(IsValid(_inputInventory)))
 	{
 		_resourceInputPoint->SetInventory(_inputInventory);
+		_resourceInputPoint->SetParentStation(this);
+
 		_resourceOutputPoint->SetInventory(_outputInventory);
+		_resourceOutputPoint->SetParentStation(this);
 
 		_inputInventory->OnResourceCountChanged.AddDynamic(this, &AInputOutputStationActor::OnInputInventoryResourceCountChanged);
 		_outputInventory->OnResourceCountChanged.AddDynamic(this, &AInputOutputStationActor::OnOutputInventoryResourceCountChanged);

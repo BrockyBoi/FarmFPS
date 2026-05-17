@@ -24,6 +24,7 @@ public:
 
 	UResourceInventory* GetInputInventory() const { return _inputInventory; }
 	UResourceInventory* GetOutputInventory() const { return _outputInventory; }
+	const FVector& GetResourceEndPointLocation() const { return _resourceEndPoint->GetComponentLocation(); }
 
 protected:
 	virtual void BeginPlay() override;
@@ -57,6 +58,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UResourceInventory* _outputInventory = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	USceneComponent* _resourceEndPoint = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	FVector _launchVector;

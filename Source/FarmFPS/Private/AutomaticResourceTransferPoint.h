@@ -10,6 +10,8 @@
 // Generated
 #include "AutomaticResourceTransferPoint.generated.h"
 
+class AResourcePickupActor;
+class AInputOutputStationActor;
 class UPrimitiveComponent;
 class UResourceInventory;
 
@@ -24,6 +26,9 @@ public:
 
 	void SetGivesResources(bool givesResources);
 	void SetInventory(UResourceInventory* inventory);
+	void SetParentStation(AInputOutputStationActor* station) { _parentStation = station; }
+
+	void TryDepositResourceAtActor(AResourcePickupActor* resourcePickupActor);
 
 	UPrimitiveComponent* GetPlayerCollider() const { return _playerCollider; }
 
@@ -39,6 +44,8 @@ protected:
 	UPrimitiveComponent* _playerCollider = nullptr;
 
 	TWeakObjectPtr<UResourceInventory> _inventory = nullptr;
+
+	TObjectPtr<AInputOutputStationActor> _parentStation = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ResourceType."), meta = (EditCondition = "_givesResources == false", EditConditionHides), BlueprintReadOnly)
 	FGameplayTagContainer _resourcesAllowed;

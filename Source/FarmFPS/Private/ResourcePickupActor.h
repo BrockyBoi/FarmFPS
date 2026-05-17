@@ -32,6 +32,8 @@ public:
 
 	const FGameplayTag& GetResourceType() const { return _cropType; }
 
+	bool AttemptMoveToActor(AActor* actor, UResourceInventory* actorInventory, const FVector& customEndLocation = FVector::ZeroVector);
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
@@ -47,23 +49,20 @@ protected:
 	void OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void OnComponentOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	UFUNCTION()
 	void OnGroundHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	void OnPickupPreventionTimerEnd();
+	void OnPlayerPickupPreventionTimerEnd();
 
-	void StartMovingTowardsPlayer();
+	void StartMovingTowardsActor();
 
 	UFUNCTION()
 	void OnDayEnd();
 
-	void AddResourcesToPlayerInventory(UResourceInventory* inventory);
+	void AddResourcesToInventory(UResourceInventory* inventory);
 
 	bool _isBeingThrownByPlayer = false;
 
-	bool _isMovingToPlayer = false;
+	bool _isMovingToActor = false;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
 	float _rotationRate = 0.f;
@@ -80,17 +79,19 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	float _timeCannotMoveToPlayerAfterSpawn = .5f;
 
-	bool _isPreventionTimeOver = false;
+	bool _isPlayerPickupPreventionTimeOver = false;
 
 	UPROPERTY(EditDefaultsOnly)
-	float _timeToMoveToPlayer = 1.5f;
+	float _timeToMoveToActor = 1.5f;
 
-	float _timeMovedToPlayer = 0.f;
+	float _timeMovedToActor = 0.f;
 
 	FTimerHandle _pickupPreventionTimerHandle;
 
 	FVector _startingMovementLocation = FVector::ZeroVector;
-	TWeakObjectPtr<APawn> _characterToMoveTo;
+	FVector _customEndLocation = FVector::ZeroVector;
+	TWeakObjectPtr<AActor> _actorToMoveTo;
+	TWeakObjectPtr<UResourceInventory> _inventoryOfActorMovingTowards;
 
 	UPROPERTY(EditAnywhere)
 	USphereComponent* _playerCollider = nullptr;

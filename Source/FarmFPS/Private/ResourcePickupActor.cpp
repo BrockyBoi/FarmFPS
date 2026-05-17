@@ -7,6 +7,7 @@
 
 //Brock
 #include "ActorPool.h"
+#include "AutomaticResourceTransferPoint.h"
 #include "DayNightCycleManager.h"
 #include "FarmFPSUtilities.h"
 #include "ObjectiveManager.h"
@@ -38,12 +39,55 @@ AResourcePickupActor::AResourcePickupActor()
 	_playerCollider->SetGenerateOverlapEvents(true);
 }
 
+void AResourcePickupActor::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void AResourcePickupActor::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (_isMovingToActor && ensure(_actorToMoveTo.IsValid()) && ensure(_inventoryOfActorMovingTowards.IsValid()))
+	{
+		FVector endLocation = _customEndLocation != FVector::ZeroVector ? _customEndLocation : _actorToMoveTo->GetActorLocation();
+		SetActorLocation(FMath::Lerp(_startingMovementLocation, endLocation, _timeMovedToActor / _timeToMoveToActor));
+		_timeMovedToActor += DeltaTime;
+
+		if (_timeMovedToActor >= _timeToMoveToActor)
+		{
+			AddResourcesToInventory(_inventoryOfActorMovingTowards.Get());
+
+			UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+			if (ensure(IsValid(actorPool)))
+			{
+				actorPool->AddActorToPool(_cropType, this, EPooledActorType::ResourcePickup);
+			}
+
+			if (ensure(IsValid(_onCollectResourceSound)))
+			{
+				UGameplayStatics::SpawnSoundAtLocation(this, _onCollectResourceSound, GetActorLocation());
+			}
+		}
+	}
+	else
+	{
+		AddActorLocalRotation(FRotator(0.f, _rotationRate * DeltaTime * _rotationVariance, 0.f));
+	}
+}
+
+void AResourcePickupActor::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+}
+
 void AResourcePickupActor::AddActorToPool()
 {
-	_isMovingToPlayer = false;
-	_isPreventionTimeOver = false;
-	_timeMovedToPlayer = 0;
-	_characterToMoveTo = nullptr;
+	_isMovingToActor = false;
+	_isPlayerPickupPreventionTimeOver = false;
+	_timeMovedToActor = 0;
+	_actorToMoveTo = nullptr;
+	_inventoryOfActorMovingTowards = nullptr;
 
 	if (IsValid(_playerCollider))
 	{
@@ -63,12 +107,14 @@ void AResourcePickupActor::AddActorToPool()
 	{
 		dayNightCycle->OnDayEnd.RemoveAll(this);
 	}
+
+	SetActorTickEnabled(false);
 }
 
 void AResourcePickupActor::RemoveFromPool()
 {
-	_isMovingToPlayer = false;
-	_isPreventionTimeOver = false;
+	_isMovingToActor = false;
+	_isPlayerPickupPreventionTimeOver = false;
 	_isBeingThrownByPlayer = false;
 
 	_capsuleCollider->SetSimulatePhysics(true);
@@ -77,12 +123,11 @@ void AResourcePickupActor::RemoveFromPool()
 	_rotationVariance = FMath::RandRange(.9f, 1.f);
 	_bounceVariance = FMath::RandRange(.9f, 1.f);
 
-	GetWorld()->GetTimerManager().SetTimer(_pickupPreventionTimerHandle, this, &AResourcePickupActor::OnPickupPreventionTimerEnd, _timeCannotMoveToPlayerAfterSpawn, false);
+	GetWorld()->GetTimerManager().SetTimer(_pickupPreventionTimerHandle, this, &AResourcePickupActor::OnPlayerPickupPreventionTimerEnd, _timeCannotMoveToPlayerAfterSpawn, false);
 
 	if (ensure(IsValid(_playerCollider)))
 	{
 		_playerCollider->OnComponentBeginOverlap.AddDynamic(this, &AResourcePickupActor::OnComponentOverlap);
-		_playerCollider->OnComponentEndOverlap.AddDynamic(this, &AResourcePickupActor::OnComponentOverlapEnd);
 	}
 
 	if (ensure(IsValid(_capsuleCollider)))
@@ -95,21 +140,28 @@ void AResourcePickupActor::RemoveFromPool()
 	{
 		dayNightCycle->OnDayEnd.AddUObject(this, &AResourcePickupActor::OnDayEnd);
 	}
+
+	SetActorTickEnabled(true);
 }
 
-void AResourcePickupActor::BeginPlay()
+bool AResourcePickupActor::AttemptMoveToActor(AActor* actor, UResourceInventory* actorInventory, const FVector& customEndLocation)
 {
-	Super::BeginPlay();
-}
+	if (!_isMovingToActor && ensure(IsValid(actor)) && ensure(IsValid(actorInventory)) && actorInventory->CanAddResource(_cropType, _yieldAmount))
+	{
+		_actorToMoveTo = actor;
+		_inventoryOfActorMovingTowards = actorInventory;
+		_customEndLocation = customEndLocation;
+		StartMovingTowardsActor();
 
-void AResourcePickupActor::EndPlay(EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
+		return true;
+	}
+
+	return false;
 }
 
 bool AResourcePickupActor::CanBeCollectedByPlayer() const
 {
-	return _isPreventionTimeOver && !_isBeingThrownByPlayer;
+	return !_isMovingToActor && _isPlayerPickupPreventionTimeOver && !_isBeingThrownByPlayer;
 }
 
 void AResourcePickupActor::OnThrownOnGround()
@@ -117,53 +169,22 @@ void AResourcePickupActor::OnThrownOnGround()
 	// Base empty
 }
 
-void AResourcePickupActor::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if (_isMovingToPlayer && ensure(_characterToMoveTo.IsValid()))
-	{
-		SetActorLocation(FMath::Lerp(_startingMovementLocation, _characterToMoveTo->GetActorLocation(), _timeMovedToPlayer / _timeToMoveToPlayer));
-		_timeMovedToPlayer += DeltaTime;
-
-		if (_timeMovedToPlayer >= _timeToMoveToPlayer)
-		{
-			AddResourcesToPlayerInventory(_characterToMoveTo->FindComponentByClass<UResourceInventory>());
-		}
-	}
-	else
-	{
-		AddActorLocalRotation(FRotator(0.f, _rotationRate * DeltaTime * _rotationVariance, 0.f));
-	}
-}
-
 void AResourcePickupActor::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	AFarmFPSCharacter* player = Cast<AFarmFPSCharacter>(OtherActor);
-	if (IsValid(player))
+	if (IsValid(player) && CanBeCollectedByPlayer())
 	{
 		UResourceInventory* inventory = player->FindComponentByClass<UResourceInventory>();
-		if (IsValid(inventory) && inventory->CanAddResource(_cropType, _yieldAmount))
+		if (IsValid(inventory))
 		{
-			_characterToMoveTo = player;
-
-			if (CanBeCollectedByPlayer())
-			{
-				StartMovingTowardsPlayer();
-			}
+			AttemptMoveToActor(player, inventory);
 		}
 	}
-}
 
-void AResourcePickupActor::OnComponentOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	AFarmFPSCharacter* player = Cast<AFarmFPSCharacter>(OtherActor);
-	if (IsValid(player))
+	UAutomaticResourceTransferPoint* transferPoint = Cast<UAutomaticResourceTransferPoint>(OtherActor);
+	if (IsValid(transferPoint))
 	{
-		if (!CanBeCollectedByPlayer())
-		{
-			_characterToMoveTo = nullptr;
-		}
+
 	}
 }
 
@@ -175,28 +196,23 @@ void AResourcePickupActor::OnGroundHit(UPrimitiveComponent* HitComp, AActor* Oth
 	}
 }
 
-void AResourcePickupActor::OnPickupPreventionTimerEnd()
+void AResourcePickupActor::OnPlayerPickupPreventionTimerEnd()
 {
-	_isPreventionTimeOver = true;
+	_isPlayerPickupPreventionTimeOver = true;
 	
 	AFarmFPSCharacter* player = Cast<AFarmFPSCharacter>(FarmFPSUtilities::GetPlayerCharacter(this));
 	if (ensure(IsValid(_playerCollider)) && ensure(IsValid(player)) && _playerCollider->IsOverlappingActor(player) && CanBeCollectedByPlayer())
 	{
-		_characterToMoveTo = player;
-	}
-
-	if (_characterToMoveTo.IsValid())
-	{
-		StartMovingTowardsPlayer();
+		_actorToMoveTo = player;
+		AttemptMoveToActor(_actorToMoveTo.Get(), player->FindComponentByClass<UResourceInventory>());
 	}
 }
 
-void AResourcePickupActor::StartMovingTowardsPlayer()
+void AResourcePickupActor::StartMovingTowardsActor()
 {
 	_startingMovementLocation = GetActorLocation();
-	_isMovingToPlayer = true;
+	_isMovingToActor = true;
 	_capsuleCollider->SetSimulatePhysics(false);
-	//_staticMesh->SetSimulatePhysics(false);
 }
 
 void AResourcePickupActor::OnDayEnd()
@@ -208,7 +224,7 @@ void AResourcePickupActor::OnDayEnd()
 	}
 }
 
-void AResourcePickupActor::AddResourcesToPlayerInventory(UResourceInventory* inventory)
+void AResourcePickupActor::AddResourcesToInventory(UResourceInventory* inventory)
 {
 	if (ensure(IsValid(inventory)) && ensure(inventory->CanAddResource(_cropType, _yieldAmount)))
 	{
@@ -218,17 +234,6 @@ void AResourcePickupActor::AddResourcesToPlayerInventory(UResourceInventory* inv
 		if (ensure(IsValid(objectiveManager)))
 		{
 			objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::CollectResource, _cropType, _yieldAmount);
-		}
-
-		UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
-		if (ensure(IsValid(actorPool)))
-		{
-			actorPool->AddActorToPool(_cropType, this, EPooledActorType::ResourcePickup);
-		}
-
-		if (ensure(IsValid(_onCollectResourceSound)))
-		{
-			UGameplayStatics::SpawnSoundAtLocation(this, _onCollectResourceSound, GetActorLocation());
 		}
 	}
 }

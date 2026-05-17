@@ -6,6 +6,7 @@
 // Brock
 #include "ActorPool.h"
 #include "FarmFPSUtilities.h"
+#include "InputOutputStationActor.h"
 #include "ResourceInventory.h"
 #include "ResourcePickupActor.h"
 
@@ -17,7 +18,6 @@ UAutomaticResourceTransferPoint::UAutomaticResourceTransferPoint()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-// Called when the game starts
 void UAutomaticResourceTransferPoint::BeginPlay()
 {
 	Super::BeginPlay();
@@ -78,16 +78,11 @@ void UAutomaticResourceTransferPoint::OnComponentOverlap(UPrimitiveComponent* Ov
 		else
 		{
 			AResourcePickupActor* resourcePickup = Cast<AResourcePickupActor>(OtherActor);
-			if (IsValid(resourcePickup) && ensure(_inventory.IsValid()) && _resourcesAllowed.HasTag(resourcePickup->GetResourceType()))
+			if (IsValid(resourcePickup) && ensure(_inventory.IsValid()) && ensure(IsValid(_parentStation)) && _resourcesAllowed.HasTag(resourcePickup->GetResourceType()))
 			{
 				if (!_givesResources)
 				{
-					_inventory->AddResource(resourcePickup->GetResourceType(), 1);
-					UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
-					if (ensure(IsValid(actorPool)))
-					{
-						actorPool->AddActorToPool(resourcePickup->GetResourceType(), resourcePickup, EPooledActorType::ResourcePickup);
-					}
+					resourcePickup->AttemptMoveToActor(GetOwner(), _inventory.Get(), _parentStation->GetResourceEndPointLocation());
 				}
 			}
 		}
