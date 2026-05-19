@@ -31,6 +31,9 @@ protected:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
+	UFUNCTION()
+	void OnDayEnd();
+
 	bool CanCreateResource(const UResourceInventory* inputInventory, const FCraftingData& recipeToCraft) const;
 	void ConvertLimitedResources(UResourceInventory* inputInventory, UResourceInventory* outputInventory, const FCraftingData& recipeToCraft, int amountToCraft);
 	void ConvertAllResourcesPossible(UResourceInventory* inputInventory, UResourceInventory* outputInventory, const FCraftingData& recipeToCraft);

@@ -21,23 +21,33 @@ AExplodableResourcePickupActor::AExplodableResourcePickupActor() : Super()
 void AExplodableResourcePickupActor::BeginPlay()
 {
 	Super::BeginPlay();
-
-	_explosionCollider->OnComponentBeginOverlap.AddDynamic(this, &AExplodableResourcePickupActor::OnExplosionOverlap);
 }
 
 void AExplodableResourcePickupActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	_explosionCollider->OnComponentBeginOverlap.RemoveDynamic(this, &AExplodableResourcePickupActor::OnExplosionOverlap);
-
 	Super::EndPlay(EndPlayReason);
 }
 
 void AExplodableResourcePickupActor::OnThrownOnGround()
 {
+	Super::OnThrownOnGround();
+
 	if (ensure(IsValid(_explosionCollider)))
 	{
 		_explosionCollider->SetSphereRadius(_explosionRadius.GetModifiedValue(this));
 		_explosionCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+
+		TSet<AActor*> overlappingActors;
+		_explosionCollider->GetOverlappingActors(overlappingActors);
+
+		for (AActor* overlappingActor : overlappingActors)
+		{
+			ACrop* crop = Cast<ACrop>(overlappingActor);
+			if (IsValid(crop))
+			{
+				OverlapWithCrop(crop);
+			}
+		}
 
 		GetWorldTimerManager().SetTimer(_explosionTimerHandle, this, &AExplodableResourcePickupActor::OnExplosionTimerFinished, _explosionDuration);
 	}
@@ -57,15 +67,11 @@ void AExplodableResourcePickupActor::RemoveFromPool()
 	_explosionCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-void AExplodableResourcePickupActor::OnExplosionOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AExplodableResourcePickupActor::OverlapWithCrop(ACrop* crop)
 {
-	if (IsValid(OtherActor))
+	if (ensure(IsValid(crop)))
 	{
-		ACrop* crop = Cast<ACrop>(OtherActor);
-		if (IsValid(crop))
-		{
-			crop->AddCropResourceValue(_explosionResourceType, _explosionResourceValue.GetModifiedValue(this));
-		}
+		crop->AddCropResourceValue(_explosionResourceType, _explosionResourceValue.GetModifiedValue(this));
 	}
 }
 

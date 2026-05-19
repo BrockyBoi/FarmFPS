@@ -4,6 +4,7 @@
 
 // Brock
 #include "CraftingData.h"
+#include "DayNightCycleManager.h"
 #include "FarmFPSUtilities.h"
 #include "ObjectiveManager.h"
 #include "ObjectiveTypeTags.h"
@@ -18,6 +19,12 @@ UResourceConverterComponent::UResourceConverterComponent()
 void UResourceConverterComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightCycle)))
+	{
+		dayNightCycle->OnDayEnd.AddUObject(this, &UResourceConverterComponent::OnDayEnd);
+	}
 }
 
 void UResourceConverterComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -60,7 +67,22 @@ void UResourceConverterComponent::TickComponent(float DeltaTime, ELevelTick Tick
 }
 
 void UResourceConverterComponent::EndPlay(EEndPlayReason::Type EndPlayReason)
-{}
+{
+	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (IsValid(dayNightCycle))
+	{
+		dayNightCycle->OnDayEnd.RemoveAll(this);
+	}
+
+	Super::EndPlay(EndPlayReason);
+}
+
+void UResourceConverterComponent::OnDayEnd()
+{
+	_resourcesToSpawn.Empty();
+	_currentCraftingTime = 0.f;
+	SetComponentTickEnabled(false);
+}
 
 bool UResourceConverterComponent::TryConvertResources(UResourceInventory* inputInventory, UResourceInventory* outputInventory, const FCraftingData& recipeToCraft, int amountToCraft)
 {

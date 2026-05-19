@@ -3,6 +3,7 @@
 #include "Customer.h"
 
 // Brock
+#include "BreadRequirementManager.h"
 #include "BreadStand.h"
 #include "CustomerQueue.h"
 #include "CustomerSpawnerManager.h"
@@ -167,10 +168,17 @@ void ACustomer::AttemptBuyBreadAtFrontOfQueue()
 			const int price = priceData.ModifiedIntValue.GetModifiedValue(this);
 
 			_breadStand->GetOutputInventory()->AddResource(ResourceTypeTags::Money, GetAmountDesired() * price);
+
 			UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
 			if (ensure(IsValid(objectiveManager)))
 			{
 				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::SellBread, GetResourceDesired(), GetAmountDesired());
+			}
+
+			UBreadRequirementManager* breadRequirementManager = FarmFPSUtilities::GetBreadRequirementManager(this);
+			if (ensure(IsValid(breadRequirementManager)))
+			{
+				breadRequirementManager->SellBread(amountCanBuy);
 			}
 
 			if (_amountLeftToBuy <= 0)

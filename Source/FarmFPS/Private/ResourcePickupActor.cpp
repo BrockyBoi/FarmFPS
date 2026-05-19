@@ -108,6 +108,13 @@ void AResourcePickupActor::AddActorToPool()
 		dayNightCycle->OnDayEnd.RemoveAll(this);
 	}
 
+	UPrimitiveComponent* primitive = Cast<UPrimitiveComponent>(GetRootComponent());
+	if (ensure(IsValid(primitive)))
+	{
+		primitive->SetPhysicsLinearVelocity(FVector::ZeroVector);
+		primitive->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+	}
+
 	SetActorTickEnabled(false);
 }
 
@@ -166,7 +173,7 @@ bool AResourcePickupActor::CanBeCollectedByPlayer() const
 
 void AResourcePickupActor::OnThrownOnGround()
 {
-	// Base empty
+	Cosmetic_OnHitGround();
 }
 
 void AResourcePickupActor::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -192,6 +199,10 @@ void AResourcePickupActor::OnGroundHit(UPrimitiveComponent* HitComp, AActor* Oth
 {
 	if (ensure(IsValid(OtherActor)))
 	{
+		if (_isBeingThrownByPlayer)
+		{
+			OnThrownOnGround();
+		}
 		_isBeingThrownByPlayer = false;
 	}
 }

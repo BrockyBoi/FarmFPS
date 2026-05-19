@@ -11,10 +11,11 @@
 
 class ABreadStand;
 class AGameStateBase;
+class UActorLookupComponent;
 class UActorPool;
+class UBreadRequirementManager;
 class UCustomerSpawnerManager;
 class UDayNightCycleManager;
-class UActorLookupComponent;
 class UPerkManager;
 class UObjectiveManager;
 
@@ -30,6 +31,7 @@ public:
 	static UDayNightCycleManager* GetDayNightCycleManager(const UObject* WorldContextObject);
 	static UActorLookupComponent* GetResourceActorLookupComponent(const UObject* WorldContextObject);
 	static UActorPool* GetActorPool(const UObject* WorldContextObject);
+	static UBreadRequirementManager* GetBreadRequirementManager(const UObject* WorldContextObject);
 	static float GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, const FGameplayTagContainer& perkTags, float valueToModify);
 	static float GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, const FGameplayTag& perkTag, float valueToModify);
 };

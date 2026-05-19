@@ -13,6 +13,8 @@
 // Generated
 #include "ExplodableResourcePickupActor.generated.h"
 
+class ACrop;
+
 /**
  * 
  */
@@ -32,8 +34,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	UFUNCTION()
-	void OnExplosionOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OverlapWithCrop(ACrop* crop);
 
 	UFUNCTION()
 	void OnExplosionTimerFinished();
@@ -43,7 +44,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	USphereComponent* _explosionCollider = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ResourceType."))
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "CropResourceType,ResourceType"))
 	FGameplayTag _explosionResourceType;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

@@ -247,7 +247,7 @@ void AFarmFPSCharacter::ThrowInventoryItem()
 						thrownItem->SetIsBeingThrownByPlayer(true);
 						if (UPrimitiveComponent* primitiveComponent = Cast<UPrimitiveComponent>(thrownItem->GetRootComponent()))
 						{
-							primitiveComponent->AddImpulse(GetActorForwardVector() * _throwForce.GetModifiedValue(this));
+							primitiveComponent->AddImpulse(GetFirstPersonCameraComponent()->GetForwardVector() * _throwForce.GetModifiedValue(this));
 						}
 					}
 				}

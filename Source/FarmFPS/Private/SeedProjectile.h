@@ -29,9 +29,6 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Seed")
-	FGameplayTag _cropType;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _onSeedPlantedSound;
 };

@@ -51,6 +51,9 @@ protected:
 	UFUNCTION()
 	void OnGroundHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
+	void Cosmetic_OnHitGround();
+
 	void OnPlayerPickupPreventionTimerEnd();
 
 	void StartMovingTowardsActor();

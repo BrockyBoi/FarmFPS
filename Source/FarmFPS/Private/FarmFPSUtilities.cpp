@@ -5,6 +5,7 @@
 // Brock
 #include "ActorLookupComponent.h"
 #include "ActorPool.h"
+#include "BreadRequirementManager.h"
 #include "BreadStand.h"
 #include "CustomerSpawnerManager.h"
 #include "DayNightCycleManager.h"
@@ -139,6 +140,22 @@ UActorPool* FarmFPSUtilities::GetActorPool(const UObject* WorldContextObject)
 	if (ensure(IsValid(actorPool)))
 	{
 		return actorPool;
+	}
+
+	return nullptr;
+}
+
+UBreadRequirementManager* FarmFPSUtilities::GetBreadRequirementManager(const UObject* WorldContextObject)
+{
+	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
+	{
+		return nullptr;
+	}
+
+	UBreadRequirementManager* breadRequirementManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UBreadRequirementManager>();
+	if (ensure(IsValid(breadRequirementManager)))
+	{
+		return breadRequirementManager;
 	}
 
 	return nullptr;
