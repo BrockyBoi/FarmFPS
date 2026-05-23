@@ -13,18 +13,25 @@ UActorLookupComponent::UActorLookupComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
+void UActorLookupComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	InitializeMapFromTables();
+}
+
 TSubclassOf<AActor> UActorLookupComponent::GetActorReference(const FGameplayTag& actorTag, EPooledActorType actorType) const
 {
 	switch (actorType)
 	{
-		case EPooledActorType::Projectile:
-			return GetProjectileActor(actorTag);
-		case EPooledActorType::ResourcePickup:
-			return GetResourceActor(actorTag);
-		case EPooledActorType::Crop:
-			return GetCropActor(actorTag);
-		default:
-			return TSubclassOf<AActor>();
+	case EPooledActorType::Projectile:
+		return GetProjectileActor(actorTag);
+	case EPooledActorType::ResourcePickup:
+		return GetResourceActor(actorTag);
+	case EPooledActorType::Crop:
+		return GetCropActor(actorTag);
+	default:
+		return TSubclassOf<AActor>();
 	}
 }
 
@@ -32,7 +39,7 @@ TSubclassOf<AResourcePickupActor> UActorLookupComponent::GetResourceActor(const 
 {
 	if (ensure(_resourceActorMap.Contains(resourceType)))
 	{
-		return _resourceActorMap[resourceType];
+		return _resourceActorMap[resourceType].ResourceActorClass;
 	}
 
 	return TSubclassOf<AResourcePickupActor>();
@@ -40,29 +47,22 @@ TSubclassOf<AResourcePickupActor> UActorLookupComponent::GetResourceActor(const 
 
 TSubclassOf<AShooterProjectile> UActorLookupComponent::GetProjectileActor(const FGameplayTag& resourceType) const
 {
-	if (ensure(_projectileActorMap.Contains(resourceType)))
+	if (ensure(_resourceActorMap.Contains(resourceType)))
 	{
-		return _projectileActorMap[resourceType];
+		return _resourceActorMap[resourceType].ProjectileActorClass;
 	}
 
 	return TSubclassOf<AShooterProjectile>();
 }
 
-TSubclassOf<AActor> UActorLookupComponent::GetCropActor(const FGameplayTag& cropType) const
+TSubclassOf<ACrop> UActorLookupComponent::GetCropActor(const FGameplayTag& cropType) const
 {
-	if (ensure(_cropActorMap.Contains(cropType)))
+	if (ensure(_resourceActorMap.Contains(cropType)))
 	{
-		return _cropActorMap[cropType];
+		return _resourceActorMap[cropType].CropActorClass;
 	}
-	
-	return TSubclassOf<AActor>();
-}
 
-void UActorLookupComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	InitializeMapFromTables();
+	return TSubclassOf<ACrop>();
 }
 
 void UActorLookupComponent::InitializeMapFromTables()
@@ -77,37 +77,7 @@ void UActorLookupComponent::InitializeMapFromTables()
 
 			if (ensure(row))
 			{
-				_resourceActorMap.Add(row->ResourceType, row->ResourceActorClass);
-			}
-		}
-	}
-
-	if (ensure(IsValid(_projectileActorTable)))
-	{
-		// Iterate through the internal row map directly
-		for (auto It = _projectileActorTable->GetRowMap().CreateConstIterator(); It; ++It)
-		{
-			FName RowName = It.Key();
-			FProjectileActorData* row = reinterpret_cast<FProjectileActorData*>(It.Value());
-
-			if (ensure(row))
-			{
-				_projectileActorMap.Add(row->ProjectileType, row->ProjectileActorClass);
-			}
-		}
-	}
-
-	if (ensure(IsValid(_cropActorTable)))
-	{
-		// Iterate through the internal row map directly
-		for (auto It = _cropActorTable->GetRowMap().CreateConstIterator(); It; ++It)
-		{
-			FName RowName = It.Key();
-			FCropActorData* row = reinterpret_cast<FCropActorData*>(It.Value());
-
-			if (ensure(row))
-			{
-				_cropActorMap.Add(row->ResourceType, row->CropActorClass);
+				_resourceActorMap.Add(row->ResourceType, *row);
 			}
 		}
 	}

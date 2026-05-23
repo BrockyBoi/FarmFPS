@@ -54,17 +54,24 @@ void ACrop::AddCropResourceValue(const FGameplayTag& resourceType, float amount)
 {
 	if (ensure(IsValid(_cropResourcesInventory)))
 	{
-		_cropResourcesInventory->AddResource(resourceType, amount);
-
-		AffectGrowth();
-
-		if (!_hasStartedPerfectTiming && IsLightAndWaterFull())
+		if (resourceType == ResourceTypeTags::Damage)
 		{
-			OnLightAndWaterFilled();
-			_hasStartedPerfectTiming = true;
+			DoDamageToCrop(amount);
 		}
+		else
+		{
+			_cropResourcesInventory->AddResource(resourceType, amount);
 
-		Cosmetic_OnResourceAdded();
+			AffectGrowth();
+
+			if (!_hasStartedPerfectTiming && IsLightAndWaterFull())
+			{
+				OnLightAndWaterFilled();
+				_hasStartedPerfectTiming = true;
+			}
+
+			Cosmetic_OnResourceAdded();
+		}
 	}
 }
 

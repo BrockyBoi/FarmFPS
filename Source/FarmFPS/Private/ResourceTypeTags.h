@@ -15,5 +15,6 @@ namespace ResourceTypeTags
 	static const FGameplayTag Water = FGameplayTag::RequestGameplayTag(FName("CropResourceType.Water"));
 	static const FGameplayTag Light = FGameplayTag::RequestGameplayTag(FName("CropResourceType.Light"));
 	static const FGameplayTag Love = FGameplayTag::RequestGameplayTag(FName("CropResourceType.Love"));
+	static const FGameplayTag Damage = FGameplayTag::RequestGameplayTag(FName("CropResourceType.Damage"));
 };
 

@@ -3,6 +3,8 @@
 #pragma once
 
 // Brock
+#include "Crop.h"
+#include "ShooterProjectile.h"
 #include "ResourcePickupActor.h"
 
 // UE
@@ -16,9 +18,15 @@ struct FResourceActorData : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "ResourceType."))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "CropResourceType,ResourceType"))
 	FGameplayTag ResourceType;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<AResourcePickupActor> ResourceActorClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<AShooterProjectile> ProjectileActorClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<ACrop> CropActorClass;
 };

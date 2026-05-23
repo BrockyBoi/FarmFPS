@@ -4,6 +4,7 @@
 
 // Brock
 #include "PooledActorTypes.h"
+#include "ResourceActorData.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -32,20 +33,11 @@ protected:
 	void InitializeMapFromTables();
 
 private:
-
 	TSubclassOf<AResourcePickupActor> GetResourceActor(const FGameplayTag& resourceType) const;
 	TSubclassOf<AShooterProjectile> GetProjectileActor(const FGameplayTag& resourceType) const;
-	TSubclassOf<AActor> GetCropActor(const FGameplayTag& cropType) const;
+	TSubclassOf<ACrop> GetCropActor(const FGameplayTag& cropType) const;
 
 	UPROPERTY(EditDefaultsOnly)
 	UDataTable* _resourceActorTable;
-	TMap<FGameplayTag, TSubclassOf<AResourcePickupActor>> _resourceActorMap;
-
-	UPROPERTY(EditDefaultsOnly)
-	UDataTable* _projectileActorTable;
-	TMap<FGameplayTag, TSubclassOf<AShooterProjectile>> _projectileActorMap;
-
-	UPROPERTY(EditDefaultsOnly)
-	UDataTable* _cropActorTable;
-	TMap<FGameplayTag, TSubclassOf<ACrop>> _cropActorMap;
+	TMap<FGameplayTag, FResourceActorData> _resourceActorMap;
 };
