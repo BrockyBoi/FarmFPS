@@ -176,7 +176,9 @@ void AFarmFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(GroundSlamAction, ETriggerEvent::Completed, this, &AFarmFPSCharacter::DoGroundSlamEnd);
 
 		EnhancedInputComponent->BindAction(SelectInventoryItemAction, ETriggerEvent::Triggered, this, &AFarmFPSCharacter::DoSelectInventoryItem);
-		EnhancedInputComponent->BindAction(ThrowInventoryItemAction, ETriggerEvent::Triggered, this, &AFarmFPSCharacter::ThrowInventoryItem);
+
+		EnhancedInputComponent->BindAction(ThrowInventoryItemAction, ETriggerEvent::Started, this, &AFarmFPSCharacter::OnThrowStart);
+		EnhancedInputComponent->BindAction(ThrowInventoryItemAction, ETriggerEvent::Completed, this, &AFarmFPSCharacter::OnThrowStop);
 	}
 	else
 	{
@@ -227,6 +229,21 @@ void AFarmFPSCharacter::DoSelectInventoryItem(const FInputActionValue& Value)
 	}
 }
 
+void AFarmFPSCharacter::OnThrowStart()
+{
+	_isThrowingItems = true;
+
+	_throwInterval = _maxThrowSpeedInterval;
+	// Start a timer to repeatedly throw items while the input is held
+	GetWorld()->GetTimerManager().SetTimer(_throwTimerHandle, this, &AFarmFPSCharacter::ThrowInventoryItem, _throwInterval, false, 0.f);
+}
+
+void AFarmFPSCharacter::OnThrowStop()
+{
+	_isThrowingItems = false;
+	GetWorld()->GetTimerManager().ClearTimer(_throwTimerHandle);
+}
+
 void AFarmFPSCharacter::ThrowInventoryItem()
 {
 	if (ensure(IsValid(_itemSelector)) && ensure(IsValid(_inventory)))
@@ -251,6 +268,9 @@ void AFarmFPSCharacter::ThrowInventoryItem()
 						}
 					}
 				}
+
+				_throwInterval = FMath::Max(_throwInterval - _throwIntervalSpeedUpPerThrow, _minThrowSpeedInterval);
+				GetWorld()->GetTimerManager().SetTimer(_throwTimerHandle, this, &AFarmFPSCharacter::ThrowInventoryItem, _throwInterval, false);
 			}
 		}
 	}

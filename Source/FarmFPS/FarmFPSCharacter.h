@@ -72,6 +72,12 @@ protected:
 	void DoSelectInventoryItem(const FInputActionValue& Value);
 
 	UFUNCTION(BlueprintCallable, Category = "Input")
+	void OnThrowStart();
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	void OnThrowStop();
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
 	void ThrowInventoryItem();
 
 	/** Handles aim inputs from either controls or UI interfaces */
@@ -197,8 +203,23 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Jump")
 	FModifiedFloatValue _extraJumpHeight = 10.f;
 
+	bool _isThrowingItems = false;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Throw")
 	FModifiedFloatValue _throwForce = 1000.f;
+
+	float _throwInterval = 0.5f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Throw")
+	float _throwIntervalSpeedUpPerThrow = 0.01;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Throw")
+	float _maxThrowSpeedInterval = 0.5f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Throw")
+	float _minThrowSpeedInterval = 0.01;
+
+	FTimerHandle _throwTimerHandle;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Affectors")
 	TSubclassOf<AConstantCropAffectorArea> _waterAffectorClass;

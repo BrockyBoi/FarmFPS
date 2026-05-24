@@ -8,12 +8,14 @@
 // UE
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Delegates/Delegate.h"
 
 // Generated
 #include "BreadRequirementManager.generated.h"
 
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UBreadRequirementManager : public UActorComponent
+class FARMFPS_API UBreadRequirementManager : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -26,7 +28,24 @@ public:
 	int GetCurrentBreadSold() const { return _currentBreadSold; }
 
 	UFUNCTION(BlueprintPure)
-	bool HasSoldBreadNeeded() const { return _currentBreadSold >= _startingBreadRequired.GetModifiedValue(this); }
+	bool HasSoldBreadNeeded() const { return _currentBreadSold >= _breadRequiredForCurrentDay; }
+
+	UFUNCTION(BlueprintPure)
+	int GetBreadRequiredForDay() const { return _breadRequiredForCurrentDay; }
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBreadSold, int, BreadSold);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRequirementsMet);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDayFailed);
+
+	UPROPERTY(BlueprintAssignable)
+	FOnBreadSold OnBreadSold;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnRequirementsMet OnRequirementsMet;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnDayFailed OnDayFailed;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
@@ -38,11 +57,8 @@ private:
 	UFUNCTION()
 	void OnDayEnd();
 
-	UFUNCTION()
-	void OnBreadSold();
-
-	void OnRequirementsMet();
-	void OnDayFailed();
+	void RequirementsMet();
+	void DayFailed();
 
 	int _currentBreadSold = 0;
 	int _breadRequiredForCurrentDay = 0;

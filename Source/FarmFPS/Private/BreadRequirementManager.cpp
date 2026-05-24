@@ -2,6 +2,10 @@
 
 #include "BreadRequirementManager.h"
 
+// Brock
+#include "DayNightCycleManager.h"
+#include "FarmFPSUtilities.h"
+
 UBreadRequirementManager::UBreadRequirementManager()
 {
 	PrimaryComponentTick.bCanEverTick = false;
@@ -10,19 +14,39 @@ UBreadRequirementManager::UBreadRequirementManager()
 void UBreadRequirementManager::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightCycleManager)))
+	{
+		if (dayNightCycleManager->IsDay())
+		{
+			OnDayBegin();
+		}
+
+		dayNightCycleManager->OnDayBegin.AddUObject(this, &UBreadRequirementManager::OnDayBegin);
+		dayNightCycleManager->OnDayEnd.AddUObject(this, &UBreadRequirementManager::OnDayEnd);
+	}
 }
 
 void UBreadRequirementManager::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
+	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (IsValid(dayNightCycleManager))
+	{
+		dayNightCycleManager->OnDayBegin.RemoveAll(this);
+		dayNightCycleManager->OnDayEnd.RemoveAll(this);
+	}
+
 	Super::EndPlay(EndPlayReason);
 }
 
 void UBreadRequirementManager::SellBread(int breadAmount)
 {
 	_currentBreadSold += breadAmount;
+	OnBreadSold.Broadcast(_currentBreadSold);
 	if (HasSoldBreadNeeded())
 	{
-		OnRequirementsMet();
+		RequirementsMet();
 	}
 }
 
@@ -45,15 +69,16 @@ void UBreadRequirementManager::OnDayEnd()
 {
 	if (!HasSoldBreadNeeded())
 	{
-		OnDayFailed();
+		DayFailed();
 	}
 }
 
-void UBreadRequirementManager::OnBreadSold()
-{}
+void UBreadRequirementManager::RequirementsMet()
+{
+	OnRequirementsMet.Broadcast();
+}
 
-void UBreadRequirementManager::OnRequirementsMet()
-{}
-
-void UBreadRequirementManager::OnDayFailed()
-{}
+void UBreadRequirementManager::DayFailed()
+{
+	OnDayFailed.Broadcast();
+}

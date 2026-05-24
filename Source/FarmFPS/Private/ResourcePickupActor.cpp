@@ -97,7 +97,10 @@ void AResourcePickupActor::AddActorToPool()
 
 	if (IsValid(_capsuleCollider))
 	{
+		_capsuleCollider->SetPhysicsLinearVelocity(FVector::ZeroVector);
+		_capsuleCollider->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
 		_capsuleCollider->OnComponentHit.RemoveAll(this);
+		_capsuleCollider->SetSimulatePhysics(false);
 	}
 
 	GetWorld()->GetTimerManager().ClearTimer(_pickupPreventionTimerHandle);
@@ -106,13 +109,6 @@ void AResourcePickupActor::AddActorToPool()
 	if (IsValid(dayNightCycle))
 	{
 		dayNightCycle->OnDayEnd.RemoveAll(this);
-	}
-
-	UPrimitiveComponent* primitive = Cast<UPrimitiveComponent>(GetRootComponent());
-	if (ensure(IsValid(primitive)))
-	{
-		primitive->SetPhysicsLinearVelocity(FVector::ZeroVector);
-		primitive->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
 	}
 
 	SetActorTickEnabled(false);
@@ -125,6 +121,9 @@ void AResourcePickupActor::RemoveFromPool()
 	_isBeingThrownByPlayer = false;
 
 	_capsuleCollider->SetSimulatePhysics(true);
+
+	_capsuleCollider->SetPhysicsLinearVelocity(FVector::ZeroVector);
+	_capsuleCollider->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
 
 	_startingHeight = GetActorLocation().Z;
 	_rotationVariance = FMath::RandRange(.9f, 1.f);
