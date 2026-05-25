@@ -1,12 +1,12 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-
 #include "ShooterCharacter.h"
 
 // Brock
-#include "PlayerInventoryItemSelector.h"
-#include "ResourceInventory.h"
+#include "Managers/PlayerInventoryItemSelector.h"
+#include "Resources/ResourceInventory.h"
 
+// UE
 #include "ShooterWeapon.h"
 #include "EnhancedInputComponent.h"
 #include "Components/InputComponent.h"

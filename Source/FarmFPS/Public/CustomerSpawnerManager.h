@@ -3,7 +3,7 @@
 #pragma once
 
 // Brock
-#include "CraftingData.h"
+#include "Managers/CraftingData.h"
 
 // UE
 #include "CoreMinimal.h"

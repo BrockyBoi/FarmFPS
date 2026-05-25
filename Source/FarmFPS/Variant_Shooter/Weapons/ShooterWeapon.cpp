@@ -3,11 +3,11 @@
 #include "ShooterWeapon.h"
 
 // Brock
-#include "ActorPool.h"
-#include "FarmFPSCharacter.h"
-#include "ModifiedValueData.h"
+#include "Managers/ActorPool.h"
+#include "Managers/ModifiedValueData.h"
 
 // UE
+#include "FarmFPSCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"

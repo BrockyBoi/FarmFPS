@@ -2,8 +2,10 @@
 
 #pragma once
 
-#include "ModifiedValueData.h"
+// Brock
+#include "Managers/ModifiedValueData.h"
 
+// UE
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ShooterWeaponHolder.h"

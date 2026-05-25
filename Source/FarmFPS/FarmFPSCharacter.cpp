@@ -3,15 +3,15 @@
 #include "FarmFPSCharacter.h"
 
 // Brock
-#include "ActorPool.h"
-#include "ConstantCropAffectorArea.h"
-#include "Crop.h"
-#include "FarmFPSUtilities.h"
-#include "PerkManager.h"
-#include "PlayerInventoryItemSelector.h"
-#include "ResourcePickupActor.h"
-#include "ResourceInventory.h"
-#include "ResourceTypeTags.h"
+#include "Managers/ActorPool.h"
+#include "Projectiles/ConstantCropAffectorArea.h"
+#include "Managers/FarmFPSUtilities.h"
+#include "Managers/PerkManager.h"
+#include "Plants/Plant.h"
+#include "Managers/PlayerInventoryItemSelector.h"
+#include "Resources/ResourcePickupActor.h"
+#include "Resources/ResourceInventory.h"
+#include "Resources/ResourceTypeTags.h"
 
 // UE
 #include "Animation/AnimInstance.h"
@@ -131,10 +131,10 @@ void AFarmFPSCharacter::OnGroundSlamComponentOverlap(UPrimitiveComponent* Overla
 {
 	if (IsValid(OtherActor))
 	{
-		ACrop* crop = Cast<ACrop>(OtherActor);
-		if (IsValid(crop))
+		APlant* plant = Cast<APlant>(OtherActor);
+		if (IsValid(plant))
 		{
-			crop->DoDamageToCrop(_groundSlamDamage.GetModifiedValue(this));
+			plant->DoDamage(_groundSlamDamage.GetModifiedValue(this));
 		}
 	}
 }
@@ -143,10 +143,10 @@ void AFarmFPSCharacter::OnMeleeComponentOverlap(UPrimitiveComponent* OverlappedC
 {
 	if (IsValid(OtherActor))
 	{
-		ACrop* crop = Cast<ACrop>(OtherActor);
-		if (IsValid(crop))
+		APlant* plant = Cast<APlant>(OtherActor);
+		if (IsValid(plant))
 		{
-			crop->DoDamageToCrop(_meleeDamage.GetModifiedValue(this));
+			plant->DoDamage(_meleeDamage.GetModifiedValue(this));
 		}
 	}
 }

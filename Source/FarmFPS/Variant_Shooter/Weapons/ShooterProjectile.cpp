@@ -2,7 +2,11 @@
 
 #include "ShooterProjectile.h"
 
-#include "ActorPool.h"
+// Brock
+#include "Managers/ActorPool.h"
+#include "Managers/FarmFPSUtilities.h"
+
+// UE
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/Character.h"
@@ -12,7 +16,6 @@
 #include "GameFramework/Controller.h"
 #include "Engine/OverlapResult.h"
 #include "Engine/World.h"
-#include "FarmFPSUtilities.h"
 #include "TimerManager.h"
 
 AShooterProjectile::AShooterProjectile()
