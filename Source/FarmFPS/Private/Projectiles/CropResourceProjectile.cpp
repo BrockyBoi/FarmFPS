@@ -9,10 +9,8 @@
 #include "Misc/MoonHitBox.h"
 #include "Resources/ResourceTypeTags.h"
 
-// Sets default values
 ACropResourceProjectile::ACropResourceProjectile() : Super()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	_cropCollider = CreateDefaultSubobject<USphereComponent>(TEXT("CropCollider"));
@@ -23,7 +21,6 @@ ACropResourceProjectile::ACropResourceProjectile() : Super()
 	_cropCollider->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
 }
 
-// Called when the game starts or when spawned
 void ACropResourceProjectile::BeginPlay()
 {
 	Super::BeginPlay();

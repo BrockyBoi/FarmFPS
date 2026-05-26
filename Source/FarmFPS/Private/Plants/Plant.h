@@ -65,6 +65,8 @@ protected:
 
 	virtual void OnPlayerDestroyPlant();
 
+	void InitializeInventory();
+
 	UFUNCTION()
 	virtual void OnDayEnd();
 

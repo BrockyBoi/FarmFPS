@@ -52,10 +52,15 @@ protected:
 
 private:
 	UFUNCTION()
+	void OnDayBegin();
+
+	UFUNCTION()
 	void OnDayEnd();
 
 	void CheckInitializeMap(const FGameplayTag& cropType);
 	void ClearAllExceptMoney();
+
+	bool _canAddResources = false;
 
 	UPROPERTY(VisibleAnywhere, Transient)
 	TMap<FGameplayTag, float> _resourcesMap;

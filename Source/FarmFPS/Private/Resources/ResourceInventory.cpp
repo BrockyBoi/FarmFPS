@@ -19,6 +19,7 @@ void UResourceInventory::BeginPlay()
 	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycle)))
 	{
+		dayNightCycle->OnDayBegin.AddUObject(this, &UResourceInventory::OnDayBegin);
 		dayNightCycle->OnDayEnd.AddUObject(this, &UResourceInventory::OnDayEnd);
 	}
 }
@@ -28,6 +29,7 @@ void UResourceInventory::EndPlay(EEndPlayReason::Type EndPlayReason)
 	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycle))
 	{
+		dayNightCycle->OnDayBegin.RemoveAll(this);
 		dayNightCycle->OnDayEnd.RemoveAll(this);
 	}
 	_resourcesMap.Empty();
@@ -36,7 +38,7 @@ void UResourceInventory::EndPlay(EEndPlayReason::Type EndPlayReason)
 
 void UResourceInventory::AddResource(const FGameplayTag& resourceType, float amount)
 {
-	if (amount > 0)
+	if (_canAddResources && amount > 0)
 	{
 		CheckInitializeMap(resourceType);
 
@@ -92,7 +94,7 @@ void UResourceInventory::AddAllResourcesInInventory(UResourceInventory* otherInv
 
 bool UResourceInventory::CanAddResource(const FGameplayTag& resourceType, float amount) const
 {
-	return GetResourceCount(resourceType) + amount <= GetResourceCap(resourceType);
+	return _canAddResources && GetResourceCount(resourceType) + amount <= GetResourceCap(resourceType);
 }
 
 float UResourceInventory::GetResourceCount(const FGameplayTag& resourceType) const
@@ -115,9 +117,15 @@ uint16 UResourceInventory::GetResourceCap(const FGameplayTag& resourceType) cons
 	return _resourceCaps.Contains(resourceType)  && _resourceCaps[resourceType] > 0 ? _resourceCaps[resourceType] : _defaultResourceCap;
 }
 
+void UResourceInventory::OnDayBegin()
+{
+	_canAddResources = true;
+}
+
 void UResourceInventory::OnDayEnd()
 {
 	ClearAllExceptMoney();
+	_canAddResources = false;
 }
 
 void UResourceInventory::CheckInitializeMap(const FGameplayTag& resourceType)

@@ -50,6 +50,7 @@ protected:
 	UFUNCTION()
 	void OnBreakCropTimerEnd();
 
+	virtual void OnPlayerDestroyPlant() override;
 	void SpawnResourceActors();
 	void DestroyPlant();
 
@@ -58,8 +59,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Crop Yield")
 	FModifiedFloatValue _perfectTimingDuration = 5.f;
-
-	UResourceInventory* _cropResourcesInventory = nullptr;
 
 	UPROPERTY(EditDefaultsOnly)
 	float _yieldPickupSpawnHeight = 100.f;

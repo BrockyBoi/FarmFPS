@@ -15,6 +15,8 @@ APlant::APlant()
 void APlant::BeginPlay()
 {
 	Super::BeginPlay();
+
+	InitializeInventory();
 }
 
 void APlant::AddResource(const FGameplayTag& resourceType, float amount)
@@ -70,6 +72,19 @@ void APlant::OnPlayerDestroyPlant()
 {
 	_isBroken = true;
 	DestroyPlant();
+}
+
+void APlant::InitializeInventory()
+{
+	_resourcesInventory = FindComponentByClass<UResourceInventory>();
+	if (ensure(IsValid(_resourcesInventory)))
+	{
+		_resourcesInventory->SetResourceAmount(ResourceTypeTags::Water, 0);
+		_resourcesInventory->SetResourceAmount(ResourceTypeTags::Light, 0);
+
+		_resourcesInventory->SetResourceCap(ResourceTypeTags::Water, _cropData.WaterNeeded);
+		_resourcesInventory->SetResourceCap(ResourceTypeTags::Light, _cropData.LightNeeded);
+	}
 }
 
 void APlant::DestroyPlant()

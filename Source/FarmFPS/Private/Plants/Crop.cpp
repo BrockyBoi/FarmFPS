@@ -78,15 +78,7 @@ void ACrop::RemoveFromPool()
 		objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::PlantCrop, _cropData.ResourceType);
 	}
 
-	_cropResourcesInventory = FindComponentByClass<UResourceInventory>();
-	if (ensure(IsValid(_cropResourcesInventory)))
-	{
-		_cropResourcesInventory->SetResourceAmount(ResourceTypeTags::Water, 0);
-		_cropResourcesInventory->SetResourceAmount(ResourceTypeTags::Light, 0);
-
-		_cropResourcesInventory->SetResourceCap(ResourceTypeTags::Water, _cropData.WaterNeeded);
-		_cropResourcesInventory->SetResourceCap(ResourceTypeTags::Light, _cropData.LightNeeded);
-	}
+	InitializeInventory();
 
 	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycle)))
@@ -95,6 +87,12 @@ void ACrop::RemoveFromPool()
 	}
 
 	AffectGrowth();
+}
+
+void ACrop::OnPlayerDestroyPlant()
+{
+	SpawnResourceActors();
+	Super::OnPlayerDestroyPlant();
 }
 
 void ACrop::SpawnResourceActors()
