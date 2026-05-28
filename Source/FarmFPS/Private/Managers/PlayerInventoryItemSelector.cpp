@@ -77,27 +77,14 @@ void UPlayerInventoryItemSelector::OnResourceChanged(const FGameplayTag& resourc
 
 	const int startingItemTypeCount = _currentInventoryItemTypes.Num();
 
-	if (_currentInventoryItemTypes.Contains(resourceType) && newAmount <= 0)
-	{
-		_currentInventoryItemTypes.Remove(resourceType);
-	}
-	else if (!_currentInventoryItemTypes.Contains(resourceType) && newAmount > 0)
+	if (!_currentInventoryItemTypes.Contains(resourceType) && newAmount > 0)
 	{
 		_currentInventoryItemTypes.Add(resourceType);
 	}
 
-	if (startingItemTypeCount > 0 && _currentSelectedIndex >= _currentInventoryItemTypes.Num())
-	{
-		_currentSelectedIndex = _currentInventoryItemTypes.Num() - 1;
-	}
-	else if(startingItemTypeCount == 0 && _currentInventoryItemTypes.Num() > 0)
+	if(startingItemTypeCount == 0 && _currentInventoryItemTypes.Num() > 0)
 	{
 		_currentSelectedIndex = 0;
-	}
-
-	if (_currentInventoryItemTypes.Num() == 0)
-	{
-		_currentSelectedIndex = -1;
 	}
 }
 

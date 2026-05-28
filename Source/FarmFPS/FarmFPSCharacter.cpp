@@ -249,29 +249,26 @@ void AFarmFPSCharacter::ThrowInventoryItem()
 	if (ensure(IsValid(_itemSelector)) && ensure(IsValid(_inventory)))
 	{
 		FGameplayTag currentResource = _itemSelector->GetCurrentSelectedItemType();
-		if (currentResource != ResourceTypeTags::None)
+		if (currentResource != ResourceTypeTags::None && _inventory->HasResourceAmount(currentResource, 1))
 		{
-			if (ensure(_inventory->HasResourceAmount(currentResource, 1)))
+			_inventory->RemoveResource(currentResource, 1);
+			UActorPool* pool = FarmFPSUtilities::GetActorPool(this);
+			if (ensure(IsValid(pool)))
 			{
-				_inventory->RemoveResource(currentResource, 1);
-				UActorPool* pool = FarmFPSUtilities::GetActorPool(this);
-				if (ensure(IsValid(pool)))
+				const FVector spawnLocation = GetActorLocation() + (GetActorForwardVector() * 100.f) + FVector(0.f, 0.f, 50.f);
+				AResourcePickupActor* thrownItem = Cast<AResourcePickupActor>(pool->GetActorFromPool(currentResource, spawnLocation, EPooledActorType::ResourcePickup));
+				if (ensure(IsValid(thrownItem)))
 				{
-					const FVector spawnLocation = GetActorLocation() + (GetActorForwardVector() * 100.f) + FVector(0.f, 0.f, 50.f);
-					AResourcePickupActor* thrownItem = Cast<AResourcePickupActor>(pool->GetActorFromPool(currentResource, spawnLocation, EPooledActorType::ResourcePickup));
-					if (ensure(IsValid(thrownItem)))
+					thrownItem->SetIsBeingThrownByPlayer(true);
+					if (UPrimitiveComponent* primitiveComponent = Cast<UPrimitiveComponent>(thrownItem->GetRootComponent()))
 					{
-						thrownItem->SetIsBeingThrownByPlayer(true);
-						if (UPrimitiveComponent* primitiveComponent = Cast<UPrimitiveComponent>(thrownItem->GetRootComponent()))
-						{
-							primitiveComponent->AddImpulse(GetFirstPersonCameraComponent()->GetForwardVector() * _throwForce.GetModifiedValue(this));
-						}
+						primitiveComponent->AddImpulse(GetFirstPersonCameraComponent()->GetForwardVector() * _throwForce.GetModifiedValue(this));
 					}
 				}
-
-				_throwInterval = FMath::Max(_throwInterval - _throwIntervalSpeedUpPerThrow, _minThrowSpeedInterval);
-				GetWorld()->GetTimerManager().SetTimer(_throwTimerHandle, this, &AFarmFPSCharacter::ThrowInventoryItem, _throwInterval, false);
 			}
+
+			_throwInterval = FMath::Max(_throwInterval - _throwIntervalSpeedUpPerThrow, _minThrowSpeedInterval);
+			GetWorld()->GetTimerManager().SetTimer(_throwTimerHandle, this, &AFarmFPSCharacter::ThrowInventoryItem, _throwInterval, false);
 		}
 	}
 }

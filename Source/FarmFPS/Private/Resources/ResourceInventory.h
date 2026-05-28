@@ -29,6 +29,7 @@ public:
 
 	void AddAllResourcesInInventory(UResourceInventory* otherInventory);
 
+	void SetCanAddResources(bool canAdd) { _canAddResources = canAdd; }
 	bool CanAddResource(const FGameplayTag& resourceType, float amount) const;
 
 	UFUNCTION(BlueprintPure)
@@ -60,7 +61,7 @@ private:
 	void CheckInitializeMap(const FGameplayTag& cropType);
 	void ClearAllExceptMoney();
 
-	bool _canAddResources = false;
+	bool _canAddResources = true;
 
 	UPROPERTY(VisibleAnywhere, Transient)
 	TMap<FGameplayTag, float> _resourcesMap;

@@ -66,8 +66,7 @@ void ACrop::AddActorToPool()
 
 void ACrop::RemoveFromPool()
 {
-	_isBroken = false;
-	_isInPerfectTiming = _hasPerfectTimingPeriodEnded = false;
+	_isBroken = _isInPerfectTiming = _hasPerfectTimingPeriodEnded = _isLightAndWaterFull = false;
 	_sinAngleInPerfectTiming = 270.f;
 
 	Cosmetic_OnRemovedFromPool();
@@ -83,6 +82,11 @@ void ACrop::RemoveFromPool()
 	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycle)))
 	{
+		if (dayNightCycle->IsDay())
+		{
+			_resourcesInventory->SetCanAddResources(true);
+		}
+
 		dayNightCycle->OnDayEnd.AddUObject(this, &ACrop::OnDayEnd);
 	}
 
