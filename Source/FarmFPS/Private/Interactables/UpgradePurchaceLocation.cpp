@@ -42,11 +42,13 @@ void UUpgradePurchaceLocation::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void UUpgradePurchaceLocation::OnDayBegin()
 {
 	GetOwner()->SetActorHiddenInGame(true);
+	GetOwner()->SetActorEnableCollision(false);
 }
 
 void UUpgradePurchaceLocation::OnDayEnd()
 {
 	GetOwner()->SetActorHiddenInGame(false);
+	GetOwner()->SetActorEnableCollision(true);
 }
 
 void UUpgradePurchaceLocation::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
