@@ -326,14 +326,14 @@ void AFarmFPSCharacter::OnPressSpawnLightAffector()
 void AFarmFPSCharacter::DoMeleeStart()
 {
 	_isMeleeing = true;
-	_groundSlamSphereCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	_meleeCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	GetWorld()->GetTimerManager().SetTimer(_meleeTimerHandle, this, &AFarmFPSCharacter::DoMeleeEnd, _meleeDuration.GetModifiedValue(this), false);
 }
 
 void AFarmFPSCharacter::DoMeleeEnd()
 {
 	_isMeleeing = false;
-	_groundSlamSphereCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	_meleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetWorld()->GetTimerManager().ClearTimer(_meleeTimerHandle);
 }
 

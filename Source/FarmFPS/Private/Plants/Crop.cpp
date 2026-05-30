@@ -144,8 +144,9 @@ void ACrop::SpawnResourceActors()
 			objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::FinishCrop, _cropData.ResourceType);
 		}
 
-		FTimerHandle handle;
-		GetWorld()->GetTimerManager().SetTimer(handle, this, &ACrop::OnBreakCropTimerEnd, .1f, false);
+		// Genuinely don't remember why I added this, but I'm scared to remove it
+		//FTimerHandle handle;
+		//GetWorld()->GetTimerManager().SetTimer(handle, this, &ACrop::OnBreakCropTimerEnd, .1f, false);
 
 		if (ensure(IsValid(_onBreakCropSound)))
 		{
@@ -199,6 +200,11 @@ void ACrop::OnBreakCropTimerEnd()
 
 void ACrop::DestroyPlant()
 {
+	if (OnPlantBreak.IsBound())
+	{
+		OnPlantBreak.Broadcast();
+	}
+
 	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(actorPool)))
 	{

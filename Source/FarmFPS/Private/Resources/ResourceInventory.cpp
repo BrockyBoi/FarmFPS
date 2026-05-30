@@ -94,7 +94,7 @@ void UResourceInventory::AddAllResourcesInInventory(UResourceInventory* otherInv
 
 bool UResourceInventory::CanAddResource(const FGameplayTag& resourceType, float amount) const
 {
-	return _canAddResources && GetResourceCount(resourceType) + amount <= GetResourceCap(resourceType);
+	return _canAddResources && GetResourceCount(resourceType) < GetResourceCap(resourceType);
 }
 
 float UResourceInventory::GetResourceCount(const FGameplayTag& resourceType) const

@@ -31,8 +31,8 @@ public:
 	/** Constructor */
 	AShooterProjectile();
 
-	void AddActorToPool();
-	void RemoveFromPool();
+	virtual void AddActorToPool();
+	virtual void RemoveFromPool();
 
 	const FGameplayTag& GetProjectileType() const { return ProjectileType; }
 

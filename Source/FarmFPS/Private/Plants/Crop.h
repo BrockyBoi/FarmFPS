@@ -52,7 +52,7 @@ protected:
 
 	virtual void OnPlayerDestroyPlant() override;
 	void SpawnResourceActors();
-	void DestroyPlant();
+	virtual void DestroyPlant() override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Crop Yield")
 	FModifiedFloatValue _perfectTimingYieldBonus = 1.5f;

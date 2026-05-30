@@ -17,7 +17,6 @@
 // Generated
 #include "CropResourceProjectile.generated.h"
 
-
 UCLASS()
 class ACropResourceProjectile : public AShooterProjectile
 {
@@ -26,7 +25,10 @@ class ACropResourceProjectile : public AShooterProjectile
 public:	
 	// Sets default values for this actor's properties
 	ACropResourceProjectile();
-	float GetCropResourceAmount(const UObject* worldObject) const { return _resourceAmount.GetModifiedValue(worldObject); }
+	float GetCropResourceAmount(const UObject* worldObject) const { return _currentResourceAmount; }
+
+	virtual void AddActorToPool() override;
+	virtual void RemoveFromPool() override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -41,6 +43,11 @@ protected:
 	UPROPERTY(EditAnywhere)
 	USphereComponent* _cropCollider = nullptr;
 
+	float _currentResourceAmount = 0;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Crop Resource")
 	FModifiedFloatValue _resourceAmount = 1.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Crop Resource")
+	FModifiedFloatValue _resourceDecayOnHit = .1f;
 };
