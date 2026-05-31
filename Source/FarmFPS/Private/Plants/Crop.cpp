@@ -17,7 +17,7 @@
 // UE
 #include "Kismet/GameplayStatics.h"
 
-ACrop::ACrop()
+ACrop::ACrop() : Super()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = false;
@@ -56,6 +56,7 @@ void ACrop::OnPerfectTimingEnd()
 
 void ACrop::AddActorToPool()
 {
+	_resourcesInventory->ListenToDayCycleEvents(false);
 	_isInPerfectTiming = _hasPerfectTimingPeriodEnded = false;
 	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycle))
@@ -66,6 +67,7 @@ void ACrop::AddActorToPool()
 
 void ACrop::RemoveFromPool()
 {
+	_resourcesInventory->ListenToDayCycleEvents(true);
 	_isBroken = _isInPerfectTiming = _hasPerfectTimingPeriodEnded = _isLightAndWaterFull = false;
 	_sinAngleInPerfectTiming = 270.f;
 

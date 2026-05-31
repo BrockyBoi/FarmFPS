@@ -100,6 +100,7 @@ void AFarmFPSCharacter::BeginPlay()
 	if (ensure(IsValid(_inventory)) && ensure(IsValid(_itemSelector)))
 	{
 		_itemSelector->SetPlayerInventory(_inventory);
+		_inventory->SetCanAlwaysAddResources(true);
 	}
 }
 

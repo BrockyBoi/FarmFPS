@@ -30,7 +30,10 @@ public:
 	void AddAllResourcesInInventory(UResourceInventory* otherInventory);
 
 	void SetCanAddResources(bool canAdd) { _canAddResources = canAdd; }
+	void SetCanAlwaysAddResources(bool canAlwaysAdd) { _canAlwaysAddResources = canAlwaysAdd; }
 	bool CanAddResource(const FGameplayTag& resourceType, float amount) const;
+
+	void ListenToDayCycleEvents(bool listen);
 
 	UFUNCTION(BlueprintPure)
 	float GetResourceCount(const FGameplayTag& resourceType) const;
@@ -62,6 +65,9 @@ private:
 	void ClearAllExceptMoney();
 
 	bool _canAddResources = true;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool _canAlwaysAddResources = false;
 
 	UPROPERTY(VisibleAnywhere, Transient)
 	TMap<FGameplayTag, float> _resourcesMap;

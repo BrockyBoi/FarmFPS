@@ -16,22 +16,12 @@ void UResourceInventory::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
-	if (ensure(IsValid(dayNightCycle)))
-	{
-		dayNightCycle->OnDayBegin.AddUObject(this, &UResourceInventory::OnDayBegin);
-		dayNightCycle->OnDayEnd.AddUObject(this, &UResourceInventory::OnDayEnd);
-	}
+	ListenToDayCycleEvents(true);
 }
 
 void UResourceInventory::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
-	if (IsValid(dayNightCycle))
-	{
-		dayNightCycle->OnDayBegin.RemoveAll(this);
-		dayNightCycle->OnDayEnd.RemoveAll(this);
-	}
+	ListenToDayCycleEvents(false);
 	_resourcesMap.Empty();
 	Super::EndPlay(EndPlayReason);
 }
@@ -85,16 +75,38 @@ void UResourceInventory::SetResourceAmount(const FGameplayTag& resourceType, flo
 
 void UResourceInventory::AddAllResourcesInInventory(UResourceInventory* otherInventory)
 {
-	for (auto pair : otherInventory->_resourcesMap)
+	if (_canAddResources && ensure(IsValid(otherInventory)))
 	{
-		AddResource(pair.Key, pair.Value);
-		otherInventory->RemoveResource(pair.Key, pair.Value);
+		for (auto pair : otherInventory->_resourcesMap)
+		{
+			AddResource(pair.Key, pair.Value);
+			otherInventory->RemoveResource(pair.Key, pair.Value);
+		}
 	}
 }
 
 bool UResourceInventory::CanAddResource(const FGameplayTag& resourceType, float amount) const
 {
 	return _canAddResources && GetResourceCount(resourceType) < GetResourceCap(resourceType);
+}
+
+void UResourceInventory::ListenToDayCycleEvents(bool listen)
+{
+	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+
+	if (IsValid(dayNightCycle))
+	{
+		if (listen)
+		{
+			dayNightCycle->OnDayBegin.AddUObject(this, &UResourceInventory::OnDayBegin);
+			dayNightCycle->OnDayEnd.AddUObject(this, &UResourceInventory::OnDayEnd);
+		}
+		else
+		{
+			dayNightCycle->OnDayBegin.RemoveAll(this);
+			dayNightCycle->OnDayEnd.RemoveAll(this);
+		}
+	}
 }
 
 float UResourceInventory::GetResourceCount(const FGameplayTag& resourceType) const
@@ -125,7 +137,11 @@ void UResourceInventory::OnDayBegin()
 void UResourceInventory::OnDayEnd()
 {
 	ClearAllExceptMoney();
-	_canAddResources = false;
+
+	if (!_canAlwaysAddResources)
+	{
+		_canAddResources = false;
+	}
 }
 
 void UResourceInventory::CheckInitializeMap(const FGameplayTag& resourceType)
