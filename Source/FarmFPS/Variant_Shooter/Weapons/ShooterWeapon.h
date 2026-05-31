@@ -92,6 +92,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Refire", meta = (ClampMin = 0, ClampMax = 5, Units = "s"))
 	float RefireRate = 0.5f;
 
+	UPROPERTY(EditAnywhere, Category = "Refire")
+	FModifiedFloatValue FireRateMultiplier = 1.f;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Reload")
 	FModifiedFloatValue ReloadTime = 1.5f;
 
@@ -162,6 +165,8 @@ public:
 	void StopFiring();
 
 	virtual void StartReload();
+
+	float GetFireRate() const { return RefireRate * FireRateMultiplier.GetModifiedValue(this); }
 
 protected:
 

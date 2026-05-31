@@ -227,6 +227,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Affectors")
 	TSubclassOf<AConstantCropAffectorArea> _lightAffectorClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Movement")
+	FModifiedFloatValue _movementSpeedMultiplier = 1.f;
+
+	float _startingMovementSpeed = 0;
+
 	UPROPERTY(EditAnywhere)
 	USphereComponent* _groundSlamSphereCollider;
 

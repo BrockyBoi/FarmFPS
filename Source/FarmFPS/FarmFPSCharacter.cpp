@@ -90,8 +90,11 @@ void AFarmFPSCharacter::BeginPlay()
 	if (ensure(IsValid(_perkManager)))
 	{
 		_perkManager->OnPerkLevelChange.AddDynamic(this, &AFarmFPSCharacter::OnPerkLevelDataChanged);
+
 		_startingJumpCount = JumpMaxCount;
 		_startingJumpHeight = GetCharacterMovement()->JumpZVelocity;
+
+		_startingMovementSpeed = GetCharacterMovement()->MaxWalkSpeed;
 	}
 
 	if (ensure(IsValid(_inventory)) && ensure(IsValid(_itemSelector)))
@@ -124,6 +127,7 @@ void AFarmFPSCharacter::OnPerkLevelDataChanged(const FGameplayTag& perkType, con
 {
 	JumpMaxCount = _startingJumpCount + _extraJumpCount.GetModifiedValue(this);
 	GetCharacterMovement()->JumpZVelocity = _startingJumpHeight + _extraJumpHeight.GetModifiedValue(this);
+	GetCharacterMovement()->MaxWalkSpeed =  _startingMovementSpeed * _movementSpeedMultiplier.GetModifiedValue(this);
 	_meleeCollider->SetBoxExtent(_meleeColliderBounds + FVector(_meleeScale.GetModifiedValue(this)));
 }
 

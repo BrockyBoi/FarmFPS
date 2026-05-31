@@ -112,7 +112,7 @@ void AShooterWeapon::StartFiring()
 	// this may be under the refire rate if the weapon shoots slow enough and the player is spamming the trigger
 	const float TimeSinceLastShot = GetWorld()->GetTimeSeconds() - TimeOfLastShot;
 
-	if (TimeSinceLastShot > RefireRate)
+	if (TimeSinceLastShot > GetFireRate())
 	{
 		// fire the weapon right away
 		Fire();
@@ -162,11 +162,11 @@ void AShooterWeapon::Fire()
 	if (bFullAuto)
 	{
 		// schedule the next shot
-		GetWorld()->GetTimerManager().SetTimer(RefireTimer, this, &AShooterWeapon::Fire, RefireRate, false);
+		GetWorld()->GetTimerManager().SetTimer(RefireTimer, this, &AShooterWeapon::Fire, GetFireRate(), false);
 	} else {
 
 		// for semi-auto weapons, schedule the cooldown notification
-		GetWorld()->GetTimerManager().SetTimer(RefireTimer, this, &AShooterWeapon::FireCooldownExpired, RefireRate, false);
+		GetWorld()->GetTimerManager().SetTimer(RefireTimer, this, &AShooterWeapon::FireCooldownExpired, GetFireRate(), false);
 
 	}
 }
