@@ -272,7 +272,7 @@ void AFarmFPSCharacter::ThrowInventoryItem()
 				}
 			}
 
-			_throwInterval = FMath::Max(_throwInterval - _throwIntervalSpeedUpPerThrow, _minThrowSpeedInterval);
+			_throwInterval = FMath::Max(_throwInterval - _throwIntervalSpeedUpPerThrow.GetModifiedValue(this), _minThrowSpeedInterval);
 			GetWorld()->GetTimerManager().SetTimer(_throwTimerHandle, this, &AFarmFPSCharacter::ThrowInventoryItem, _throwInterval, false);
 		}
 	}

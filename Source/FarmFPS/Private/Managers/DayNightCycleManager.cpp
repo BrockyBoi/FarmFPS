@@ -96,7 +96,10 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 void UDayNightCycleManager::TransitionToNextDay()
 {
 	UGameplayStatics::SpawnSound2D(this, _onNightEndSound);
-	_musicAudioComponent->FadeOut(0.5f, 0.f);
+	if (ensure(IsValid(_musicAudioComponent)))
+	{
+		_musicAudioComponent->FadeOut(0.5f, 0.f);
+	}
 	_timeElapsed = 0.f;
 	_currentDayState = EDayState::NightTransitionToDay;
 }

@@ -69,6 +69,9 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	bool _canAlwaysAddResources = false;
 
+	UPROPERTY(EditDefaultsOnly)
+	bool _clearResourcesAtEndOfDay = true;
+
 	UPROPERTY(VisibleAnywhere, Transient)
 	TMap<FGameplayTag, float> _resourcesMap;
 

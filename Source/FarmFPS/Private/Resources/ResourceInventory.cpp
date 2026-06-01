@@ -136,7 +136,10 @@ void UResourceInventory::OnDayBegin()
 
 void UResourceInventory::OnDayEnd()
 {
-	ClearAllExceptMoney();
+	if (_clearResourcesAtEndOfDay)
+	{
+		ClearAllExceptMoney();
+	}
 
 	if (!_canAlwaysAddResources)
 	{

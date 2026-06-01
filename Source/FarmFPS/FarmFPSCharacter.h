@@ -211,7 +211,7 @@ protected:
 	float _throwInterval = 0.5f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Throw")
-	float _throwIntervalSpeedUpPerThrow = 0.01;
+	FModifiedFloatValue _throwIntervalSpeedUpPerThrow = 0.01;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Throw")
 	float _maxThrowSpeedInterval = 0.5f;
