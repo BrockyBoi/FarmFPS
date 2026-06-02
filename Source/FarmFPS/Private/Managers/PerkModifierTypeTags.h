@@ -28,5 +28,8 @@ namespace PerkModifierTypeTags
 	// Customers
 	static const FGameplayTag CustomerSpawnRateIncrease = FGameplayTag::RequestGameplayTag(FName("PerkModifier.CustomerSpawnRateIncrease"));
 	static const FGameplayTag MaxCustomerCount = FGameplayTag::RequestGameplayTag(FName("PerkModifier.MaxCustomerCount"));
+
+	// Bread Related
+	static const FGameplayTag DailyBreadIncreaseAmount = FGameplayTag::RequestGameplayTag(FName("PerkModifier.DailyBreadIncreaseAmount"));
 };
 

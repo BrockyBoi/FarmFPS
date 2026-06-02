@@ -56,12 +56,12 @@ void UBreadRequirementManager::OnDayBegin()
 
 	if (_isFirstDay)
 	{
-		_breadRequiredForCurrentDay = _startingBreadRequired.GetModifiedValue(this);
+		_breadRequiredForCurrentDay = _startingBreadRequired;
 		_isFirstDay = false;
 	}
 	else
 	{
-		_breadRequiredForCurrentDay = FMath::CeilToInt(_breadRequiredForCurrentDay * _dailyMultiplier.GetModifiedValue(this));
+		_breadRequiredForCurrentDay += _dailyBreadIncreaseAmount.GetModifiedValue(this);
 	}
 }
 

@@ -50,6 +50,12 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BreadRequirement", meta = (AllowPrivateAccess = true))
+	int _startingBreadRequired = 1;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BreadRequirement", meta = (AllowPrivateAccess = true))
+	FModifiedIntValue _dailyBreadIncreaseAmount = 1;
+
 private:
 	UFUNCTION()
 	void OnDayBegin();
@@ -64,10 +70,4 @@ private:
 	int _breadRequiredForCurrentDay = 0;
 
 	bool _isFirstDay = true;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BreadRequirement", meta = (AllowPrivateAccess = true))
-	FModifiedIntValue _startingBreadRequired = 10;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BreadRequirement", meta = (AllowPrivateAccess = true))
-	FModifiedFloatValue _dailyMultiplier = 1.5f;
 };
