@@ -14,6 +14,7 @@
 
 enum class EDayState : uint8
 {
+	WaitingForTradeOff,
 	Day,
 	MidNight,
 	NightTransitionToDay

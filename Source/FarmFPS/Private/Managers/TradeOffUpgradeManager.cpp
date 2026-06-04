@@ -15,6 +15,21 @@ UTradeOffUpgradeManager::UTradeOffUpgradeManager()
 void UTradeOffUpgradeManager::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (ensure(IsValid(_tradeOffPossiblitiesTable)))
+	{
+		// Iterate through the internal row map directly
+		for (auto It = _tradeOffPossiblitiesTable->GetRowMap().CreateConstIterator(); It; ++It)
+		{
+			FName RowName = It.Key();
+			FTradeOffPossibility* row = reinterpret_cast<FTradeOffPossibility*>(It.Value());
+
+			if (ensure(row))
+			{
+				_possibilities.Add(row->PerkType, *row);
+			}
+		}
+	}
 }
 
 void UTradeOffUpgradeManager::OnUpgradeAccepted()
@@ -22,7 +37,8 @@ void UTradeOffUpgradeManager::OnUpgradeAccepted()
 	UPerkManager* perkManager = FarmFPSUtilities::GetPlayerPerkManager(this);
 	if (ensure(IsValid(perkManager)))
 	{
-		perkManager->ModifyAdditiveValue(PerkModifierTypeTags::DailyBreadIncreaseAmount, _currentTradeOff.BreadIncreaseAmount);
+		perkManager->ModifyPerkData(_currentTradeOff.PerkType, _currentTradeOff.PerkData);
+		perkManager->ModifyPerkData(PerkModifierTypeTags::DailyBreadIncreaseAmount, _currentTradeOff.BreadIncreaseAmount);
 		_currentTradeOff = FTradeOffData();
 	}
 }
@@ -36,7 +52,6 @@ void UTradeOffUpgradeManager::GenerateTradeOffs()
 {
 	float percentage = FMath::FRand();
 	EPerkRarity rarity = EPerkRarity::Common;
-	FGameplayTag perkType = _potentialUpgradeTypes.GetGameplayTagArray()[FMath::RandRange(0, _potentialUpgradeTypes.Num() - 1)];
 	if (percentage < _rarityChancePercentages[EPerkRarity::Legendary].GetModifiedValue(this))
 	{
 		rarity = EPerkRarity::Legendary;
@@ -50,5 +65,19 @@ void UTradeOffUpgradeManager::GenerateTradeOffs()
 		rarity = EPerkRarity::Rare;
 	}
 
-	_currentTradeOff = FTradeOffData(rarity, perkType, _playerPerkValues[rarity], _breadIncreaseAmounts[rarity]);
+	TArray<FGameplayTag> possibleUpgrades;
+	_possibilities.GetKeys(possibleUpgrades);
+	if (!ensure(possibleUpgrades.Num() <= 0))
+	{
+		return;
+	}
+
+	FGameplayTag perkType;
+	do
+	{
+		perkType = possibleUpgrades[FMath::RandRange(0, _possibilities.Num() - 1)];
+	}
+	while (!_possibilities[perkType].PlayerPerkValues.Contains(rarity));
+
+	_currentTradeOff = FTradeOffData(rarity, perkType, _possibilities[perkType].PlayerPerkValues[rarity], _breadIncreaseAmounts[rarity]);
 }

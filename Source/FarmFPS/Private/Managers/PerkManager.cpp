@@ -37,21 +37,23 @@ void UPerkManager::ModifyPerkData(const FGameplayTag& perkTag, const FPerkData& 
 
 float UPerkManager::ModifyValueByPerks(const FGameplayTag& perkTag, float valueToModify) const
 {
-	return (valueToModify + GetPerkData(perkTag).AdditiveValue) * GetPerkData(perkTag).MultiplicativeValue;
+	return valueToModify * GetPerkData(perkTag).MultiplicativeValue + GetPerkData(perkTag).AdditiveValue;
 }
 
 float UPerkManager::ModifyValueByPerks(const FGameplayTagContainer& perkTags, float valueToModify) const
 {
 	float startingValue = valueToModify;
-	for (const FGameplayTag& perkTag : perkTags)
-	{
-		valueToModify += GetPerkData(perkTag).AdditiveValue;
-	}
 
 	for (const FGameplayTag& perkTag : perkTags)
 	{
 		valueToModify *= GetPerkData(perkTag).MultiplicativeValue;
 	}
+
+	for (const FGameplayTag& perkTag : perkTags)
+	{
+		valueToModify += GetPerkData(perkTag).AdditiveValue;
+	}
+
 	return valueToModify;
 }
 
@@ -59,4 +61,3 @@ void UPerkManager::BeginPlay()
 {
 	Super::BeginPlay();
 }
-

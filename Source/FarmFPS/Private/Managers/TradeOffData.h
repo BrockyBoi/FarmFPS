@@ -36,17 +36,17 @@ struct FTradeOffData
 	FPerkData PerkData;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	int BreadIncreaseAmount;
+	FPerkData BreadIncreaseAmount;
 
 	FTradeOffData()
 	{
 		Rarity = EPerkRarity::Common;
 		PerkType = FGameplayTag::EmptyTag;
 		PerkData = FPerkData();
-		BreadIncreaseAmount = 0;
+		BreadIncreaseAmount = FPerkData();
 	}
 
-	FTradeOffData(EPerkRarity rarity, FGameplayTag perkType, FPerkData& perkData, int breadIncreaseAmount)
+	FTradeOffData(EPerkRarity rarity, FGameplayTag perkType, FPerkData& perkData, FPerkData breadIncreaseAmount)
 	{
 		Rarity = rarity;
 		PerkType = perkType;

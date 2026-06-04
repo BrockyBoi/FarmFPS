@@ -3,8 +3,10 @@
 #pragma once
 
 // Brock
+#include "PerkData.h"
 #include "ModifiedValueData.h"
 #include "TradeOffData.h"
+#include "TradeOffPossibility.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -36,14 +38,13 @@ private:
 	FTradeOffData _currentTradeOff;
 
 	UPROPERTY(EditDefaultsOnly)
-	TMap<EPerkRarity, FPerkData> _playerPerkValues;
-
-	UPROPERTY(EditDefaultsOnly)
-	TMap<EPerkRarity, int> _breadIncreaseAmounts;
+	TMap<EPerkRarity, FPerkData> _breadIncreaseAmounts;
 
 	UPROPERTY(EditDefaultsOnly)
 	TMap<EPerkRarity, FModifiedFloatValue> _rarityChancePercentages;
 
 	UPROPERTY(EditDefaultsOnly)
-	FGameplayTagContainer _potentialUpgradeTypes;
+	UDataTable* _tradeOffPossiblitiesTable;
+
+	TMap<FGameplayTag, FTradeOffPossibility> _possibilities;
 };
