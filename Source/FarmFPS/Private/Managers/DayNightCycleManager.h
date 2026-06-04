@@ -37,16 +37,22 @@ public:
 
 	void TransitionToNextDay();
 
-	DECLARE_MULTICAST_DELEGATE(FOnDayChange);
+	DECLARE_MULTICAST_DELEGATE(FOnDayStateChange);
 
-	FOnDayChange OnDayBegin;
-	FOnDayChange OnDayEnd;
+	FOnDayStateChange OnDayBegin;
+	FOnDayStateChange OnDayEnd;
+	FOnDayStateChange OnWaitingForTradeOff;
+
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:
+	UFUNCTION()
 	void StartDay();
 	void EndDay();
+
+	void GenerateDailyTradeOff();
 
 	UPROPERTY(EditDefaultsOnly)
 	FModifiedFloatValue _dayLength = 60.f;

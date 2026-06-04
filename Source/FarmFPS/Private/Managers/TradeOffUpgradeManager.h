@@ -24,16 +24,33 @@ class UTradeOffUpgradeManager : public UActorComponent
 public:	
 	UTradeOffUpgradeManager();
 
+	UFUNCTION(BlueprintCallable)
+	void OnTradeOffAccepted();
+
+	UFUNCTION(BlueprintCallable)
+	void OnTradeOffDeclined();
+
+	void GenerateTradeOff();
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTradeOffCreatedEvent, FTradeOffData, tradeOff);
+	UPROPERTY(BlueprintAssignable)
+	FOnTradeOffCreatedEvent OnTradeOffCreated;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTradeOffInputEvent);
+	UPROPERTY(BlueprintAssignable)
+	FOnTradeOffInputEvent OnTradeOffAnyInput;
+	UPROPERTY(BlueprintAssignable)
+	FOnTradeOffInputEvent OnTradeOffAcceptedInput;
+	UPROPERTY(BlueprintAssignable)
+	FOnTradeOffInputEvent OnTradeOffDeclinedInput;
+
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	void OnDayBegin();
+	void OnTradeOffDayStateReached();
 
 private:
-	void OnUpgradeAccepted();
-	void OnUpgradeDeclined();
-
-	void GenerateTradeOffs();
 
 	FTradeOffData _currentTradeOff;
 

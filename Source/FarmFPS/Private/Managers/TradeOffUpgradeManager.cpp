@@ -3,6 +3,7 @@
 #include "Managers/TradeOffUpgradeManager.h"
 
 // Brock
+#include "DayNightCycleManager.h"
 #include "FarmFPSUtilities.h"
 #include "PerkManager.h"
 #include "PerkModifierTypeTags.h"
@@ -30,9 +31,31 @@ void UTradeOffUpgradeManager::BeginPlay()
 			}
 		}
 	}
+
+	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightCycleManager)))
+	{
+		dayNightCycleManager->OnWaitingForTradeOff.AddUObject(this, &UTradeOffUpgradeManager::OnTradeOffDayStateReached);
+	}
 }
 
-void UTradeOffUpgradeManager::OnUpgradeAccepted()
+void UTradeOffUpgradeManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (IsValid(dayNightCycleManager))
+	{
+		dayNightCycleManager->OnWaitingForTradeOff.RemoveAll(this);
+	}
+
+	Super::EndPlay(EndPlayReason);
+}
+
+void UTradeOffUpgradeManager::OnTradeOffDayStateReached()
+{
+	GenerateTradeOff();
+}
+
+void UTradeOffUpgradeManager::OnTradeOffAccepted()
 {
 	UPerkManager* perkManager = FarmFPSUtilities::GetPlayerPerkManager(this);
 	if (ensure(IsValid(perkManager)))
@@ -41,14 +64,33 @@ void UTradeOffUpgradeManager::OnUpgradeAccepted()
 		perkManager->ModifyPerkData(PerkModifierTypeTags::DailyBreadIncreaseAmount, _currentTradeOff.BreadIncreaseAmount);
 		_currentTradeOff = FTradeOffData();
 	}
+
+	if (OnTradeOffAnyInput.IsBound())
+	{
+		OnTradeOffAnyInput.Broadcast();
+	}
+
+	if (OnTradeOffAcceptedInput.IsBound())
+	{
+		OnTradeOffAcceptedInput.Broadcast();
+	}
 }
 
-void UTradeOffUpgradeManager::OnUpgradeDeclined()
+void UTradeOffUpgradeManager::OnTradeOffDeclined()
 {
 	_currentTradeOff = FTradeOffData();
+	if (OnTradeOffDeclinedInput.IsBound())
+	{
+		OnTradeOffDeclinedInput.Broadcast();
+	}
+
+	if (OnTradeOffAnyInput.IsBound())
+	{
+		OnTradeOffAnyInput.Broadcast();
+	}
 }
 
-void UTradeOffUpgradeManager::GenerateTradeOffs()
+void UTradeOffUpgradeManager::GenerateTradeOff()
 {
 	float percentage = FMath::FRand();
 	EPerkRarity rarity = EPerkRarity::Common;

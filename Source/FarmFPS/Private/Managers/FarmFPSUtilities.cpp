@@ -11,6 +11,7 @@
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/ObjectiveManager.h"
 #include "Managers/PerkManager.h"
+#include "Managers/TradeOffUpgradeManager.h"
 
 // UE
 #include "GameFramework/GameStateBase.h"
@@ -156,6 +157,22 @@ UBreadRequirementManager* FarmFPSUtilities::GetBreadRequirementManager(const UOb
 	if (ensure(IsValid(breadRequirementManager)))
 	{
 		return breadRequirementManager;
+	}
+
+	return nullptr;
+}
+
+UTradeOffUpgradeManager* FarmFPSUtilities::GetTradeOffUpgradeManager(const UObject* WorldContextObject)
+{
+	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
+	{
+		return nullptr;
+	}
+
+	UTradeOffUpgradeManager* tradeOffUpgradeManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UTradeOffUpgradeManager>();
+	if (ensure(IsValid(tradeOffUpgradeManager)))
+	{
+		return tradeOffUpgradeManager;
 	}
 
 	return nullptr;

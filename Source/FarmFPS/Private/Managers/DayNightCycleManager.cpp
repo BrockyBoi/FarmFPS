@@ -2,6 +2,9 @@
 
 #include "DayNightCycleManager.h"
 
+// Brock
+#include "TradeOffUpgradeManager.h"
+
 // UE
 #include "Components/AudioComponent.h"
 #include "EngineUtils.h"
@@ -34,9 +37,24 @@ void UDayNightCycleManager::BeginPlay()
 		}
 	}
 
-	StartDay();
+	GenerateDailyTradeOff();
+
+	UTradeOffUpgradeManager* tradeOffUpgradeManager = FarmFPSUtilities::GetTradeOffUpgradeManager(this);
+	if (ensure(IsValid(tradeOffUpgradeManager)))
+	{
+		tradeOffUpgradeManager->GenerateTradeOff();
+		tradeOffUpgradeManager->OnTradeOffAnyInput.AddDynamic(this, &UDayNightCycleManager::StartDay);
+	}
 }
 
+void UDayNightCycleManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	UTradeOffUpgradeManager* tradeOffUpgradeManager = FarmFPSUtilities::GetTradeOffUpgradeManager(this);
+	if (IsValid(tradeOffUpgradeManager))
+	{
+		tradeOffUpgradeManager->OnTradeOffAnyInput.RemoveAll(this);
+	}
+}
 
 void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -163,5 +181,23 @@ void UDayNightCycleManager::EndDay()
 	//GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &UDayNightCycleManager::StartDay, _timeUntilAutoStartNextDay, false);
 
 	UGameplayStatics::SpawnSound2D(this, _onDayEndSound);
+}
+
+void UDayNightCycleManager::GenerateDailyTradeOff()
+{
+	_currentDayState = EDayState::WaitingForTradeOff;
+	if (ensure(_sunLight.IsValid()) && ensure(_moonLight.IsValid()))
+	{
+		_sunLight->SetActorHiddenInGame(false);
+		_moonLight->SetActorHiddenInGame(true);
+
+		FRotator rotation(90.f, 0.f, 0.f);
+		_sunLight->SetActorRotation(rotation);
+	}
+
+	if (OnWaitingForTradeOff.IsBound())
+	{
+		OnWaitingForTradeOff.Broadcast();
+	}
 }
 
