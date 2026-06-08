@@ -17,21 +17,6 @@ void UTradeOffUpgradeManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (ensure(IsValid(_tradeOffPossiblitiesTable)))
-	{
-		// Iterate through the internal row map directly
-		for (auto It = _tradeOffPossiblitiesTable->GetRowMap().CreateConstIterator(); It; ++It)
-		{
-			FName RowName = It.Key();
-			FTradeOffPossibility* row = reinterpret_cast<FTradeOffPossibility*>(It.Value());
-
-			if (ensure(row))
-			{
-				_possibilities.Add(row->PerkType, *row);
-			}
-		}
-	}
-
 	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycleManager)))
 	{
@@ -53,6 +38,24 @@ void UTradeOffUpgradeManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void UTradeOffUpgradeManager::OnTradeOffDayStateReached()
 {
 	GenerateTradeOff();
+}
+
+void UTradeOffUpgradeManager::IntializeTradeOffs()
+{
+	if (ensure(IsValid(_tradeOffPossiblitiesTable)))
+	{
+		// Iterate through the internal row map directly
+		for (auto It = _tradeOffPossiblitiesTable->GetRowMap().CreateConstIterator(); It; ++It)
+		{
+			FName RowName = It.Key();
+			FTradeOffPossibility* row = reinterpret_cast<FTradeOffPossibility*>(It.Value());
+
+			if (ensure(row))
+			{
+				_possibilities.Add(row->PerkType, *row);
+			}
+		}
+	}
 }
 
 void UTradeOffUpgradeManager::OnTradeOffAccepted()
@@ -92,6 +95,20 @@ void UTradeOffUpgradeManager::OnTradeOffDeclined()
 
 void UTradeOffUpgradeManager::GenerateTradeOff()
 {
+	if (_rarityChancePercentages.IsEmpty())
+	{
+		return;
+	}
+
+	if (_possibilities.IsEmpty())
+	{
+		IntializeTradeOffs();
+		if (!ensure(!_possibilities.IsEmpty()))
+		{
+			return;
+		}
+	}
+
 	float percentage = FMath::FRand();
 	EPerkRarity rarity = EPerkRarity::Common;
 	if (percentage < _rarityChancePercentages[EPerkRarity::Legendary].GetModifiedValue(this))
@@ -109,7 +126,7 @@ void UTradeOffUpgradeManager::GenerateTradeOff()
 
 	TArray<FGameplayTag> possibleUpgrades;
 	_possibilities.GetKeys(possibleUpgrades);
-	if (!ensure(possibleUpgrades.Num() <= 0))
+	if (!ensure(possibleUpgrades.Num() > 0))
 	{
 		return;
 	}
@@ -122,4 +139,7 @@ void UTradeOffUpgradeManager::GenerateTradeOff()
 	while (!_possibilities[perkType].PlayerPerkValues.Contains(rarity));
 
 	_currentTradeOff = FTradeOffData(rarity, perkType, _possibilities[perkType].PlayerPerkValues[rarity], _breadIncreaseAmounts[rarity]);
+
+	FTimerHandle timerHandle;
+	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &UTradeOffUpgradeManager::OnTradeOffDeclined, .5f, false);
 }

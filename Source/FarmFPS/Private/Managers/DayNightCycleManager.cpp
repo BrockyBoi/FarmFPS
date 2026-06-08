@@ -54,6 +54,8 @@ void UDayNightCycleManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	{
 		tradeOffUpgradeManager->OnTradeOffAnyInput.RemoveAll(this);
 	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

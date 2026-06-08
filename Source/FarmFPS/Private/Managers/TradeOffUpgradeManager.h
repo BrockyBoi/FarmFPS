@@ -51,6 +51,7 @@ protected:
 	void OnTradeOffDayStateReached();
 
 private:
+	void IntializeTradeOffs();
 
 	FTradeOffData _currentTradeOff;
 
