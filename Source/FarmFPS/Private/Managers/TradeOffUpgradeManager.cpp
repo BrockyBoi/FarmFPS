@@ -139,7 +139,8 @@ void UTradeOffUpgradeManager::GenerateTradeOff()
 	while (!_possibilities[perkType].PlayerPerkValues.Contains(rarity));
 
 	_currentTradeOff = FTradeOffData(rarity, perkType, _possibilities[perkType].PlayerPerkValues[rarity], _breadIncreaseAmounts[rarity]);
+	OnTradeOffCreated.Broadcast(_currentTradeOff);
 
 	FTimerHandle timerHandle;
-	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &UTradeOffUpgradeManager::OnTradeOffDeclined, .5f, false);
+	//GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &UTradeOffUpgradeManager::OnTradeOffDeclined, .5f, false);
 }

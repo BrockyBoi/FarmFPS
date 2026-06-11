@@ -37,12 +37,11 @@ void UDayNightCycleManager::BeginPlay()
 		}
 	}
 
-	GenerateDailyTradeOff();
+	StartDay();
 
 	UTradeOffUpgradeManager* tradeOffUpgradeManager = FarmFPSUtilities::GetTradeOffUpgradeManager(this);
 	if (ensure(IsValid(tradeOffUpgradeManager)))
 	{
-		tradeOffUpgradeManager->GenerateTradeOff();
 		tradeOffUpgradeManager->OnTradeOffAnyInput.AddDynamic(this, &UDayNightCycleManager::StartDay);
 	}
 }
@@ -108,7 +107,7 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 		if (_timeElapsed >= _timeToReachPeakMoon)
 		{
-			StartDay();
+			GenerateDailyTradeOff();
 		}
 	}
 }

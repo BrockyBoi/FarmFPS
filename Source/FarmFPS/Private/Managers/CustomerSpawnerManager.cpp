@@ -37,11 +37,6 @@ void UCustomerSpawnerManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (ensure(IsValid(GetWorld())))
-	{
-		GetWorld()->GetTimerManager().SetTimer(_spawnTimer, this, &UCustomerSpawnerManager::AttemptSpawnCustomer, _spawnRate.GetModifiedValue(this), true);
-	}
-
 	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycle)))
 	{
