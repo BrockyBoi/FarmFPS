@@ -5,6 +5,7 @@
 #include "ShooterProjectile.h"
 
 // Brock
+#include "Managers/ModifiedValueData.h"
 #include "Managers/PoolableActor.h"
 
 // UE
@@ -29,6 +30,14 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 
+	bool CanSpawnCropAtLocation(class ACrop* crop, const FVector& spawnLocation) const;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _onSeedPlantedSound;
+
+	UPROPERTY(EditDefaultsOnly)
+	FModifiedFloatValue _minDistanceFromNearestCrop;
+
+	UPROPERTY(EditDefaultsOnly)
+	TEnumAsByte<ECollisionChannel> _collisionChannelToCheck;
 };

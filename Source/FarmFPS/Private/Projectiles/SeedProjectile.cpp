@@ -36,7 +36,29 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 			ACrop* crop = Cast<ACrop>(actorPool->GetActorFromPool(ProjectileType, HitLocation, EPooledActorType::Crop));
 			if (ensure(IsValid(crop)))
 			{
+				// Make sure that there are no other crops at current location
+				if (!CanSpawnCropAtLocation(crop, HitLocation))
+				{
+					int maxAttemptsAllowed = 25;
+					int currentAttempt = 0;
+					float distFromHit = _minDistanceFromNearestCrop.GetModifiedValue(this);
+					FVector randVector = FVector::Zero();
+					FVector modifiedVector = FVector::Zero();
+					do
+					{
+						FVector2D vec = FMath::RandPointInCircle(distFromHit);
+						randVector = FVector(vec.X, vec.Y, HitLocation.Z);
+						randVector.Normalize();
+						randVector *= distFromHit;
+						currentAttempt++;
+						modifiedVector = HitLocation + randVector;
+					} while (!CanSpawnCropAtLocation(crop, modifiedVector) && currentAttempt < maxAttemptsAllowed);
 
+					if (CanSpawnCropAtLocation(crop, modifiedVector))
+					{
+						crop->SetActorLocation(modifiedVector);
+					}
+				}
 			}
 
 			if (ensure(IsValid(_onSeedPlantedSound)))
@@ -47,4 +69,15 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 
 		actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
 	}
+}
+
+bool ASeedProjectile::CanSpawnCropAtLocation(ACrop* crop, const FVector& spawnLocation) const
+{
+	if (ensure(IsValid(crop)) && ensure(IsValid(GetWorld())))
+	{
+		FHitResult outHit;
+		return !GetWorld()->SweepSingleByChannel(outHit, spawnLocation, spawnLocation, FQuat::Identity, _collisionChannelToCheck, crop->GetCapsuleComponent()->GetCollisionShape());
+	}
+
+	return false;
 }

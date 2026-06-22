@@ -17,6 +17,7 @@
 #include "Crop.generated.h"
 
 class AResourcePickupActor;
+class UCapsuleComponent;
 class UResourceInventory;
 
 UCLASS()
@@ -32,6 +33,8 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	bool GetIsInPerfectTiming() const { return _isInPerfectTiming; }
+
+	UCapsuleComponent* GetCapsuleComponent() const;
 
 protected:
 	virtual void BeginPlay() override;

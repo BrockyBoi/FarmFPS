@@ -25,6 +25,11 @@ ACrop::ACrop() : Super()
 	_destroyAtEndOfDay = true;
 }
 
+UCapsuleComponent* ACrop::GetCapsuleComponent() const
+{
+	return FindComponentByClass<UCapsuleComponent>();
+}
+
 void ACrop::BeginPlay()
 {
 	Super::BeginPlay();
