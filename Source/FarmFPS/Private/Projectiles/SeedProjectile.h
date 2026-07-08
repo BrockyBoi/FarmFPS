@@ -30,13 +30,13 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 
-	bool CanSpawnCropAtLocation(class ACrop* crop, const FVector& spawnLocation) const;
+	bool CanSpawnCropAtLocation(class ACrop* crop, const FVector& spawnLocation, const FVector& hitNormal) const;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _onSeedPlantedSound;
 
 	UPROPERTY(EditDefaultsOnly)
-	FModifiedFloatValue _minDistanceFromNearestCrop;
+	FModifiedFloatValue _minDistanceFromNearestCrop = 15.f;
 
 	UPROPERTY(EditDefaultsOnly)
 	TEnumAsByte<ECollisionChannel> _collisionChannelToCheck;

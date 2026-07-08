@@ -24,32 +24,70 @@ ACropResourceProjectile::ACropResourceProjectile() : Super()
 void ACropResourceProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-
-
 }
 
 void ACropResourceProjectile::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
-
-
 	Super::EndPlay(EndPlayReason);
+}
+
+void ACropResourceProjectile::EnableCollider(const bool enable)
+{
+	if (ensure(IsValid(_cropCollider)))
+	{
+		if (enable)
+		{
+			_cropCollider->OnComponentBeginOverlap.AddDynamic(this, &ACropResourceProjectile::OnComponentOverlap);
+			_cropCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		}
+		else
+		{
+			_cropCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			_cropCollider->OnComponentBeginOverlap.RemoveAll(this);
+		}
+	}
+}
+
+void ACropResourceProjectile::InteractWithPlant(APlant* plant)
+{
+	if (ensure(IsValid(plant)))
+	{
+		UResourceInventory* resourceInventory = plant->GetResourceInventory();
+		if (ensure(IsValid(resourceInventory)))
+		{
+			if (resourceInventory->CanAddResource(ProjectileType, _currentResourceAmount))
+			{
+				plant->AddResource(ProjectileType, _currentResourceAmount);
+				_currentResourceAmount *= (1 - _resourceDecayOnHit.GetModifiedValue(this));
+			}
+
+			if (_currentResourceAmount <= 0)
+			{
+				UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+				if (ensure(IsValid(actorPool)))
+				{
+					actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
+					return;
+				}
+			}
+		}
+	}
 }
 
 void ACropResourceProjectile::AddActorToPool()
 {
-	if (IsValid(_cropCollider))
-	{
-		_cropCollider->OnComponentBeginOverlap.RemoveAll(this);
-	}
+	Super::AddActorToPool();
+
+	EnableCollider(false);
 }
 
 void ACropResourceProjectile::RemoveFromPool()
 {
 	Super::RemoveFromPool();
 
-	if (ensure(IsValid(_cropCollider)))
+	if (_enableColliderOnRemoveFromPool)
 	{
-		_cropCollider->OnComponentBeginOverlap.AddDynamic(this, &ACropResourceProjectile::OnComponentOverlap);
+		EnableCollider(true);
 	}
 
 	_currentResourceAmount = _resourceAmount.GetModifiedValue(this);
@@ -62,18 +100,7 @@ void ACropResourceProjectile::OnComponentOverlap(UPrimitiveComponent* Overlapped
 		APlant* plant = Cast<APlant>(OtherActor);
 		if (IsValid(plant))
 		{
-			plant->AddResource(ProjectileType, _currentResourceAmount);
-			_currentResourceAmount *= (1 - _resourceDecayOnHit.GetModifiedValue(this));
-
-			if (_currentResourceAmount <= 0)
-			{
-				UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
-				if (ensure(IsValid(actorPool)))
-				{
-					actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
-					return;
-				}
-			}
+			InteractWithPlant(plant);
 		}
 
 		UMoonHitBox* moonHitBox = OtherActor->FindComponentByClass<UMoonHitBox>();

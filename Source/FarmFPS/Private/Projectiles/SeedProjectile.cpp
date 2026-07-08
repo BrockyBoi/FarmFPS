@@ -11,7 +11,9 @@
 #include "Resources/ResourcePickupActor.h"
 
 // UE
+#include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ASeedProjectile::ASeedProjectile()
@@ -29,6 +31,8 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(GetWorld())) && ensure(IsValid(actorPool)))
 	{
+		actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
+
 		UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
 		UFarmingPlotComponent* farmPlot = Other->FindComponentByClass<UFarmingPlotComponent>();
 		if (IsValid(farmPlot) && farmPlot->GetAllowedSeedTypes().HasTag(ProjectileType) && IsValid(dayNightCycle) && dayNightCycle->IsDay())
@@ -36,28 +40,43 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 			ACrop* crop = Cast<ACrop>(actorPool->GetActorFromPool(ProjectileType, HitLocation, EPooledActorType::Crop));
 			if (ensure(IsValid(crop)))
 			{
+				FVector modifiedVector = HitLocation;
+
 				// Make sure that there are no other crops at current location
-				if (!CanSpawnCropAtLocation(crop, HitLocation))
+				if (!CanSpawnCropAtLocation(crop, modifiedVector, HitNormal))
 				{
-					int maxAttemptsAllowed = 25;
+					int maxAttemptsAllowed = 24;
 					int currentAttempt = 0;
 					float distFromHit = _minDistanceFromNearestCrop.GetModifiedValue(this);
 					FVector randVector = FVector::Zero();
-					FVector modifiedVector = FVector::Zero();
+					FRotator slopeRotator = UKismetMathLibrary::MakeRotFromZ(HitNormal);
+					FVector slopeForward = FRotationMatrix(slopeRotator).GetUnitAxis(EAxis::X);
+					FVector slopeRight = FRotationMatrix(slopeRotator).GetUnitAxis(EAxis::Y);
+					float angle = FMath::RandRange(0, 360);
+
 					do
 					{
-						FVector2D vec = FMath::RandPointInCircle(distFromHit);
-						randVector = FVector(vec.X, vec.Y, HitLocation.Z);
-						randVector.Normalize();
-						randVector *= distFromHit;
 						currentAttempt++;
-						modifiedVector = HitLocation + randVector;
-					} while (!CanSpawnCropAtLocation(crop, modifiedVector) && currentAttempt < maxAttemptsAllowed);
+						// Add an extra 15 degrees each attempt to find valid spot
+						angle += currentAttempt * 15;
 
-					if (CanSpawnCropAtLocation(crop, modifiedVector))
-					{
-						crop->SetActorLocation(modifiedVector);
-					}
+						float degToRad = FMath::DegreesToRadians(angle);
+						float scaleX = distFromHit * FMath::Cos(angle);
+						float scaleY = distFromHit * FMath::Sin(angle);
+
+						modifiedVector = HitLocation + (slopeForward * scaleX) + (slopeRight * scaleY);
+					} while (!CanSpawnCropAtLocation(crop, modifiedVector, HitNormal) && currentAttempt < maxAttemptsAllowed);
+				}
+
+				if (CanSpawnCropAtLocation(crop, modifiedVector, HitNormal))
+				{
+					crop->SetActorLocation(modifiedVector);
+					crop->SetActorRotation(Other->GetActorRotation());
+				}
+				else
+				{
+					actorPool->AddActorToPool(ProjectileType, crop, EPooledActorType::Crop);
+					return;
 				}
 			}
 
@@ -66,18 +85,58 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 				UGameplayStatics::SpawnSoundAtLocation(this, _onSeedPlantedSound, GetActorLocation());
 			}
 		}
-
-		actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
 	}
 }
 
-bool ASeedProjectile::CanSpawnCropAtLocation(ACrop* crop, const FVector& spawnLocation) const
+bool ASeedProjectile::CanSpawnCropAtLocation(ACrop* crop, const FVector& spawnLocation, const FVector& hitNormal) const
 {
-	if (ensure(IsValid(crop)) && ensure(IsValid(GetWorld())))
+	bool hasOtherCrops = false;
+	bool hasValidFarmPlot = false;
+	if (ensure(IsValid(crop)) && ensure(IsValid(crop->GetCapsuleComponent())) && ensure(IsValid(GetWorld())))
 	{
-		FHitResult outHit;
-		return !GetWorld()->SweepSingleByChannel(outHit, spawnLocation, spawnLocation, FQuat::Identity, _collisionChannelToCheck, crop->GetCapsuleComponent()->GetCollisionShape());
+		// Check that we don't hit any other crops
+		TArray<FHitResult> outHits;
+		FCollisionQueryParams params;
+		params.AddIgnoredActor(crop);
+		FRotator slopeRotator = UKismetMathLibrary::MakeRotFromZ(hitNormal);
+
+		auto shape = crop->GetCapsuleComponent()->GetCollisionShape();
+		GetWorld()->SweepMultiByChannel(outHits, spawnLocation, spawnLocation, FQuat(slopeRotator), _collisionChannelToCheck, crop->GetCapsuleComponent()->GetCollisionShape(), params);
+		for (FHitResult& result : outHits)
+		{
+			AActor* actor = result.GetActor();
+			if (IsValid(actor))
+			{
+				if (actor->IsA<ACrop>())
+				{
+					hasOtherCrops = true;
+					break;
+				}
+				//else if (IsValid(actor->FindComponentByClass<UFarmingPlotComponent>()) && actor->FindComponentByClass<UFarmingPlotComponent>()->GetAllowedSeedTypes().HasTag(ProjectileType))
+				//{
+				//	hasValidFarmPlot = true;
+				//}
+			}
+		}
+
+		// Double check that new location is actually on top of farm plot
+		if (!hasOtherCrops)
+		{
+			GetWorld()->LineTraceMultiByChannel(outHits, spawnLocation + (hitNormal * 10.f), spawnLocation - (hitNormal * 20.f), _collisionChannelToCheck, params);
+			for (FHitResult& result : outHits)
+			{
+				AActor* actor = result.GetActor();
+				if (IsValid(actor))
+				{
+					UFarmingPlotComponent* farmPlot = actor->GetComponentByClass<UFarmingPlotComponent>();
+					if (IsValid(farmPlot) && farmPlot->GetAllowedSeedTypes().HasTag(ProjectileType))
+					{
+						return true;
+					}
+				}
+			}
+		}
 	}
 
-	return false;
+	return hasValidFarmPlot && !hasOtherCrops;
 }
