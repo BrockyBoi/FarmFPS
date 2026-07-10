@@ -61,7 +61,7 @@ void AResourcePickupActor::Tick(float DeltaTime)
 			UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
 			if (ensure(IsValid(actorPool)))
 			{
-				actorPool->AddActorToPool(_cropType, this, EPooledActorType::ResourcePickup);
+				actorPool->AddActorToPool(_resourceType, this, EPooledActorType::ResourcePickup);
 			}
 
 			if (ensure(IsValid(_onCollectResourceSound)))
@@ -152,7 +152,7 @@ void AResourcePickupActor::RemoveFromPool()
 
 bool AResourcePickupActor::AttemptMoveToActor(AActor* actor, UResourceInventory* actorInventory, const FVector& customEndLocation)
 {
-	if (!_isMovingToActor && ensure(IsValid(actor)) && ensure(IsValid(actorInventory)) && actorInventory->CanAddResource(_cropType, _yieldAmount))
+	if (!_isMovingToActor && ensure(IsValid(actor)) && ensure(IsValid(actorInventory)) && actorInventory->CanAddResource(_resourceType, _resourceAmount))
 	{
 		_actorToMoveTo = actor;
 		_inventoryOfActorMovingTowards = actorInventory;
@@ -230,20 +230,20 @@ void AResourcePickupActor::OnDayEnd()
 	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(actorPool)))
 	{
-		actorPool->AddActorToPool(_cropType, this, EPooledActorType::ResourcePickup);
+		actorPool->AddActorToPool(_resourceType, this, EPooledActorType::ResourcePickup);
 	}
 }
 
 void AResourcePickupActor::AddResourcesToInventory(UResourceInventory* inventory)
 {
-	if (ensure(IsValid(inventory)) && ensure(inventory->CanAddResource(_cropType, _yieldAmount)))
+	if (ensure(IsValid(inventory)) && ensure(inventory->CanAddResource(_resourceType, _resourceAmount)))
 	{
-		inventory->AddResource(_cropType, _yieldAmount);
+		inventory->AddResource(_resourceType, _resourceAmount);
 
 		UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
 		if (ensure(IsValid(objectiveManager)))
 		{
-			objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::CollectResource, _cropType, _yieldAmount);
+			objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::CollectResource, _resourceType, _resourceAmount);
 		}
 	}
 }

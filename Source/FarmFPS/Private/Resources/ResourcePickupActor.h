@@ -30,7 +30,7 @@ public:
 
 	void SetIsBeingThrownByPlayer(bool isBeingThrown) { _isBeingThrownByPlayer = isBeingThrown; }
 
-	const FGameplayTag& GetResourceType() const { return _cropType; }
+	const FGameplayTag& GetResourceType() const { return _resourceType; }
 
 	bool AttemptMoveToActor(AActor* actor, UResourceInventory* actorInventory, const FVector& customEndLocation = FVector::ZeroVector);
 
@@ -105,11 +105,11 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* _staticMesh = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Crop Yield", meta = (Categories = "ResourceType."))
-	FGameplayTag _cropType;
+	UPROPERTY(EditDefaultsOnly, Category = "Resource", meta = (Categories = "ResourceType."))
+	FGameplayTag _resourceType;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Crop Yield")
-	uint16 _yieldAmount = 1;
+	UPROPERTY(EditDefaultsOnly, Category = "Resource")
+	uint16 _resourceAmount = 1;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _onCollectResourceSound = nullptr;
