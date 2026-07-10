@@ -23,12 +23,16 @@ void ARocketProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UP
 
 void ARocketProjectile::RemoveFromPool()
 {
+	_canGiveResources = false;
+
 	Super::RemoveFromPool();
 }
 
 void ARocketProjectile::Explode()
 {
 	EnableCollider(true);
+	_canGiveResources = true;
+
 	_cropCollider->SetSphereRadius(_explosionRange.GetModifiedValue(this));
 
 	TSet<AActor*> overlappingActors;
@@ -45,18 +49,32 @@ void ARocketProjectile::Explode()
 			}
 
 			FVector explosionToActor =  actor->GetActorLocation() - GetActorLocation();
+			float explosionToActorSize = explosionToActor.SizeSquared();
+
 			explosionToActor.Normalize();
 			FVector explosionVector = explosionToActor * _explosionForce.GetModifiedValue(this);
 
 			UPrimitiveComponent* primitiveComponent = actor->FindComponentByClass<UPrimitiveComponent>();
 			if (IsValid(primitiveComponent))
 			{
-				primitiveComponent->AddForce(explosionVector);
+				primitiveComponent->AddImpulse(explosionVector, NAME_None, true);
 			}
 
 			AFarmFPSCharacter* player = Cast<AFarmFPSCharacter>(actor);
 			if (IsValid(player))
 			{
+				if (explosionToActorSize <= _squaredDistanceForForwardVectorRocketJump)
+				{
+					FVector velocity = player->GetMovementComponent()->Velocity;
+					velocity.Normalize();
+
+					if (!velocity.IsNearlyZero())
+					{
+						velocity = FVector(velocity.X, velocity.Y, 0.f);
+						explosionVector = velocity + (FVector::UpVector * _explosionForce.GetModifiedValue(this));
+					}
+				}
+
 				player->LaunchCharacter(explosionVector, false, false);
 			}
 		}

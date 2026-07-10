@@ -23,6 +23,7 @@ protected:
 	ARocketProjectile();
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 	virtual void RemoveFromPool() override;
+
 private:
 	void Explode();
 
@@ -31,4 +32,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	FModifiedFloatValue _explosionForce = 200.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float _squaredDistanceForForwardVectorRocketJump = 1000.f;
 };

@@ -56,7 +56,7 @@ void APlant::AddResource(const FGameplayTag& resourceType, float amount)
 
 void APlant::DoDamage(int damageAmount)
 {
-	if (_isBroken || _cropData.CropHealth <= 0)
+	if (_isBroken)
 	{
 		return;
 	}

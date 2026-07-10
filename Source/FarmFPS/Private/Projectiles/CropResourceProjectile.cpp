@@ -33,17 +33,21 @@ void ACropResourceProjectile::EndPlay(EEndPlayReason::Type EndPlayReason)
 
 void ACropResourceProjectile::EnableCollider(const bool enable)
 {
-	if (ensure(IsValid(_cropCollider)))
+	if (ensure(IsValid(_cropCollider)) && ensure(IsValid(CollisionComponent)))
 	{
 		if (enable)
 		{
 			_cropCollider->OnComponentBeginOverlap.AddDynamic(this, &ACropResourceProjectile::OnComponentOverlap);
 			_cropCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+
+			CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		}
 		else
 		{
 			_cropCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			_cropCollider->OnComponentBeginOverlap.RemoveAll(this);
+
+			CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 	}
 }
@@ -55,20 +59,20 @@ void ACropResourceProjectile::InteractWithPlant(APlant* plant)
 		UResourceInventory* resourceInventory = plant->GetResourceInventory();
 		if (ensure(IsValid(resourceInventory)))
 		{
-			if (resourceInventory->CanAddResource(ProjectileType, _currentResourceAmount))
+			if (_canGiveResources && resourceInventory->CanAddResource(ProjectileType, _currentResourceAmount))
 			{
 				plant->AddResource(ProjectileType, _currentResourceAmount);
 				_currentResourceAmount *= (1 - _resourceDecayOnHit.GetModifiedValue(this));
 			}
+		}
 
-			if (_currentResourceAmount <= 0)
+		if (_currentResourceAmount <= 0)
+		{
+			UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+			if (ensure(IsValid(actorPool)))
 			{
-				UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
-				if (ensure(IsValid(actorPool)))
-				{
-					actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
-					return;
-				}
+				actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
+				return;
 			}
 		}
 	}
@@ -89,6 +93,8 @@ void ACropResourceProjectile::RemoveFromPool()
 	{
 		EnableCollider(true);
 	}
+
+	CollisionComponent->IgnoreActorWhenMoving(FarmFPSUtilities::GetPlayerCharacter(this), true);
 
 	_currentResourceAmount = _resourceAmount.GetModifiedValue(this);
 }

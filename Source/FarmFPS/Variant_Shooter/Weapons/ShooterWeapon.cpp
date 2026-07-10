@@ -153,7 +153,7 @@ void AShooterWeapon::Fire()
 	// make noise so the AI perception system can hear us
 	MakeNoise(ShotLoudness, PawnOwner, PawnOwner->GetActorLocation(), ShotNoiseRange, ShotNoiseTag);
 
-	if (ensure(IsValid(_onShootSound)))
+	if (IsValid(_onShootSound))
 	{
 		UGameplayStatics::SpawnSoundAtLocation(this, _onShootSound, GetActorLocation());
 	}

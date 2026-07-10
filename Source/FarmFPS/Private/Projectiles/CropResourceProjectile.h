@@ -47,6 +47,8 @@ protected:
 	UPROPERTY(EditAnywhere)
 	USphereComponent* _cropCollider = nullptr;
 
+	bool _canGiveResources = true;
+
 	float _currentResourceAmount = 0;
 
 	UPROPERTY(EditDefaultsOnly)
