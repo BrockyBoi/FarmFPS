@@ -182,6 +182,9 @@ void AFarmFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		EnhancedInputComponent->BindAction(SelectInventoryItemAction, ETriggerEvent::Triggered, this, &AFarmFPSCharacter::DoSelectInventoryItem);
 
+		EnhancedInputComponent->BindAction(ShowCropHealth, ETriggerEvent::Started, this, &AFarmFPSCharacter::DoShowCropHealth);
+		EnhancedInputComponent->BindAction(ShowCropHealth, ETriggerEvent::Completed, this, &AFarmFPSCharacter::DoHideCropHealth);
+
 		EnhancedInputComponent->BindAction(ThrowInventoryItemAction, ETriggerEvent::Started, this, &AFarmFPSCharacter::OnThrowStart);
 		EnhancedInputComponent->BindAction(ThrowInventoryItemAction, ETriggerEvent::Completed, this, &AFarmFPSCharacter::OnThrowStop);
 	}
@@ -220,6 +223,18 @@ void AFarmFPSCharacter::LookInput(const FInputActionValue& Value)
 	// pass the axis values to the aim input
 	DoAim(LookAxisVector.X, LookAxisVector.Y);
 
+}
+
+void AFarmFPSCharacter::DoShowCropHealth()
+{
+	_isShowingCropHealth = true;
+	OnShowCropHealth.Broadcast(true);
+}
+
+void AFarmFPSCharacter::DoHideCropHealth()
+{
+	_isShowingCropHealth = false;
+	OnShowCropHealth.Broadcast(false);
 }
 
 void AFarmFPSCharacter::DoSelectInventoryItem(const FInputActionValue& Value)

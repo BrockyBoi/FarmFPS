@@ -49,6 +49,12 @@ public:
 	/** Returns first person camera component **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnCropHealthShownEvent, bool showHealth);
+
+	FOnCropHealthShownEvent OnShowCropHealth;
+
+	bool IsShowingCropHealth() const { return _isShowingCropHealth; }
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
@@ -67,6 +73,12 @@ protected:
 
 	/** Called from Input Actions for looking input */
 	void LookInput(const FInputActionValue& Value);
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	void DoShowCropHealth();
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	void DoHideCropHealth();
 
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	void DoSelectInventoryItem(const FInputActionValue& Value);
@@ -125,6 +137,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* SelectInventoryItemAction;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* ShowCropHealth;
 
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -239,5 +254,6 @@ protected:
 	UBoxComponent* _meleeCollider;
 
 	bool _startedGroundSlam = false;
+	bool _isShowingCropHealth = false;
 };
 

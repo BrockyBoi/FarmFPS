@@ -15,6 +15,7 @@
 #include "Resources/ResourceTypeTags.h"
 
 // UE
+#include "FarmFPSCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
 ACrop::ACrop() : Super()
@@ -68,6 +69,13 @@ void ACrop::AddActorToPool()
 	{
 		dayNightCycle->OnDayEnd.RemoveAll(this);
 	}
+
+	AFarmFPSCharacter* farmFPSCharacter = Cast<AFarmFPSCharacter>(FarmFPSUtilities::GetPlayerCharacter(this));
+	if (IsValid(farmFPSCharacter))
+	{
+		farmFPSCharacter->OnShowCropHealth.RemoveAll(this);
+		Cosmetic_OnShouldShowCropHealth(false);
+	}
 }
 
 void ACrop::RemoveFromPool()
@@ -95,6 +103,13 @@ void ACrop::RemoveFromPool()
 		}
 
 		dayNightCycle->OnDayEnd.AddUObject(this, &ACrop::OnDayEnd);
+	}
+
+	AFarmFPSCharacter* farmFPSCharacter = Cast<AFarmFPSCharacter>(FarmFPSUtilities::GetPlayerCharacter(this));
+	if (ensure(IsValid(farmFPSCharacter)))
+	{
+		farmFPSCharacter->OnShowCropHealth.AddUObject(this, &ACrop::Cosmetic_OnShouldShowCropHealth);
+		Cosmetic_OnShouldShowCropHealth(farmFPSCharacter->IsShowingCropHealth());
 	}
 
 	AffectGrowth();

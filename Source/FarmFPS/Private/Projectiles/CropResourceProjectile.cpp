@@ -5,8 +5,8 @@
 // Brock
 #include "Managers/ActorPool.h"
 #include "Managers/FarmFPSUtilities.h"
-#include "Plants/Plant.h"
 #include "Misc/MoonHitBox.h"
+#include "Plants/Plant.h"
 #include "Resources/ResourceTypeTags.h"
 
 ACropResourceProjectile::ACropResourceProjectile() : Super()
@@ -37,17 +37,17 @@ void ACropResourceProjectile::EnableCollider(const bool enable)
 	{
 		if (enable)
 		{
-			_cropCollider->OnComponentBeginOverlap.AddDynamic(this, &ACropResourceProjectile::OnComponentOverlap);
 			_cropCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-
 			CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			
+			_cropCollider->OnComponentBeginOverlap.AddDynamic(this, &ACropResourceProjectile::OnComponentOverlap);
 		}
 		else
 		{
 			_cropCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			_cropCollider->OnComponentBeginOverlap.RemoveAll(this);
-
 			CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+			_cropCollider->OnComponentBeginOverlap.RemoveAll(this);
 		}
 	}
 }

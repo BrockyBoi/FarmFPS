@@ -50,6 +50,9 @@ protected:
 
 	virtual void OnLightAndWaterFilled() override;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void Cosmetic_OnShouldShowCropHealth(bool showCropHealth);
+
 	UFUNCTION()
 	void OnBreakCropTimerEnd();
 
