@@ -98,6 +98,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Reload")
 	FModifiedFloatValue ReloadTime = 1.5f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
+	bool _hasPhysicalRecoil = false;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
+	FModifiedFloatValue PhysicalRecoilMultiplier = 150.f;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _onShootSound;
 

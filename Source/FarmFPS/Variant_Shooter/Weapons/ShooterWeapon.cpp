@@ -7,6 +7,7 @@
 #include "Managers/ModifiedValueData.h"
 
 // UE
+#include "Camera/CameraComponent.h"
 #include "FarmFPSCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -238,6 +239,16 @@ void AShooterWeapon::FireProjectile(const FVector& TargetLocation)
 
 			// update the weapon HUD
 			WeaponOwner->UpdateWeaponHUD(CurrentBullets, MagazineSize);
+		}
+	}
+
+	if (_hasPhysicalRecoil)
+	{
+		AFarmFPSCharacter* CharacterOwner = Cast<AFarmFPSCharacter>(PawnOwner);
+		if (ensure(IsValid(CharacterOwner)))
+		{
+			FVector forwardVec = CharacterOwner->GetFirstPersonCameraComponent()->GetForwardVector();
+			CharacterOwner->LaunchCharacter(-forwardVec * PhysicalRecoilMultiplier.GetModifiedValue(this), false, false);
 		}
 	}
 }

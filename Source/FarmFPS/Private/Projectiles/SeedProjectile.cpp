@@ -80,7 +80,7 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 				}
 			}
 
-			if (ensure(IsValid(_onSeedPlantedSound)))
+			if (IsValid(_onSeedPlantedSound))
 			{
 				UGameplayStatics::SpawnSoundAtLocation(this, _onSeedPlantedSound, GetActorLocation());
 			}
