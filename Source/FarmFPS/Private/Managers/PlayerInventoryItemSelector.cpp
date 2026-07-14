@@ -55,6 +55,7 @@ void UPlayerInventoryItemSelector::SetIndexValue(int index)
 	if (_currentInventoryItemTypes.IsValidIndex(index))
 	{
 		_currentSelectedIndex = index;
+		OnIndexChanged.Broadcast(_currentSelectedIndex, GetCurrentSelectedItemType());
 	}
 }
 
@@ -85,6 +86,11 @@ void UPlayerInventoryItemSelector::OnResourceChanged(const FGameplayTag& resourc
 	if(startingItemTypeCount == 0 && _currentInventoryItemTypes.Num() > 0)
 	{
 		_currentSelectedIndex = 0;
+	}
+
+	if (startingItemTypeCount > 0 && newAmount == 0)
+	{
+
 	}
 }
 

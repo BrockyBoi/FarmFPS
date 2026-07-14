@@ -38,6 +38,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetResourceCount(const FGameplayTag& resourceType) const;
 
+	UFUNCTION(BlueprintCallable)
+	bool HasResource(const FGameplayTag& resourceType) const { return _resourcesMap.Contains(resourceType); }
+
 	UFUNCTION(BlueprintPure)
 	bool HasResourceAmount(const FGameplayTag& resourceType, float amount) const;
 

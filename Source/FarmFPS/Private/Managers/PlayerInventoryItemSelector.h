@@ -23,9 +23,18 @@ public:
 	void IncreaseIndex();
 	void DecreaseIndex();
 	void SetIndexValue(int index);
+	int GetCurrentIndex() const { return _currentSelectedIndex; }
 
 	void SetPlayerInventory(UResourceInventory* playerInventory);
+
+	UFUNCTION(BlueprintCallable)
+	const FGameplayTag& GetItemTypeAtIndex(int index) const { return _currentInventoryItemTypes.IsValidIndex(index) ? _currentInventoryItemTypes[index] : FGameplayTag::EmptyTag; }
+
+	UFUNCTION(BlueprintPure)
 	const FGameplayTag& GetCurrentSelectedItemType() const { return _currentInventoryItemTypes.IsValidIndex(_currentSelectedIndex) ? _currentInventoryItemTypes[_currentSelectedIndex] : FGameplayTag::EmptyTag; }
+
+	DECLARE_MULTICAST_DELEGATE_TwoParams(FOnIndexChangedEvent, int index, FGameplayTag resourceType);
+	FOnIndexChangedEvent OnIndexChanged;
 
 protected:
 	virtual void BeginPlay() override;

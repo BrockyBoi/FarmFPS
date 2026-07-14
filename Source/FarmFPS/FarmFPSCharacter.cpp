@@ -101,6 +101,7 @@ void AFarmFPSCharacter::BeginPlay()
 	{
 		_itemSelector->SetPlayerInventory(_inventory);
 		_inventory->SetCanAlwaysAddResources(true);
+		_itemSelector->OnIndexChanged.AddUObject(this, &AFarmFPSCharacter::Cosmetic_OnItemSelectorIndexChanged);
 	}
 }
 
@@ -119,6 +120,11 @@ void AFarmFPSCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
 	if (IsValid(_perkManager))
 	{
 		_perkManager->OnPerkLevelChange.RemoveAll(this);
+	}
+
+	if (IsValid(_itemSelector))
+	{
+		_itemSelector->OnIndexChanged.RemoveAll(this);
 	}
 
 	Super::EndPlay(EndPlayReason);

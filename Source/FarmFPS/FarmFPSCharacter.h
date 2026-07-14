@@ -49,6 +49,9 @@ public:
 	/** Returns first person camera component **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
+	UFUNCTION(BlueprintPure)
+	UResourceInventory* GetResourceInventory() const { return _inventory; }
+
 	DECLARE_MULTICAST_DELEGATE_OneParam(FOnCropHealthShownEvent, bool showHealth);
 
 	FOnCropHealthShownEvent OnShowCropHealth;
@@ -115,6 +118,9 @@ protected:
 	void DoMeleeEnd();
 	void DoGroundSlamStart();
 	void DoGroundSlamEnd();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCosmetic)
+	void Cosmetic_OnItemSelectorIndexChanged(int index, FGameplayTag resourceType);
 
 	/** Set up input action bindings */
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
