@@ -16,6 +16,7 @@ class UActorPool;
 class UBreadRequirementManager;
 class UCustomerSpawnerManager;
 class UDayNightCycleManager;
+class UEffectManager;
 class UPerkManager;
 class UObjectiveManager;
 class UTradeOffUpgradeManager;
@@ -34,6 +35,7 @@ public:
 	static UActorPool* GetActorPool(const UObject* WorldContextObject);
 	static UBreadRequirementManager* GetBreadRequirementManager(const UObject* WorldContextObject);
 	static UTradeOffUpgradeManager* GetTradeOffUpgradeManager(const UObject* WorldContextObject);
+	static UEffectManager* GetEffectManager(const UObject* WorldContextObject);
 	static float GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, const FGameplayTagContainer& perkTags, float valueToModify);
 	static float GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, const FGameplayTag& perkTag, float valueToModify);
 };

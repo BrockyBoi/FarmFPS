@@ -4,6 +4,7 @@
 
 // Brock
 #include "Managers/ModifiedValueData.h"
+#include "StatusEffects/EffectManager.h"
 
 // Shooter
 #include "ShooterProjectile.h"
@@ -59,4 +60,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Crop Resource")
 	FModifiedFloatValue _resourceDecayOnHit = .1f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Lingering Status Effect")
+	FAddResourceOverTimeEffectData _addResourceOverTimeEffectData;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Arc Status Effect")
+	FArcBetweenCropsEffectData _arcBetweenCropsEffectData;
 };

@@ -3,33 +3,31 @@
 #pragma once
 
 // Brock
-#include "OnCropHitEffect.h"
+#include "OnCropHitStatusEffect.h"
 
 // UE
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 
-// Generated
-#include "LingeringResourceEffectOnHit.generated.h"
+class APlant;
 
 /**
  * 
  */
-UCLASS()
-class ULingeringResourceEffectOnHit : public UOnCropHitEffect
+class LingeringStatusEffectOnHit : public OnCropHitStatusEffect
 {
-	GENERATED_BODY()
 
 public:
+	LingeringStatusEffectOnHit(FGameplayTag resourceType, APlant* plant, float lingerDuration, float resourcesPerSecond);
 	virtual void TickEffect(float deltaTime) override;
+	virtual void StartEffect() override;
 
 protected:
-	virtual void OnHitCrop(class ACrop* crop) override;
 	virtual void OnEffectStarted() override;
 	virtual void StopEffect() override;
 
 	float _currentTimeElapsed = 0.f;
 
-	FModifiedFloatValue _lingerDuration = 3.f;
-	FModifiedFloatValue _resourcePerSecond = 5.f;
+	float _lingerDuration = 3.f;
+	float _resourcePerSecond = 5.f;
 };

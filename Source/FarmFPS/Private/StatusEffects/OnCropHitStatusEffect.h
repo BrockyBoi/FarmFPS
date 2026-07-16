@@ -4,26 +4,24 @@
 
 // Brock
 #include "Managers/ModifiedValueData.h"
+#include "StatusEffect.h"
 
 // UE
 #include "CoreMinimal.h"
-
- // Generated
-#include "OnCropHitEffect.generated.h"
+#include "GameplayTagContainer.h"
 
 class ACrop;
+class APlant;
 
-UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class FARMFPS_API UOnCropHitEffect : public UActorComponent
+class OnCropHitStatusEffect : public StatusEffect 
 {
-	GENERATED_BODY()
-
 public:
-	void SetResourceType(FGameplayTag resourceType);
+	OnCropHitStatusEffect();
+	OnCropHitStatusEffect(FGameplayTag resourceType, APlant* plant);
+
 	virtual void TickEffect(float deltaTime);
 
 protected:
-	virtual void OnHitCrop(ACrop* crop);
 	virtual void OnEffectStarted();
 	virtual void StopEffect();
 

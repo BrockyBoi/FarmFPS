@@ -12,6 +12,7 @@
 #include "Managers/ObjectiveManager.h"
 #include "Managers/PerkManager.h"
 #include "Managers/TradeOffUpgradeManager.h"
+#include "StatusEffects/EffectManager.h"
 
 // UE
 #include "GameFramework/GameStateBase.h"
@@ -173,6 +174,22 @@ UTradeOffUpgradeManager* FarmFPSUtilities::GetTradeOffUpgradeManager(const UObje
 	if (ensure(IsValid(tradeOffUpgradeManager)))
 	{
 		return tradeOffUpgradeManager;
+	}
+
+	return nullptr;
+}
+
+UEffectManager* FarmFPSUtilities::GetEffectManager(const UObject* WorldContextObject)
+{
+	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
+	{
+		return nullptr;
+	}
+
+	UEffectManager* effectManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UEffectManager>();
+	if (ensure(IsValid(effectManager)))
+	{
+		return effectManager;
 	}
 
 	return nullptr;

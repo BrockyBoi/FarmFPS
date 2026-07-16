@@ -5,8 +5,15 @@
 // Brock
 #include "Managers/ActorPool.h"
 #include "Managers/FarmFPSUtilities.h"
+
 #include "Misc/MoonHitBox.h"
+
+#include "Plants/Crop.h"
 #include "Plants/Plant.h"
+
+#include "StatusEffects/ArcResourceToOtherCropOnHit.h"
+#include "StatusEffects/LingeringStatusEffectOnHit.h"
+
 #include "Resources/ResourceTypeTags.h"
 
 ACropResourceProjectile::ACropResourceProjectile() : Super()
@@ -73,6 +80,23 @@ void ACropResourceProjectile::InteractWithPlant(APlant* plant)
 			{
 				actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
 				return;
+			}
+		}
+
+		ACrop* crop = Cast<ACrop>(plant);
+		if (IsValid(crop))
+		{
+			float procValue = FMath::RandRange(0.f, 1.f);
+			if (procValue >= _addResourceOverTimeEffectData.PercentageToProcEffect.GetModifiedValue(this))
+			{
+				LingeringStatusEffectOnHit lingeringEffect = LingeringStatusEffectOnHit(ProjectileType, crop, _addResourceOverTimeEffectData.LingerDuration.GetModifiedValue(this), _addResourceOverTimeEffectData.ResourcesPerSecond.GetModifiedValue(this));
+				lingeringEffect.StartEffect();
+			}
+
+			if (procValue >= _arcBetweenCropsEffectData.PercentageToProcEffect.GetModifiedValue(this))
+			{
+				ArcResourceToOtherCropOnHit arcEffect = ArcResourceToOtherCropOnHit(ProjectileType, crop, _currentResourceAmount, _arcBetweenCropsEffectData.MaxArcCount.GetModifiedValue(this), _arcBetweenCropsEffectData.ResourcePercentageToGive.GetModifiedValue(this), _arcBetweenCropsEffectData.CropCollisionChannel);
+				arcEffect.StartEffect();
 			}
 		}
 	}
