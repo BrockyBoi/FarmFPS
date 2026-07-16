@@ -23,6 +23,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AddResource(const FGameplayTag& resourceType, float amount);
+	const FCropData& GetCropData() const { return _cropData; }
 
 	void DoDamage(int damageAmount);
 
