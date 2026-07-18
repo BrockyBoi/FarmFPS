@@ -14,12 +14,21 @@
 #include "EffectManager.generated.h"
 
 USTRUCT(BlueprintType)
-struct FAddResourceOverTimeEffectData
+struct FOnHitStatusEffectData
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly)
 	FModifiedFloatValue PercentageToProcEffect;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool CanEffectStack;
+};
+
+USTRUCT(BlueprintType)
+struct FAddResourceOverTimeEffectData : public FOnHitStatusEffectData
+{
+	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly)
 	FModifiedFloatValue LingerDuration;
@@ -29,24 +38,15 @@ struct FAddResourceOverTimeEffectData
 };
 
 USTRUCT(BlueprintType)
-struct FArcBetweenCropsEffectData
+struct FArcBetweenCropsEffectData : public FOnHitStatusEffectData
 {
 	GENERATED_BODY()
-
-	UPROPERTY(EditDefaultsOnly)
-	FModifiedFloatValue PercentageToProcEffect;
 
 	UPROPERTY(EditDefaultsOnly)
 	FModifiedIntValue MaxArcCount;
 
 	UPROPERTY(EditDefaultsOnly)
 	FModifiedFloatValue ResourcePercentageOnArc;
-};
-
-enum class EStatusEffectType
-{
-	Arc,
-	Lingering
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -60,11 +60,13 @@ public:
 
 	void TriggerEffect(EStatusEffectType effectType);
 
-	void AddLingeringEffect(StatusEffect& statusEffect);
-	void RemoveLingeringEffect(StatusEffect& statusEffect);
+	void AddLingeringEffect(StatusEffect* statusEffect);
+	void RemoveLingeringEffect(StatusEffect* statusEffect);
+
+	bool HasStatusEffectType(EStatusEffectType statusEffectType) const;
 
 protected:
 	virtual void BeginPlay() override;
 
-	TArray<StatusEffect> _lingeringStatusEffects = TArray<StatusEffect>();
+	TArray<StatusEffect*> _lingeringStatusEffects = TArray<StatusEffect*>();
 };

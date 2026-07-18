@@ -5,20 +5,15 @@
 // Brock
 #include "Plants/Crop.h"
 
-OnCropHitStatusEffect::OnCropHitStatusEffect()
+OnCropHitStatusEffect::OnCropHitStatusEffect() : StatusEffect()
 {
 }
 
-OnCropHitStatusEffect::OnCropHitStatusEffect(FGameplayTag resourceType, APlant* plant)
+OnCropHitStatusEffect::OnCropHitStatusEffect(EStatusEffectType statusEffectType, FGameplayTag resourceType, APlant* plant) : StatusEffect(statusEffectType)
 {
 	_resourceType = resourceType;
 	_cropToAffect = Cast<ACrop>(plant);
 	ensure(_cropToAffect.IsValid());
-}
-
-void OnCropHitStatusEffect::TickEffect(float deltaTime)
-{
-	// Do stuff presumably
 }
 
 void OnCropHitStatusEffect::OnEffectStarted()

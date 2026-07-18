@@ -16,9 +16,9 @@ class ArcResourceToOtherCropOnHit : public OnCropHitStatusEffect
 public:
 	ArcResourceToOtherCropOnHit(FGameplayTag resourceType, APlant* plant, float baseResourceAmount, int maxArcCount, float resourcePercentageToGive, ECollisionChannel cropCollisionChannel);
 	void SetBaseResourceAmount(float resourceAmount) { _baseResourceAmount = resourceAmount; }
+	virtual void StartEffect() override;
 
 protected:
-	virtual void OnEffectStarted() override;
 
 	int _timesArced = 0;
 

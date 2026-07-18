@@ -66,4 +66,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Arc Status Effect")
 	FArcBetweenCropsEffectData _arcBetweenCropsEffectData;
+
+	UPROPERTY(EditDefaultsOnly)
+	TEnumAsByte<ECollisionChannel> _cropCollisionChannel;
 };

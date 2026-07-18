@@ -23,7 +23,6 @@ public:
 	virtual void StartEffect() override;
 
 protected:
-	virtual void OnEffectStarted() override;
 	virtual void StopEffect() override;
 
 	float _currentTimeElapsed = 0.f;

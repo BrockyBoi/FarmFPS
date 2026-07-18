@@ -5,7 +5,7 @@
 // Brock
 #include "Plants/Crop.h"
 
-ArcResourceToOtherCropOnHit::ArcResourceToOtherCropOnHit(FGameplayTag resourceType, APlant* plant, float baseResourceAmount, int maxArcCount, float resourcePercentageToGive, ECollisionChannel cropCollisionChannel) : OnCropHitStatusEffect(resourceType, plant)
+ArcResourceToOtherCropOnHit::ArcResourceToOtherCropOnHit(FGameplayTag resourceType, APlant* plant, float baseResourceAmount, int maxArcCount, float resourcePercentageToGive, ECollisionChannel cropCollisionChannel) : OnCropHitStatusEffect(EStatusEffectType::Arc, resourceType, plant)
 {
 	_baseResourceAmount = baseResourceAmount;
 	_maxArcCount = maxArcCount;
@@ -13,9 +13,9 @@ ArcResourceToOtherCropOnHit::ArcResourceToOtherCropOnHit(FGameplayTag resourceTy
 	_collisionChannel = cropCollisionChannel;
 }
 
-void ArcResourceToOtherCropOnHit::OnEffectStarted()
+void ArcResourceToOtherCropOnHit::StartEffect()
 {
-	OnCropHitStatusEffect::OnEffectStarted();
+	OnCropHitStatusEffect::StartEffect();
 
 	_timesArced = 0;
 	if (ensure(_cropToAffect.IsValid()))
@@ -29,7 +29,7 @@ void ArcResourceToOtherCropOnHit::OnEffectStarted()
 		for (FHitResult& result : hitResults)
 		{
 			ACrop* crop = Cast<ACrop>(result.GetActor());
-			if (IsValid(crop) && crop->GetCropData().ResourceType == _resourceType)
+			if (IsValid(crop) && crop->GetCropData().ResourceType == _cropToAffect->GetCropData().ResourceType)
 			{
 				ArcToCrop(crop);
 

@@ -7,7 +7,7 @@
 #include "Managers/FarmFPSUtilities.h"
 #include "Plants/Crop.h"
 
-LingeringStatusEffectOnHit::LingeringStatusEffectOnHit(FGameplayTag resourceType, APlant* plant, float lingerDuration, float resourcesPerSecond) : OnCropHitStatusEffect(resourceType, plant)
+LingeringStatusEffectOnHit::LingeringStatusEffectOnHit(FGameplayTag resourceType, APlant* plant, float lingerDuration, float resourcesPerSecond) : OnCropHitStatusEffect(EStatusEffectType::GiveResourceOverTime, resourceType, plant)
 {
 	_lingerDuration = lingerDuration;
 	_resourcePerSecond = resourcesPerSecond;
@@ -15,7 +15,7 @@ LingeringStatusEffectOnHit::LingeringStatusEffectOnHit(FGameplayTag resourceType
 
 void LingeringStatusEffectOnHit::TickEffect(float deltaTime)
 {
-	OnCropHitStatusEffect::TickEffect(deltaTime);
+	StatusEffect::TickEffect(deltaTime);
 
 	_currentTimeElapsed += deltaTime;
 
@@ -32,18 +32,19 @@ void LingeringStatusEffectOnHit::TickEffect(float deltaTime)
 
 void LingeringStatusEffectOnHit::StartEffect()
 {
-	OnCropHitStatusEffect::StartEffect();
+	StatusEffect::StartEffect();
 
 	UEffectManager* effectManager = FarmFPSUtilities::GetEffectManager(_cropToAffect.Get());
 	if (ensure(IsValid(effectManager)))
 	{
-		effectManager->AddLingeringEffect(*this);
-	}
-}
+		if (!_canStack && effectManager->HasStatusEffectType(EStatusEffectType::GiveResourceOverTime))
+		{
+			StopEffect();
+			return;
+		}
 
-void LingeringStatusEffectOnHit::OnEffectStarted()
-{
-	OnCropHitStatusEffect::OnEffectStarted();
+		effectManager->AddLingeringEffect(this);
+	}
 }
 
 void LingeringStatusEffectOnHit::StopEffect()
@@ -51,7 +52,7 @@ void LingeringStatusEffectOnHit::StopEffect()
 	UEffectManager* effectManager = FarmFPSUtilities::GetEffectManager(_cropToAffect.Get());
 	if (IsValid(effectManager))
 	{
-		effectManager->RemoveLingeringEffect(*this);
+		effectManager->RemoveLingeringEffect(this);
 	}
 
 	OnCropHitStatusEffect::StopEffect();

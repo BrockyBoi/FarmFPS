@@ -16,13 +16,16 @@ void UEffectManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	for (StatusEffect& effect : _lingeringStatusEffects)
+	for (StatusEffect* effect : _lingeringStatusEffects)
 	{
-		effect.TickEffect(DeltaTime);
+		if (ensure(effect != nullptr))
+		{
+			effect->TickEffect(DeltaTime);
+		}
 	}
 }
 
-void UEffectManager::AddLingeringEffect(StatusEffect& statusEffect)
+void UEffectManager::AddLingeringEffect(StatusEffect* statusEffect)
 {
 	_lingeringStatusEffects.AddUnique(statusEffect);
 
@@ -32,7 +35,7 @@ void UEffectManager::AddLingeringEffect(StatusEffect& statusEffect)
 	}
 }
 
-void UEffectManager::RemoveLingeringEffect(StatusEffect& statusEffect)
+void UEffectManager::RemoveLingeringEffect(StatusEffect* statusEffect)
 {
 	if (_lingeringStatusEffects.Contains(statusEffect))
 	{
@@ -43,5 +46,18 @@ void UEffectManager::RemoveLingeringEffect(StatusEffect& statusEffect)
 			SetComponentTickEnabled(false);
 		}
 	}
+}
+
+bool UEffectManager::HasStatusEffectType(EStatusEffectType statusEffectType) const
+{
+	for (StatusEffect* statusEffect : _lingeringStatusEffects)
+	{
+		if (statusEffect != nullptr && statusEffect->GetStatusEffectType() == statusEffectType)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 

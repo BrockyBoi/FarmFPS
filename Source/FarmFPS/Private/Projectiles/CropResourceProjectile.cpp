@@ -87,16 +87,22 @@ void ACropResourceProjectile::InteractWithPlant(APlant* plant)
 		if (IsValid(crop))
 		{
 			float procValue = FMath::RandRange(0.f, 1.f);
-			if (procValue >= _addResourceOverTimeEffectData.PercentageToProcEffect.GetModifiedValue(this))
+			if (procValue >= 1 - _addResourceOverTimeEffectData.PercentageToProcEffect.GetModifiedValue(this))
 			{
-				LingeringStatusEffectOnHit lingeringEffect = LingeringStatusEffectOnHit(ProjectileType, crop, _addResourceOverTimeEffectData.LingerDuration.GetModifiedValue(this), _addResourceOverTimeEffectData.ResourcesPerSecond.GetModifiedValue(this));
-				lingeringEffect.StartEffect();
+				LingeringStatusEffectOnHit* lingeringEffect = new LingeringStatusEffectOnHit(ProjectileType, crop, _addResourceOverTimeEffectData.LingerDuration.GetModifiedValue(this), _addResourceOverTimeEffectData.ResourcesPerSecond.GetModifiedValue(this));
+				if (ensure(lingeringEffect != nullptr))
+				{
+					lingeringEffect->StartEffect();
+				}
 			}
 
-			if (procValue >= _arcBetweenCropsEffectData.PercentageToProcEffect.GetModifiedValue(this))
+			if (procValue >= 1 - _arcBetweenCropsEffectData.PercentageToProcEffect.GetModifiedValue(this))
 			{
-				ArcResourceToOtherCropOnHit arcEffect = ArcResourceToOtherCropOnHit(ProjectileType, crop, _currentResourceAmount, _arcBetweenCropsEffectData.MaxArcCount.GetModifiedValue(this), _arcBetweenCropsEffectData.ResourcePercentageToGive.GetModifiedValue(this), _arcBetweenCropsEffectData.CropCollisionChannel);
-				arcEffect.StartEffect();
+				ArcResourceToOtherCropOnHit* arcEffect = new ArcResourceToOtherCropOnHit(ProjectileType, crop, _currentResourceAmount, _arcBetweenCropsEffectData.MaxArcCount.GetModifiedValue(this), _arcBetweenCropsEffectData.PercentageToProcEffect.GetModifiedValue(this), _cropCollisionChannel);
+				if (ensure(arcEffect != nullptr))
+				{
+					arcEffect->StartEffect();
+				}
 			}
 		}
 	}

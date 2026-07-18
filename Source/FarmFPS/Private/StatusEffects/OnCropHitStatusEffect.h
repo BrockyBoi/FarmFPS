@@ -17,9 +17,7 @@ class OnCropHitStatusEffect : public StatusEffect
 {
 public:
 	OnCropHitStatusEffect();
-	OnCropHitStatusEffect(FGameplayTag resourceType, APlant* plant);
-
-	virtual void TickEffect(float deltaTime);
+	OnCropHitStatusEffect(EStatusEffectType statusEffectType, FGameplayTag resourceType, APlant* plant);
 
 protected:
 	virtual void OnEffectStarted();
