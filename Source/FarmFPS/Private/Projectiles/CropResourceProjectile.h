@@ -36,7 +36,8 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
-	void EnableCollider(const bool enable);
+	void EnableCropCollider(const bool enable);
+	void EnablePhysicsCollider(const bool enable);
 
 	void InteractWithPlant(class APlant* plant);
 
@@ -53,7 +54,7 @@ protected:
 	float _currentResourceAmount = 0;
 
 	UPROPERTY(EditDefaultsOnly)
-	bool _enableColliderOnRemoveFromPool = true;
+	bool _enableCropColliderOnRemoveFromPool = true;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Crop Resource")
 	FModifiedFloatValue _resourceAmount = 1.f;

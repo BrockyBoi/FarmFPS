@@ -38,23 +38,38 @@ void ACropResourceProjectile::EndPlay(EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-void ACropResourceProjectile::EnableCollider(const bool enable)
+void ACropResourceProjectile::EnableCropCollider(const bool enable)
 {
-	if (ensure(IsValid(_cropCollider)) && ensure(IsValid(CollisionComponent)))
+	if (ensure(IsValid(_cropCollider)))
 	{
 		if (enable)
 		{
 			_cropCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-			CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			
+			_cropCollider->OnComponentBeginOverlap.RemoveAll(this);
 			_cropCollider->OnComponentBeginOverlap.AddDynamic(this, &ACropResourceProjectile::OnComponentOverlap);
 		}
 		else
 		{
 			_cropCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 			_cropCollider->OnComponentBeginOverlap.RemoveAll(this);
+		}
+	}
+}
+
+void ACropResourceProjectile::EnablePhysicsCollider(const bool enable)
+{
+	if (ensure(IsValid(CollisionComponent)))
+	{
+		if (enable)
+		{
+			CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+		}
+		else
+		{
+			CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 	}
 }
@@ -112,17 +127,16 @@ void ACropResourceProjectile::AddActorToPool()
 {
 	Super::AddActorToPool();
 
-	EnableCollider(false);
+	EnableCropCollider(false);
+	EnablePhysicsCollider(false);
 }
 
 void ACropResourceProjectile::RemoveFromPool()
 {
 	Super::RemoveFromPool();
 
-	if (_enableColliderOnRemoveFromPool)
-	{
-		EnableCollider(true);
-	}
+	EnableCropCollider(_enableCropColliderOnRemoveFromPool);
+	EnablePhysicsCollider(true);
 
 	CollisionComponent->IgnoreActorWhenMoving(FarmFPSUtilities::GetPlayerCharacter(this), true);
 

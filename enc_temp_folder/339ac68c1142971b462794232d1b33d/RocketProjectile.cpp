@@ -16,13 +16,10 @@ ARocketProjectile::ARocketProjectile() : Super()
 
 void ARocketProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
-	AActor* playerCharacter = FarmFPSUtilities::GetPlayerCharacter(this);
-	if (Other != playerCharacter)
-	{
-		Explode();
+	GEngine->AddOnScreenDebugMessage(0, 5.f, FColor::Blue, FString::Printf(TEXT("Actor hit: %s"), *Other->GetName()));
+	Explode();
 
-		Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
-	}
+	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 }
 
 void ARocketProjectile::RemoveFromPool()
