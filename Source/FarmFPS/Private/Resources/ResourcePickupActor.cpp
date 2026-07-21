@@ -28,15 +28,6 @@ AResourcePickupActor::AResourcePickupActor()
 
 	_staticMesh = CreateDefaultSubobject<UStaticMeshComponent>("Static Mesh");
 	_staticMesh->SetupAttachment(RootComponent);
-
-	_playerCollider = CreateDefaultSubobject<USphereComponent>(TEXT("PlayerCollider"));
-
-	_playerCollider->SetupAttachment(RootComponent);
-	_playerCollider->SetSphereRadius(16.0f);
-	_playerCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	_playerCollider->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
-
-	_playerCollider->SetGenerateOverlapEvents(true);
 }
 
 void AResourcePickupActor::BeginPlay()
@@ -89,12 +80,6 @@ void AResourcePickupActor::AddActorToPool()
 	_actorToMoveTo = nullptr;
 	_inventoryOfActorMovingTowards = nullptr;
 
-	if (IsValid(_playerCollider))
-	{
-		_playerCollider->OnComponentBeginOverlap.RemoveAll(this);
-		_playerCollider->OnComponentEndOverlap.RemoveAll(this);
-	}
-
 	if (IsValid(_capsuleCollider))
 	{
 		_capsuleCollider->SetPhysicsLinearVelocity(FVector::ZeroVector);
@@ -130,11 +115,6 @@ void AResourcePickupActor::RemoveFromPool()
 	_bounceVariance = FMath::RandRange(.9f, 1.f);
 
 	GetWorld()->GetTimerManager().SetTimer(_pickupPreventionTimerHandle, this, &AResourcePickupActor::OnPlayerPickupPreventionTimerEnd, _timeCannotMoveToPlayerAfterSpawn, false);
-
-	if (ensure(IsValid(_playerCollider)))
-	{
-		_playerCollider->OnComponentBeginOverlap.AddDynamic(this, &AResourcePickupActor::OnComponentOverlap);
-	}
 
 	if (ensure(IsValid(_capsuleCollider)))
 	{
@@ -175,25 +155,6 @@ void AResourcePickupActor::OnThrownOnGround()
 	Cosmetic_OnHitGround();
 }
 
-void AResourcePickupActor::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	AFarmFPSCharacter* player = Cast<AFarmFPSCharacter>(OtherActor);
-	if (IsValid(player) && CanBeCollectedByPlayer())
-	{
-		UResourceInventory* inventory = player->FindComponentByClass<UResourceInventory>();
-		if (IsValid(inventory))
-		{
-			AttemptMoveToActor(player, inventory);
-		}
-	}
-
-	UAutomaticResourceTransferPoint* transferPoint = Cast<UAutomaticResourceTransferPoint>(OtherActor);
-	if (IsValid(transferPoint))
-	{
-
-	}
-}
-
 void AResourcePickupActor::OnGroundHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (ensure(IsValid(OtherActor)))
@@ -211,7 +172,7 @@ void AResourcePickupActor::OnPlayerPickupPreventionTimerEnd()
 	_isPlayerPickupPreventionTimeOver = true;
 	
 	AFarmFPSCharacter* player = Cast<AFarmFPSCharacter>(FarmFPSUtilities::GetPlayerCharacter(this));
-	if (ensure(IsValid(_playerCollider)) && ensure(IsValid(player)) && _playerCollider->IsOverlappingActor(player) && CanBeCollectedByPlayer())
+	if (ensure(IsValid(player)) && CanBeCollectedByPlayer() && player->IsPickupInRangeOfPlayer(this))
 	{
 		_actorToMoveTo = player;
 		AttemptMoveToActor(_actorToMoveTo.Get(), player->FindComponentByClass<UResourceInventory>());

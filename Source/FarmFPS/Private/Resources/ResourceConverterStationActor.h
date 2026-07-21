@@ -36,7 +36,7 @@ protected:
 	UResourceConverterComponent* _resourceConverter = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FCraftingData _craftingRecipe;
+	TArray<FCraftingData> _craftingRecipes;
 
 	UPROPERTY(EditDefaultsOnly)
 	bool _automaticallyConvertResources = true;

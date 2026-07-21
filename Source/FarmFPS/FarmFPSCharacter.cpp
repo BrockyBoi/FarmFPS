@@ -41,6 +41,9 @@ AFarmFPSCharacter::AFarmFPSCharacter()
 	_groundSlamSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Ground Slam Sphere Collider"));
 	_groundSlamSphereCollider->SetupAttachment(GetMesh());
 
+	_resourcePickupCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Resource Pickup Collider"));
+	_resourcePickupCollider->SetupAttachment(GetMesh());
+
 	_meleeCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Melee Collider"));
 	_meleeCollider->SetupAttachment(GetMesh());
 
@@ -67,6 +70,18 @@ AFarmFPSCharacter::AFarmFPSCharacter()
 	// Configure character movement
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 	GetCharacterMovement()->AirControl = 0.5f;
+}
+
+bool AFarmFPSCharacter::IsPickupInRangeOfPlayer(AResourcePickupActor* pickup) const
+{
+	if (ensure(IsValid(pickup)))
+	{
+		float squaredDist = FVector::DistSquared(pickup->GetActorLocation(), GetActorLocation());
+		float squaredRadius = FMath::Square(_resourcePickupCollider->GetScaledSphereRadius());
+
+		return squaredDist <= squaredRadius;
+	}
+	return false;
 }
 
 void AFarmFPSCharacter::BeginPlay()
@@ -103,6 +118,11 @@ void AFarmFPSCharacter::BeginPlay()
 		_inventory->SetCanAlwaysAddResources(true);
 		_itemSelector->OnIndexChanged.AddUObject(this, &AFarmFPSCharacter::Cosmetic_OnItemSelectorIndexChanged);
 	}
+
+	_resourcePickupCollider->SetSphereRadius(_defaultPickupColliderRadius.GetModifiedValue(this));
+	_resourcePickupCollider->OnComponentBeginOverlap.AddDynamic(this, &AFarmFPSCharacter::OnResourcePickupOverlap);
+
+	LandedDelegate.AddDynamic(this, &AFarmFPSCharacter::OnPlayerLanded);
 }
 
 void AFarmFPSCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -127,7 +147,30 @@ void AFarmFPSCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
 		_itemSelector->OnIndexChanged.RemoveAll(this);
 	}
 
+	LandedDelegate.RemoveAll(this);
+	_resourcePickupCollider->OnComponentBeginOverlap.RemoveAll(this);
+
 	Super::EndPlay(EndPlayReason);
+}
+
+void AFarmFPSCharacter::OnPlayerLanded(const FHitResult& HitResult)
+{
+	FVector playerVelocity = GetCharacterMovement()->Velocity;
+	float verticalVelocity = FMath::Abs(playerVelocity.Z);
+
+	if (verticalVelocity > _velocityNeededToTriggerFallSlam)
+	{
+		TriggerFallSlam(verticalVelocity);
+	}
+}
+
+void AFarmFPSCharacter::TriggerFallSlam(const float velocityAtFall)
+{
+	float lerpedValue = FMath::Lerp(_minFallSlamColliderMultipler, _maxFallSlamColliderMultipler, velocityAtFall / _maxFallSlamVelocity);
+
+	_resourcePickupCollider->SetSphereRadius(_defaultPickupColliderRadius.GetModifiedValue(this) * lerpedValue);
+	FTimerHandle handle;
+	GetWorld()->GetTimerManager().SetTimer(handle, FTimerDelegate::CreateUObject(this, &AFarmFPSCharacter::OnResourcePickupBonusTimeEnd), _timeOfFallSlamColliderBonus, false);
 }
 
 void AFarmFPSCharacter::OnPerkLevelDataChanged(const FGameplayTag& perkType, const FPerkData& perkData)
@@ -159,6 +202,15 @@ void AFarmFPSCharacter::OnMeleeComponentOverlap(UPrimitiveComponent* OverlappedC
 		{
 			plant->DoDamage(_meleeDamage.GetModifiedValue(this));
 		}
+	}
+}
+
+void AFarmFPSCharacter::OnResourcePickupOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	AResourcePickupActor* resourcePickup = Cast<AResourcePickupActor>(OtherActor);
+	if (IsValid(resourcePickup) && resourcePickup->CanBeCollectedByPlayer())
+	{
+		resourcePickup->AttemptMoveToActor(this, _inventory);
 	}
 }
 
@@ -403,4 +455,9 @@ void AFarmFPSCharacter::DoGroundSlamEnd()
 			_groundSlamSphereCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		}
 	}
+}
+
+void AFarmFPSCharacter::OnResourcePickupBonusTimeEnd()
+{
+	_resourcePickupCollider->SetSphereRadius(_defaultPickupColliderRadius.GetModifiedValue(this));
 }

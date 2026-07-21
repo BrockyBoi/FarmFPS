@@ -14,6 +14,7 @@
 #include "FarmFPSCharacter.generated.h"
 
 class AConstantCropAffectorArea;
+class AResourcePickupActor;
 
 class UBoxComponent;
 class UCameraComponent;
@@ -43,6 +44,8 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool GetIsMeleeing() const { return _isMeleeing; }
 
+	bool IsPickupInRangeOfPlayer(AResourcePickupActor* pickup) const;
+
 	/** Returns the first person mesh **/
 	USkeletalMeshComponent* GetFirstPersonMesh() const { return FirstPersonMesh; }
 
@@ -63,6 +66,11 @@ protected:
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 	UFUNCTION()
+	void OnPlayerLanded(const FHitResult& HitResult);
+
+	void TriggerFallSlam(const float velocityAtFall);
+
+	UFUNCTION()
 	void OnPerkLevelDataChanged(const FGameplayTag& perkType, const FPerkData& perkData);
 
 	UFUNCTION()
@@ -70,6 +78,9 @@ protected:
 
 	UFUNCTION()
 	void OnMeleeComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnResourcePickupOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	/** Called from Input Actions for movement input */
 	void MoveInput(const FInputActionValue& Value);
@@ -118,6 +129,9 @@ protected:
 	void DoMeleeEnd();
 	void DoGroundSlamStart();
 	void DoGroundSlamEnd();
+
+	UFUNCTION()
+	void OnResourcePickupBonusTimeEnd();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCosmetic)
 	void Cosmetic_OnItemSelectorIndexChanged(int index, FGameplayTag resourceType);
@@ -184,6 +198,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	UPlayerInventoryItemSelector* _itemSelector = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Pickup Collider")
+	FModifiedFloatValue _defaultPickupColliderRadius = 150.f;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
 	FModifiedFloatValue _groundSlamDistanceThreshold;
 
@@ -195,6 +212,21 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
 	float _timeToReachGround = .75f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Fall Slam")
+	float _velocityNeededToTriggerFallSlam = 1500.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Fall Slam")
+	float _maxFallSlamVelocity = 3000.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Fall Slam")
+	float _minFallSlamColliderMultipler = 3.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Fall Slam")
+	float _maxFallSlamColliderMultipler = 15.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Fall Slam")
+	float _timeOfFallSlamColliderBonus = 1.f;
 
 	int _startingJumpCount = 0;
 	float _startingJumpHeight = 0;
@@ -255,6 +287,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	USphereComponent* _groundSlamSphereCollider;
+
+	UPROPERTY(EditAnywhere)
+	USphereComponent* _resourcePickupCollider;
 
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* _meleeCollider;

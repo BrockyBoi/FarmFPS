@@ -13,7 +13,10 @@ OnCropHitStatusEffect::OnCropHitStatusEffect(EStatusEffectType statusEffectType,
 {
 	_resourceType = resourceType;
 	_cropToAffect = Cast<ACrop>(plant);
-	ensure(_cropToAffect.IsValid());
+	if (ensure(_cropToAffect.IsValid()))
+	{
+		_cropToAffect->OnPlantBreak.AddRaw(this, &OnCropHitStatusEffect::OnCropDestroyed);
+	}
 }
 
 void OnCropHitStatusEffect::OnEffectStarted()
@@ -23,5 +26,14 @@ void OnCropHitStatusEffect::OnEffectStarted()
 
 void OnCropHitStatusEffect::StopEffect()
 {
-	_cropToAffect = nullptr;
+	if (_cropToAffect.IsValid())
+	{
+		_cropToAffect->OnPlantBreak.RemoveAll(this);
+		_cropToAffect = nullptr;
+	}
+}
+
+void OnCropHitStatusEffect::OnCropDestroyed()
+{
+	StopEffect();
 }

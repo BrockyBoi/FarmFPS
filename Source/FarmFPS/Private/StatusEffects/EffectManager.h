@@ -63,6 +63,8 @@ public:
 	void AddLingeringEffect(StatusEffect* statusEffect);
 	void RemoveLingeringEffect(StatusEffect* statusEffect);
 
+	void ClearAllStatusEffects();
+
 	bool HasStatusEffectType(EStatusEffectType statusEffectType) const;
 
 protected:

@@ -27,6 +27,7 @@ public:
 	AResourcePickupActor();
 	virtual void AddActorToPool();
 	virtual void RemoveFromPool();
+	bool CanBeCollectedByPlayer() const;
 
 	void SetIsBeingThrownByPlayer(bool isBeingThrown) { _isBeingThrownByPlayer = isBeingThrown; }
 
@@ -38,16 +39,12 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
-	bool CanBeCollectedByPlayer() const;
 	virtual void OnThrownOnGround();
 
 public:	
 	virtual void Tick(float DeltaTime) override;
 
 protected:
-	UFUNCTION()
-	void OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
 	UFUNCTION()
 	void OnGroundHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
@@ -95,9 +92,6 @@ protected:
 	FVector _customEndLocation = FVector::ZeroVector;
 	TWeakObjectPtr<AActor> _actorToMoveTo;
 	TWeakObjectPtr<UResourceInventory> _inventoryOfActorMovingTowards;
-
-	UPROPERTY(EditAnywhere)
-	USphereComponent* _playerCollider = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	UCapsuleComponent* _capsuleCollider = nullptr;

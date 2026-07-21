@@ -23,6 +23,8 @@ protected:
 	virtual void OnEffectStarted();
 	virtual void StopEffect();
 
+	virtual void OnCropDestroyed();
+
 	FModifiedFloatValue _procChanceOnHit = .15f;
 	TWeakObjectPtr<ACrop> _cropToAffect = nullptr;
 	FGameplayTag _resourceType;

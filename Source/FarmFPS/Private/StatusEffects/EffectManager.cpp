@@ -48,6 +48,12 @@ void UEffectManager::RemoveLingeringEffect(StatusEffect* statusEffect)
 	}
 }
 
+void UEffectManager::ClearAllStatusEffects()
+{
+	_lingeringStatusEffects.Empty();
+	SetComponentTickEnabled(false);
+}
+
 bool UEffectManager::HasStatusEffectType(EStatusEffectType statusEffectType) const
 {
 	for (StatusEffect* statusEffect : _lingeringStatusEffects)
