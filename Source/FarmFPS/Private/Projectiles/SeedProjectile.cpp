@@ -12,11 +12,13 @@
 
 // UE
 #include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
-ASeedProjectile::ASeedProjectile()
+ASeedProjectile::ASeedProjectile() : Super()
 {
 	PrimaryActorTick.bCanEverTick = false;
 }
@@ -24,10 +26,19 @@ ASeedProjectile::ASeedProjectile()
 void ASeedProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+
+	CollisionComponent->IgnoreActorWhenMoving(FarmFPSUtilities::GetPlayerCharacter(this), true);
 }
 
 void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
+	AActor* playerCharacter = FarmFPSUtilities::GetPlayerCharacter(this);
+	ASeedProjectile* otherProjectile = Cast<ASeedProjectile>(Other);
+	if (Other == playerCharacter || IsValid(otherProjectile))
+	{
+		return;
+	}
+
 	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(GetWorld())) && ensure(IsValid(actorPool)))
 	{

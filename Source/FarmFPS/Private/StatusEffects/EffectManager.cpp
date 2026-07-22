@@ -16,8 +16,9 @@ void UEffectManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	for (StatusEffect* effect : _lingeringStatusEffects)
+	for (int i = 0; i < _lingeringStatusEffects.Num(); ++i)
 	{
+		StatusEffect* effect = _lingeringStatusEffects[i];
 		if (ensure(effect != nullptr))
 		{
 			effect->TickEffect(DeltaTime);

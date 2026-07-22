@@ -2,6 +2,9 @@
 
 #pragma once
 
+// Brock
+#include "Managers/ModifiedValueData.h"
+
 // UE
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
@@ -15,13 +18,16 @@ struct FCropData
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int WaterNeeded;
+	FModifiedIntValue WaterNeeded;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int LightNeeded;
+	FModifiedIntValue LightNeeded;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int CropHealth;
+	FModifiedIntValue LoveNeeded;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FModifiedIntValue CropHealth;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float StartingScaleSize;
@@ -30,7 +36,10 @@ struct FCropData
 	float FinalScaleSize;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	uint8 NumberOfPickupsToDrop;
+	FModifiedIntValue NumberOfPickupsToDrop;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FModifiedIntValue NumberOfLoveSeedsToDrop;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "ResourceType."))
 	FGameplayTag ResourceType;
@@ -41,7 +50,9 @@ struct FCropData
 		FinalScaleSize = 2.5f;
 		WaterNeeded = 100;
 		LightNeeded = 100;
+		LoveNeeded = 100;
 		CropHealth = 1;
 		NumberOfPickupsToDrop = 3;
+		NumberOfLoveSeedsToDrop = 1;
 	}
 };

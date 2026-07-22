@@ -30,28 +30,34 @@ public:
 	UResourceInventory* GetResourceInventory() const { return _resourcesInventory; }
 
 	UFUNCTION(BlueprintPure)
-	int GetCurrentWaterLevel() const;
+	float GetCurrentWaterLevel() const;
 
 	UFUNCTION(BlueprintPure)
-	int GetCurrentLightLevel() const;
+	float GetCurrentLightLevel() const;
 
 	UFUNCTION(BlueprintPure)
-	float GetWaterLeft() const { return _cropData.WaterNeeded - GetCurrentWaterLevel(); }
+	float GetCurrentLoveLevel() const;
 
 	UFUNCTION(BlueprintPure)
-	float GetWaterPercentage() const { return GetCurrentWaterLevel() / (float)_cropData.WaterNeeded; }
+	float GetWaterLeft() const { return _cropData.WaterNeeded.GetModifiedValue(this) - GetCurrentWaterLevel(); }
 
 	UFUNCTION(BlueprintPure)
-	float GetLightPercentage() const { return GetCurrentLightLevel() / (float)_cropData.LightNeeded; }
+	float GetWaterPercentage() const { return GetCurrentWaterLevel() / (float)_cropData.WaterNeeded.GetModifiedValue(this); }
 
 	UFUNCTION(BlueprintPure)
-	float GetLightLeft() const { return _cropData.LightNeeded - GetCurrentLightLevel(); }
+	float GetLightPercentage() const { return GetCurrentLightLevel() / (float)_cropData.LightNeeded.GetModifiedValue(this); }
+
+	UFUNCTION(BlueprintPure)
+	float GetLightLeft() const { return _cropData.LightNeeded.GetModifiedValue(this) - GetCurrentLightLevel(); }
 
 	UFUNCTION(BlueprintPure)
 	float GetCompletionPercentage() const;
 
 	UFUNCTION(BlueprintPure)
 	bool IsLightAndWaterFull() const;
+
+	UFUNCTION(BlueprintPure)
+	bool IsFullyLoved() const;
 
 	DECLARE_MULTICAST_DELEGATE(FOnPlantBreakEvent);
 	FOnPlantBreakEvent OnPlantBreak;

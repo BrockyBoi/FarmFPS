@@ -222,6 +222,8 @@ void AShooterWeapon::FireProjectile(const FVector& TargetLocation)
 		AShooterProjectile* Projectile = Cast<AShooterProjectile>(actorPool->GetActorFromPool(WeaponResourceType, ProjectileTransform, EPooledActorType::Projectile));
 		if (ensure(IsValid(Projectile)))
 		{
+			Projectile->Shoot();
+
 			// play the firing montage
 			WeaponOwner->PlayFiringMontage(FiringMontage);
 

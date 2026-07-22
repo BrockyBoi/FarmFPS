@@ -123,57 +123,69 @@ void ACrop::OnPlayerDestroyPlant()
 
 void ACrop::SpawnResourceActors()
 {
-	if (ensure(IsValid(GetWorld())))
+	if (!ensure(IsValid(GetWorld())))
 	{
-		UPerkManager* perkManager = FarmFPSUtilities::GetPlayerPerkManager(this);
-		if (!ensure(IsValid(perkManager)))
-		{
-			return;
-		}
+		return;
+	}
 
-		int countToDrop = perkManager->ModifyValueByPerks(PerkModifierTypeTags::MoreCropYield, _cropData.NumberOfPickupsToDrop);
-		if (_isInPerfectTiming)
-		{
-			countToDrop = FMath::RoundToInt(countToDrop * _perfectTimingYieldBonus.GetModifiedValue(this));
-		}
-		else if (!IsLightAndWaterFull())
-		{
-			countToDrop = FMath::RoundToInt(countToDrop * GetCompletionPercentage());
-		}
+	int countToDrop = _cropData.NumberOfPickupsToDrop.GetModifiedValue(this);
+	int seedsToDrop = 0;
+	if (_isInPerfectTiming)
+	{
+		countToDrop = FMath::RoundToInt(countToDrop * _perfectTimingYieldBonus.GetModifiedValue(this));
+	}
+	else if (!IsLightAndWaterFull())
+	{
+		countToDrop = FMath::RoundToInt(countToDrop * GetCompletionPercentage());
+	}
 
-		UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
-		if (ensure(IsValid(actorPool)))
+	float loveAmount = GetCurrentLoveLevel();
+	if (IsFullyLoved())
+	{
+		seedsToDrop = _cropData.NumberOfLoveSeedsToDrop.GetModifiedValue(this);
+	}
+
+	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+	if (ensure(IsValid(actorPool)))
+	{
+		for (int i = 0; i < countToDrop; i++)
 		{
-			for (int i = 0; i < countToDrop; i++)
+			AActor* pickup = actorPool->GetActorFromPool(_cropData.ResourceType, GetActorLocation() + FVector::UpVector * _yieldPickupSpawnHeight, EPooledActorType::ResourcePickup);
+
+			// Pickup may not be valid if immediately collected by player
+			if (IsValid(pickup))
 			{
-				AActor* pickup = actorPool->GetActorFromPool(_cropData.ResourceType, GetActorLocation() + FVector::UpVector * _yieldPickupSpawnHeight, EPooledActorType::ResourcePickup);
-
-				// Pickup may not be valid if immediately collected by player
-				if (IsValid(pickup))
+				UPrimitiveComponent* pickupCollider = pickup->FindComponentByClass<UPrimitiveComponent>();
+				if (IsValid(pickupCollider))
 				{
-					UPrimitiveComponent* pickupCollider = pickup->FindComponentByClass<UPrimitiveComponent>();
-					if (IsValid(pickupCollider))
-					{
-						pickupCollider->AddImpulse(FVector(FMath::RandRange(-100, 100), FMath::RandRange(-100, 100), 200.f), NAME_None, true);
-					}
+					pickupCollider->AddImpulse(FVector(FMath::RandRange(-100, 100), FMath::RandRange(-100, 100), 200.f), NAME_None, true);
 				}
 			}
 		}
 
-		UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
-		if (ensure(IsValid(objectiveManager)))
+		for (int i = 0; i < seedsToDrop; i++)
 		{
-			objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::FinishCrop, _cropData.ResourceType);
+			AActor* seed = actorPool->GetActorFromPool(_cropData.ResourceType, GetActorLocation() + FVector::UpVector * (_yieldPickupSpawnHeight * 2), EPooledActorType::Projectile);
+			if (IsValid(seed))
+			{
+				UPrimitiveComponent* seedCollider = seed->FindComponentByClass<UPrimitiveComponent>();
+				if (IsValid(seedCollider))
+				{
+					seedCollider->AddImpulse(FVector(FMath::RandRange(-25, 25), FMath::RandRange(-25, 25), FMath::RandRange(100, 300)), NAME_None, true);
+				}
+			}
 		}
+	}
 
-		// Genuinely don't remember why I added this, but I'm scared to remove it
-		//FTimerHandle handle;
-		//GetWorld()->GetTimerManager().SetTimer(handle, this, &ACrop::OnBreakCropTimerEnd, .1f, false);
+	UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
+	if (ensure(IsValid(objectiveManager)))
+	{
+		objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::FinishCrop, _cropData.ResourceType);
+	}
 
-		if (ensure(IsValid(_onBreakCropSound)))
-		{
-			UGameplayStatics::SpawnSoundAtLocation(this, _onBreakCropSound, GetActorLocation());
-		}
+	if (IsValid(_onBreakCropSound))
+	{
+		UGameplayStatics::SpawnSoundAtLocation(this, _onBreakCropSound, GetActorLocation());
 	}
 }
 

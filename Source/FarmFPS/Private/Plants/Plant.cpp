@@ -56,7 +56,7 @@ void APlant::AddResource(const FGameplayTag& resourceType, float amount)
 
 void APlant::DoDamage(int damageAmount)
 {
-	if (_isBroken || _cropData.CropHealth <= 0)
+	if (_isBroken || _cropData.CropHealth.GetModifiedValue(this) <= 0)
 	{
 		return;
 	}
@@ -81,9 +81,11 @@ void APlant::InitializeInventory()
 	{
 		_resourcesInventory->SetResourceAmount(ResourceTypeTags::Water, 0);
 		_resourcesInventory->SetResourceAmount(ResourceTypeTags::Light, 0);
+		_resourcesInventory->SetResourceAmount(ResourceTypeTags::Love, 0);
 
-		_resourcesInventory->SetResourceCap(ResourceTypeTags::Water, _cropData.WaterNeeded);
-		_resourcesInventory->SetResourceCap(ResourceTypeTags::Light, _cropData.LightNeeded);
+		_resourcesInventory->SetResourceCap(ResourceTypeTags::Water, _cropData.WaterNeeded.GetModifiedValue(this));
+		_resourcesInventory->SetResourceCap(ResourceTypeTags::Light, _cropData.LightNeeded.GetModifiedValue(this));
+		_resourcesInventory->SetResourceCap(ResourceTypeTags::Love, _cropData.LoveNeeded.GetModifiedValue(this));
 	}
 }
 
@@ -124,26 +126,36 @@ void APlant::OnDayEnd()
 	}
 }
 
-int APlant::GetCurrentWaterLevel() const
+float APlant::GetCurrentWaterLevel() const
 {
 	return ensure(IsValid(_resourcesInventory)) ? _resourcesInventory->GetResourceCount(ResourceTypeTags::Water) : 0;
 }
 
-int APlant::GetCurrentLightLevel() const
+float APlant::GetCurrentLightLevel() const
 {
 	return ensure(IsValid(_resourcesInventory)) ? _resourcesInventory->GetResourceCount(ResourceTypeTags::Light) : 0;
+}
+
+float APlant::GetCurrentLoveLevel() const
+{
+	return ensure(IsValid(_resourcesInventory)) ? _resourcesInventory->GetResourceCount(ResourceTypeTags::Love) : 0;
 }
 
 float APlant::GetCompletionPercentage() const
 {
 	int water = GetCurrentWaterLevel();
 	int light = GetCurrentLightLevel();
-	float waterGrowthRatio = water / (float)_cropData.WaterNeeded;
-	float lightGrowthRatio = light / (float)_cropData.LightNeeded;
+	float waterGrowthRatio = water / (float)_cropData.WaterNeeded.GetModifiedValue(this);
+	float lightGrowthRatio = light / (float)_cropData.LightNeeded.GetModifiedValue(this);
 	return (waterGrowthRatio + lightGrowthRatio) / 2.0f;
 }
 
 bool APlant::IsLightAndWaterFull() const
 {
-	return GetCurrentLightLevel() >= _cropData.LightNeeded && GetCurrentWaterLevel() >= _cropData.WaterNeeded;
+	return FMath::IsNearlyEqual(GetCurrentLightLevel(), _cropData.LightNeeded.GetModifiedValue(this)) && FMath::IsNearlyEqual(GetCurrentWaterLevel(), _cropData.WaterNeeded.GetModifiedValue(this));
+}
+
+bool APlant::IsFullyLoved() const
+{
+	return FMath::IsNearlyEqual(GetCurrentLoveLevel(), _cropData.LoveNeeded.GetModifiedValue(this));
 }

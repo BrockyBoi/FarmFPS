@@ -33,6 +33,7 @@ public:
 
 	virtual void AddActorToPool();
 	virtual void RemoveFromPool();
+	void Shoot();
 
 	const FGameplayTag& GetProjectileType() const { return ProjectileType; }
 

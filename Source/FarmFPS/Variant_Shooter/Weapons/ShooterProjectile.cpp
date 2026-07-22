@@ -43,6 +43,14 @@ AShooterProjectile::AShooterProjectile()
 
 void AShooterProjectile::AddActorToPool()
 {
+	if (CollisionComponent)
+	{
+		CollisionComponent->SetSimulatePhysics(false);
+
+		CollisionComponent->SetPhysicsLinearVelocity(FVector::ZeroVector);
+		CollisionComponent->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+	}
+
 	if (ProjectileMovement)
 	{
 		ProjectileMovement->StopMovementImmediately();
@@ -52,12 +60,21 @@ void AShooterProjectile::AddActorToPool()
 
 void AShooterProjectile::RemoveFromPool()
 {
+	CollisionComponent->SetSimulatePhysics(true);
+
 	if (ProjectileMovement)
 	{
-		ProjectileMovement->Velocity = GetActorForwardVector() * ProjectileMovement->InitialSpeed;
-		ProjectileMovement->UpdateComponentVelocity();
-		ProjectileMovement->Activate(true);
+		//Shoot();
 	}
+}
+
+void AShooterProjectile::Shoot()
+{
+	CollisionComponent->SetSimulatePhysics(false);
+
+	ProjectileMovement->Velocity = GetActorForwardVector() * ProjectileMovement->InitialSpeed;
+	ProjectileMovement->UpdateComponentVelocity();
+	ProjectileMovement->Activate(true);
 }
 
 void AShooterProjectile::BeginPlay()
