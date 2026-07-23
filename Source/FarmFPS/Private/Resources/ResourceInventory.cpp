@@ -30,8 +30,6 @@ void UResourceInventory::AddResource(const FGameplayTag& resourceType, float amo
 {
 	if (_canAddResources && amount > 0)
 	{
-		CheckInitializeMap(resourceType);
-
 		SetResourceAmount(resourceType, GetResourceCount(resourceType) + amount);
 	}
 }
@@ -40,35 +38,27 @@ void UResourceInventory::SetResourceCap(const FGameplayTag& resourceType, float 
 {
 	if (cap > 0)
 	{
-		CheckInitializeMap(resourceType);
-
-		_resourceCaps[resourceType] = cap;
+		_resourceCaps.FindOrAdd(resourceType, cap) = cap;
 	}
 }
 
 void UResourceInventory::RemoveResource(const FGameplayTag& resourceType, float amount)
 {
-	if (amount > 0)
+	if (amount > 0 && ensure(HasResourceAmount(resourceType, amount)))
 	{
-		CheckInitializeMap(resourceType);
-
-		if (ensure(HasResourceAmount(resourceType, amount)))
-		{
-			SetResourceAmount(resourceType, GetResourceCount(resourceType) - amount);
-		}
+		SetResourceAmount(resourceType, GetResourceCount(resourceType) - amount);
 	}
 }
 
 void UResourceInventory::SetResourceAmount(const FGameplayTag& resourceType, float newAmount)
 {
-	CheckInitializeMap(resourceType);
-
 	if (FMath::IsNearlyEqual(GetResourceCount(resourceType), newAmount))
 	{
 		return;
 	}
-
-	_resourcesMap[resourceType] = FMath::Clamp(newAmount, 0 , GetResourceCap(resourceType));
+	
+	float& resourceCount = _resourcesMap.FindOrAdd(resourceType, 0);
+	resourceCount = FMath::Clamp(newAmount, 0, GetResourceCap(resourceType));
 
 	OnResourceCountChanged.Broadcast(resourceType, GetResourceCount(resourceType));
 }
@@ -111,35 +101,27 @@ void UResourceInventory::ListenToDayCycleEvents(bool listen)
 
 float UResourceInventory::GetResourceCount(const FGameplayTag& resourceType) const
 {
-	if (_resourcesMap.Contains(resourceType))
-	{
-		return _resourcesMap[resourceType];
-	}
-
-	return 0;
+	return _resourcesMap.FindOrAdd(resourceType, 0.f);
 }
 
 bool UResourceInventory::HasResourceAmount(const FGameplayTag& resourceType, float amount) const
 {
-	return GetResourceCount(resourceType) >= amount;
+	float currentAmount = GetResourceCount(resourceType);
+	return FMath::IsNearlyEqual(currentAmount, amount) || currentAmount > amount;
 }
 
 uint16 UResourceInventory::GetResourceCap(const FGameplayTag& resourceType) const
 {
-	return _resourceCaps.Contains(resourceType)  && _resourceCaps[resourceType] > 0 ? _resourceCaps[resourceType] : _defaultResourceCap;
+	const float resourceCap = _resourceCaps.FindOrAdd(resourceType, 0.f);
+	return resourceCap > 0 ? resourceCap : _defaultResourceCap;
 }
 
 bool UResourceInventory::IsResourceFull(const FGameplayTag& resourceType) const
 {
-	const float* resourceCount = _resourcesMap.Find(resourceType);
-	const float* cap = _resourceCaps.Find(resourceType);
+	const float resourceCount = GetResourceCount(resourceType);
+	const float cap = GetResourceCap(resourceType);
 
-	if (resourceCount && cap)
-	{
-		return FMath::IsNearlyEqual(*resourceCount, *cap) || *resourceCount > *cap;
-	}
-
-	return false;
+	return FMath::IsNearlyEqual(resourceCount, cap) || resourceCount > cap;
 }
 
 void UResourceInventory::OnDayBegin()
@@ -157,19 +139,6 @@ void UResourceInventory::OnDayEnd()
 	if (!_canAlwaysAddResources)
 	{
 		_canAddResources = false;
-	}
-}
-
-void UResourceInventory::CheckInitializeMap(const FGameplayTag& resourceType)
-{
-	if (!_resourcesMap.Contains(resourceType))
-	{
-		_resourcesMap.Add(resourceType, 0);
-	}
-
-	if (!_resourceCaps.Contains(resourceType))
-	{
-		_resourceCaps.Add(resourceType, 0);
 	}
 }
 
