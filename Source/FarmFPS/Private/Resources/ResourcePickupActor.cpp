@@ -132,7 +132,7 @@ void AResourcePickupActor::RemoveFromPool()
 
 bool AResourcePickupActor::AttemptMoveToActor(AActor* actor, UResourceInventory* actorInventory, const FVector& customEndLocation)
 {
-	if (!_isMovingToActor && ensure(IsValid(actor)) && ensure(IsValid(actorInventory)) && actorInventory->CanAddResource(_resourceType, _resourceAmount))
+	if (!_isMovingToActor && ensure(IsValid(actor)) && ensure(IsValid(actorInventory)) && actorInventory->CanAddResource(_resourceType))
 	{
 		_actorToMoveTo = actor;
 		_inventoryOfActorMovingTowards = actorInventory;
@@ -197,7 +197,7 @@ void AResourcePickupActor::OnDayEnd()
 
 void AResourcePickupActor::AddResourcesToInventory(UResourceInventory* inventory)
 {
-	if (ensure(IsValid(inventory)) && ensure(inventory->CanAddResource(_resourceType, _resourceAmount)))
+	if (ensure(IsValid(inventory)) && ensure(inventory->CanAddResource(_resourceType)))
 	{
 		inventory->AddResource(_resourceType, _resourceAmount);
 

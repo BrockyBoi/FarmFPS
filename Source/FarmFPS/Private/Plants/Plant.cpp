@@ -34,7 +34,7 @@ void APlant::AddResource(const FGameplayTag& resourceType, float amount)
 		}
 		else
 		{
-			if (!_resourcesInventory->CanAddResource(resourceType, amount) || _isLightAndWaterFull)
+			if (!_resourcesInventory->CanAddResource(resourceType))
 			{
 				return;
 			}
@@ -47,6 +47,12 @@ void APlant::AddResource(const FGameplayTag& resourceType, float amount)
 			{
 				OnLightAndWaterFilled();
 				_isLightAndWaterFull = true;
+			}
+
+			if (_resourcesInventory->IsResourceFull(resourceType))
+			{
+				Cosmetic_OnResourceFull(resourceType);
+				OnPlantResourceFull.Broadcast(resourceType);
 			}
 
 			Cosmetic_OnResourceAdded();

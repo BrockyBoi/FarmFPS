@@ -42,6 +42,9 @@ protected:
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason);
 
 	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
+	void Cosmetic_OnAddedToPool();
+
+	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
 	void Cosmetic_OnRemovedFromPool();
 
 	void OnPerfectTimingEnd();

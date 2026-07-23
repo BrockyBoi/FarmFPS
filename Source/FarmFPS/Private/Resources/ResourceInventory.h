@@ -31,7 +31,7 @@ public:
 
 	void SetCanAddResources(bool canAdd) { _canAddResources = canAdd; }
 	void SetCanAlwaysAddResources(bool canAlwaysAdd) { _canAlwaysAddResources = canAlwaysAdd; }
-	bool CanAddResource(const FGameplayTag& resourceType, float amount) const;
+	bool CanAddResource(const FGameplayTag& resourceType) const;
 
 	void ListenToDayCycleEvents(bool listen);
 
@@ -45,6 +45,7 @@ public:
 	bool HasResourceAmount(const FGameplayTag& resourceType, float amount) const;
 
 	uint16 GetResourceCap(const FGameplayTag& resourceType) const;
+	bool IsResourceFull(const FGameplayTag& resourceType) const;
 
 	const TMap<FGameplayTag, float>& GetResourcesMap() const { return _resourcesMap; }
 

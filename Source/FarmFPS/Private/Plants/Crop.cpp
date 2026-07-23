@@ -76,6 +76,8 @@ void ACrop::AddActorToPool()
 		farmFPSCharacter->OnShowCropHealth.RemoveAll(this);
 		Cosmetic_OnShouldShowCropHealth(false);
 	}
+
+	Cosmetic_OnAddedToPool();
 }
 
 void ACrop::RemoveFromPool()

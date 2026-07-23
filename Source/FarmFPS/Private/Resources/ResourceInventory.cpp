@@ -63,7 +63,7 @@ void UResourceInventory::SetResourceAmount(const FGameplayTag& resourceType, flo
 {
 	CheckInitializeMap(resourceType);
 
-	if (GetResourceCount(resourceType) == newAmount)
+	if (FMath::IsNearlyEqual(GetResourceCount(resourceType), newAmount))
 	{
 		return;
 	}
@@ -85,9 +85,9 @@ void UResourceInventory::AddAllResourcesInInventory(UResourceInventory* otherInv
 	}
 }
 
-bool UResourceInventory::CanAddResource(const FGameplayTag& resourceType, float amount) const
+bool UResourceInventory::CanAddResource(const FGameplayTag& resourceType) const
 {
-	return _canAddResources && GetResourceCount(resourceType) < GetResourceCap(resourceType);
+	return _canAddResources && !IsResourceFull(resourceType);
 }
 
 void UResourceInventory::ListenToDayCycleEvents(bool listen)
@@ -127,6 +127,19 @@ bool UResourceInventory::HasResourceAmount(const FGameplayTag& resourceType, flo
 uint16 UResourceInventory::GetResourceCap(const FGameplayTag& resourceType) const
 {
 	return _resourceCaps.Contains(resourceType)  && _resourceCaps[resourceType] > 0 ? _resourceCaps[resourceType] : _defaultResourceCap;
+}
+
+bool UResourceInventory::IsResourceFull(const FGameplayTag& resourceType) const
+{
+	const float* resourceCount = _resourcesMap.Find(resourceType);
+	const float* cap = _resourceCaps.Find(resourceType);
+
+	if (resourceCount && cap)
+	{
+		return FMath::IsNearlyEqual(*resourceCount, *cap) || *resourceCount > *cap;
+	}
+
+	return false;
 }
 
 void UResourceInventory::OnDayBegin()

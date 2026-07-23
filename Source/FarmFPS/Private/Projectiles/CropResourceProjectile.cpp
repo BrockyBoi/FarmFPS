@@ -81,7 +81,7 @@ void ACropResourceProjectile::InteractWithPlant(APlant* plant)
 		UResourceInventory* resourceInventory = plant->GetResourceInventory();
 		if (ensure(IsValid(resourceInventory)))
 		{
-			if (_canGiveResources && resourceInventory->CanAddResource(ProjectileType, _currentResourceAmount))
+			if (_canGiveResources && resourceInventory->CanAddResource(ProjectileType))
 			{
 				plant->AddResource(ProjectileType, _currentResourceAmount);
 				_currentResourceAmount *= (1 - _resourceDecayOnHit.GetModifiedValue(this));

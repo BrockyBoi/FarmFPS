@@ -62,6 +62,9 @@ public:
 	DECLARE_MULTICAST_DELEGATE(FOnPlantBreakEvent);
 	FOnPlantBreakEvent OnPlantBreak;
 
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnResourceFullEvent, const FGameplayTag&);
+	FOnResourceFullEvent OnPlantResourceFull;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -88,6 +91,9 @@ protected:
 
 	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
 	void Cosmetic_OnResourceAdded();
+
+	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
+	void Cosmetic_OnResourceFull(const FGameplayTag& resourceType);
 
 	UResourceInventory* _resourcesInventory = nullptr;
 
