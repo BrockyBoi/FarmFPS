@@ -58,7 +58,6 @@ public:
 
 	float GetFireRate() const { return RefireRate * FireRateMultiplier.GetModifiedValue(this); }
 	float GetCurrentTimeCharging() const { return _currentTimeCharging; }
-	float GetPercentCharged() const { return bIsChargeableWeapon ? _currentTimeCharging / MaxChargeTime : 0.f; }
 
 	/** Returns the first person mesh */
 	UFUNCTION(BlueprintPure, Category = "Weapon")
@@ -182,9 +181,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
 	FModifiedFloatValue PhysicalRecoilMultiplier = 150.f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
-	float PhysicalRecoilMultiplierBasedOnCharge = 10.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _onShootSound;

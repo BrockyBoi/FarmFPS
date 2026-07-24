@@ -215,11 +215,7 @@ void AShooterProjectile::ProcessHit(AActor* HitActor, UPrimitiveComponent* HitCo
 
 void AShooterProjectile::OnLifeTimeExpired()
 {
-	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
-	if (ensure(IsValid(actorPool)))
-	{
-		actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
-	}
+	AddActorToPool();
 }
 
 void AShooterProjectile::OnDeferredDestruction()

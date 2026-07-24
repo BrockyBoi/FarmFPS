@@ -124,44 +124,45 @@ void AShooterWeapon::StartFiring()
 	// raise the firing flag
 	bIsFiring = true;
 
-	// check how much time has passed since we last shot
-	// this may be under the refire rate if the weapon shoots slow enough and the player is spamming the trigger
-	const float TimeSinceLastShot = GetWorld()->GetTimeSeconds() - TimeOfLastShot;
-
-	if (TimeSinceLastShot > GetFireRate())
+	if (bIsChargeableWeapon)
 	{
-		if (bIsChargeableWeapon)
-		{
-			bIsCharging = true;
-		}
-		else
+		bIsCharging = true;
+	}
+	else
+	{
+		// check how much time has passed since we last shot
+		// this may be under the refire rate if the weapon shoots slow enough and the player is spamming the trigger
+		const float TimeSinceLastShot = GetWorld()->GetTimeSeconds() - TimeOfLastShot;
+
+		if (TimeSinceLastShot > GetFireRate())
 		{
 			// fire the weapon right away
 			Fire();
 		}
-	}
-	else
-	{
-		// if we're full auto, schedule the next shot
-		if (bFullAuto)
+		else
 		{
-			GetWorld()->GetTimerManager().SetTimer(RefireTimer, this, &AShooterWeapon::Fire, TimeSinceLastShot, false);
+			// if we're full auto, schedule the next shot
+			if (bFullAuto)
+			{
+				GetWorld()->GetTimerManager().SetTimer(RefireTimer, this, &AShooterWeapon::Fire, TimeSinceLastShot, false);
+			}
 		}
 	}
+
 }
 
 void AShooterWeapon::StopFiring()
 {
+	// lower the firing flag
+	bIsFiring = false;
+
 	// clear the refire timer
 	GetWorld()->GetTimerManager().ClearTimer(RefireTimer);
 
-	if (bIsCharging)
+	if (bIsChargeableWeapon)
 	{
 		Fire();
 	}
-
-	// lower the firing flag
-	bIsFiring = false;
 }
 
 void AShooterWeapon::Fire()
@@ -253,7 +254,7 @@ void AShooterWeapon::FireProjectile(const FVector& TargetLocation)
 		{
 			if (bIsChargeableWeapon)
 			{
-				Projectile->ModifyThroughChargingWeapon(GetPercentCharged());
+				Projectile->ModifyThroughChargingWeapon(GetCurrentTimeCharging() / MaxChargeTime);
 			}
 
 			Projectile->Shoot();
@@ -283,9 +284,8 @@ void AShooterWeapon::FireProjectile(const FVector& TargetLocation)
 		AFarmFPSCharacter* CharacterOwner = Cast<AFarmFPSCharacter>(PawnOwner);
 		if (ensure(IsValid(CharacterOwner)))
 		{
-			float chargeMultiplier = 1 + (PhysicalRecoilMultiplierBasedOnCharge * GetPercentCharged());
 			FVector forwardVec = CharacterOwner->GetFirstPersonCameraComponent()->GetForwardVector();
-			CharacterOwner->LaunchCharacter(-forwardVec * PhysicalRecoilMultiplier.GetModifiedValue(this) * chargeMultiplier, false, false);
+			CharacterOwner->LaunchCharacter(-forwardVec * PhysicalRecoilMultiplier.GetModifiedValue(this), false, false);
 		}
 	}
 }

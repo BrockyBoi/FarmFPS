@@ -70,7 +70,7 @@ protected:
 	FArcBetweenCropsEffectData _arcBetweenCropsEffectData;
 
 	UPROPERTY(EditAnywhere, Category = "Charging")
-	float ResourceMultiplierAtMaxCharge = 10.f;
+	float ResourceMultiplierAtMaxCharge = 3.f;
 
 	UPROPERTY(EditDefaultsOnly)
 	TEnumAsByte<ECollisionChannel> _cropCollisionChannel;

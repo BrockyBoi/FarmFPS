@@ -35,6 +35,8 @@ public:
 	virtual void RemoveFromPool();
 	void Shoot();
 
+	virtual void ModifyThroughChargingWeapon(float multiplier);
+
 	const FGameplayTag& GetProjectileType() const { return ProjectileType; }
 
 protected:
@@ -93,6 +95,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Projectile|Destruction", meta = (ClampMin = 0, ClampMax = 10, Units = "s"))
 	float DeferredDestructionTime = 5.0f;
 
+	UPROPERTY(EditAnywhere, Category = "Projectile|Charging")
+	float ScaleMultiplierAtMaxCharge = 3.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Lifetime")
+	float LifeTime = 5.f;
+
+	FTimerHandle LifeTimeTimer;
+
 	/** Timer to handle deferred destruction of this projectile */
 	FTimerHandle DestructionTimer;
 
@@ -114,6 +124,9 @@ protected:
 	/** Passes control to Blueprint to implement any effects on hit. */
 	UFUNCTION(BlueprintImplementableEvent, Category="Projectile", meta = (DisplayName = "On Projectile Hit"))
 	void BP_OnProjectileHit(const FHitResult& Hit);
+
+	UFUNCTION()
+	void OnLifeTimeExpired();
 
 	/** Called from the destruction timer to destroy this projectile */
 	void OnDeferredDestruction();
