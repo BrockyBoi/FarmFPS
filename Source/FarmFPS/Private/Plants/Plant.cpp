@@ -130,6 +130,12 @@ void APlant::OnDayEnd()
 	{
 		DestroyPlant();
 	}
+
+	if (ensure(IsValid(_resourcesInventory)) && _resourcesInventory->ClearsResourcesAtEndOfDay())
+	{
+		_resourcesInventory->ClearAllExceptMoney();
+		AffectGrowth();
+	}
 }
 
 float APlant::GetCurrentWaterLevel() const

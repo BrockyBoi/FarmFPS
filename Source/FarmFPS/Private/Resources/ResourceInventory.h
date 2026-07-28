@@ -23,6 +23,8 @@ public:
 
 	void SetResourceCap(const FGameplayTag& resourceType, float cap);
 
+	bool ClearsResourcesAtEndOfDay() const { return _clearResourcesAtEndOfDay; }
+
 	UFUNCTION(BlueprintCallable)
 	void RemoveResource(const FGameplayTag& resourceType, float amount);
 	void SetResourceAmount(const FGameplayTag& resourceType, float amount);
@@ -47,6 +49,8 @@ public:
 	uint16 GetResourceCap(const FGameplayTag& resourceType) const;
 	bool IsResourceFull(const FGameplayTag& resourceType) const;
 
+	void ClearAllExceptMoney();
+
 	const TMap<FGameplayTag, float>& GetResourcesMap() const { return _resourcesMap; }
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnResourceCountChangedEvent, const FGameplayTag&, resourceType, float, newAmount);
@@ -64,8 +68,6 @@ private:
 
 	UFUNCTION()
 	void OnDayEnd();
-
-	void ClearAllExceptMoney();
 
 	bool _canAddResources = true;
 
