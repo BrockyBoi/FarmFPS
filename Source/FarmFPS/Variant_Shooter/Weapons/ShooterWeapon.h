@@ -75,7 +75,7 @@ public:
 	const TSubclassOf<UAnimInstance>& GetThirdPersonAnimInstanceClass() const;
 
 	/** Returns the magazine size */
-	int32 GetMagazineSize() const { return MagazineSize; };
+	int32 GetMagazineSize() const { return MagazineSize.GetModifiedValue(this); };
 
 	/** Returns the current bullet count */
 	int32 GetBulletCount() const { return CurrentBullets; }
@@ -119,8 +119,8 @@ protected:
 	TSubclassOf<AShooterProjectile> ProjectileClass;
 
 	/** Number of bullets in a magazine */
-	UPROPERTY(EditAnywhere, Category = "Ammo", meta = (ClampMin = 0, ClampMax = 100))
-	int32 MagazineSize = 10;
+	UPROPERTY(EditAnywhere, Category = "Ammo")
+	FModifiedIntValue MagazineSize = 10;
 
 	/** Number of bullets in the current magazine */
 	int32 CurrentBullets = 0;
