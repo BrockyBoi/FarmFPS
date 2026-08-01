@@ -88,6 +88,8 @@ void AResourcePickupActor::AddActorToPool()
 		_capsuleCollider->SetSimulatePhysics(false);
 	}
 
+	EnableAllCollision(false);
+
 	GetWorld()->GetTimerManager().ClearTimer(_pickupPreventionTimerHandle);
 
 	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
@@ -105,7 +107,7 @@ void AResourcePickupActor::RemoveFromPool()
 	_isPlayerPickupPreventionTimeOver = false;
 	_isBeingThrownByPlayer = false;
 
-	_capsuleCollider->SetSimulatePhysics(true);
+	EnableAllCollision(true);
 
 	_capsuleCollider->SetPhysicsLinearVelocity(FVector::ZeroVector);
 	_capsuleCollider->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
@@ -155,6 +157,21 @@ void AResourcePickupActor::OnThrownOnGround()
 	Cosmetic_OnHitGround();
 }
 
+void AResourcePickupActor::EnableAllCollision(bool enableCollision)
+{
+	_capsuleCollider->SetSimulatePhysics(enableCollision);
+
+	if (!enableCollision)
+	{
+		_capsuleCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		_staticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+	else
+	{
+		_capsuleCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
+}
+
 void AResourcePickupActor::OnGroundHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (ensure(IsValid(OtherActor)))
@@ -183,7 +200,8 @@ void AResourcePickupActor::StartMovingTowardsActor()
 {
 	_startingMovementLocation = GetActorLocation();
 	_isMovingToActor = true;
-	_capsuleCollider->SetSimulatePhysics(false);
+
+	EnableAllCollision(false);
 }
 
 void AResourcePickupActor::OnDayEnd()

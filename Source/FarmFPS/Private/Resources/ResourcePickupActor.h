@@ -40,6 +40,7 @@ protected:
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void OnThrownOnGround();
+	virtual void EnableAllCollision(bool enableCollision);
 
 public:	
 	virtual void Tick(float DeltaTime) override;

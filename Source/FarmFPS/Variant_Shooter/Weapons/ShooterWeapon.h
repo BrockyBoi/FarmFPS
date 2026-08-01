@@ -52,7 +52,7 @@ public:
 	void StartFiring();
 
 	/** Stop firing this weapon */
-	void StopFiring();
+	void StopFiring(bool clearTimer = true);
 
 	virtual void StartReload();
 

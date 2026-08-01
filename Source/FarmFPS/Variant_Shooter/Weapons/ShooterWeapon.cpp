@@ -150,10 +150,13 @@ void AShooterWeapon::StartFiring()
 	}
 }
 
-void AShooterWeapon::StopFiring()
+void AShooterWeapon::StopFiring(bool clearTimer)
 {
-	// clear the refire timer
-	GetWorld()->GetTimerManager().ClearTimer(RefireTimer);
+	if (clearTimer)
+	{
+		// clear the refire timer
+		GetWorld()->GetTimerManager().ClearTimer(RefireTimer);
+	}
 
 	if (bIsCharging)
 	{
@@ -166,6 +169,12 @@ void AShooterWeapon::StopFiring()
 
 void AShooterWeapon::Fire()
 {
+	if (bFullAuto)
+	{
+		// schedule the next shot
+		GetWorld()->GetTimerManager().SetTimer(RefireTimer, this, &AShooterWeapon::Fire, GetFireRate(), false);
+	}
+
 	// ensure the player still wants to fire. They may have let go of the trigger
 	if (!bIsFiring || CurrentBullets <= 0 || bIsReloading)
 	{
@@ -181,20 +190,21 @@ void AShooterWeapon::Fire()
 	// make noise so the AI perception system can hear us
 	MakeNoise(ShotLoudness, PawnOwner, PawnOwner->GetActorLocation(), ShotNoiseRange, ShotNoiseTag);
 
-	if (IsValid(_onShootSound))
-	{
-		UGameplayStatics::SpawnSoundAtLocation(this, _onShootSound, GetActorLocation());
-	}
-
 	// are we full auto?
 	if (bFullAuto)
 	{
 		// schedule the next shot
 		GetWorld()->GetTimerManager().SetTimer(RefireTimer, this, &AShooterWeapon::Fire, GetFireRate(), false);
-	} else {
-
+	}
+	else
+	{
 		// for semi-auto weapons, schedule the cooldown notification
 		GetWorld()->GetTimerManager().SetTimer(RefireTimer, this, &AShooterWeapon::FireCooldownExpired, GetFireRate(), false);
+	}
+
+	if (IsValid(_onShootSound))
+	{
+		UGameplayStatics::SpawnSoundAtLocation(this, _onShootSound, GetActorLocation());
 	}
 
 	_currentTimeCharging = 0.f;
@@ -223,6 +233,8 @@ void AShooterWeapon::OnReloadFinish()
 
 	// update the weapon HUD
 	WeaponOwner->UpdateWeaponHUD(CurrentBullets, MagazineSize.GetModifiedValue(this));
+
+	bIsFiring = GetWorld()->GetTimerManager().IsTimerActive(RefireTimer);
 }
 
 void AShooterWeapon::FireCooldownExpired()
