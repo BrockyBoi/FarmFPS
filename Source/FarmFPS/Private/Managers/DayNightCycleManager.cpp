@@ -123,6 +123,22 @@ void UDayNightCycleManager::TransitionToNextDay()
 	_currentDayState = EDayState::NightTransitionToDay;
 }
 
+void UDayNightCycleManager::CHEAT_StartDay()
+{
+	if (GetCurrentDayState() == EDayState::MidNight)
+	{
+		TransitionToNextDay();
+	}
+}
+
+void UDayNightCycleManager::CHEAT_StartNight()
+{
+	if (GetCurrentDayState() == EDayState::Day)
+	{
+		EndDay();
+	}
+}
+
 void UDayNightCycleManager::StartDay()
 {
 	_currentDayState = EDayState::Day;

@@ -4,6 +4,7 @@
 
 // Brock
 #include "Managers/PerkData.h"
+#include "PurchaseLocation.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -14,37 +15,16 @@
 #include "UpgradePurchaceLocation.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UUpgradePurchaceLocation : public UActorComponent
+class UUpgradePurchaceLocation : public UPurchaseLocation
 {
 	GENERATED_BODY()
 
-public:	
-	UUpgradePurchaceLocation();
-
 protected:
-	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void OnPurchaseSuccess(class UPerkManager* perkManager, class UResourceInventory* inventory) override;
 
-	void OnDayBegin();
-	void OnDayEnd();
-
-	UFUNCTION()
-	void OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	bool AttemptUpgradePurchase(class UPerkManager* perkManager, class UResourceInventory* inventory);
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Upgrade", meta = (Categories = "PerkModifier."))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Upgrade", meta = (Categories = "PerkModifier."))
 	FGameplayTag _modifierUpgrade;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Upgrade", meta = (Categories = "PerkModifier."))
-	float _upgradeCost;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Upgrade")
-	float _upgradeCostMultiplier = 1.5f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Upgrade")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Upgrade")
 	FPerkData _perkUpgradeAmount;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UPrimitiveComponent* _overlappingComponent;
 };

@@ -44,6 +44,15 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool GetIsMeleeing() const { return _isMeleeing; }
 
+	UFUNCTION(Exec)
+	void AddResourcesBrock(FString resourceName, int amount);
+
+	UFUNCTION(Exec)
+	void StartDayBrock();
+
+	UFUNCTION(Exec)
+	void EndDayBrock();
+
 	bool IsPickupInRangeOfPlayer(AResourcePickupActor* pickup) const;
 
 	/** Returns the first person mesh **/

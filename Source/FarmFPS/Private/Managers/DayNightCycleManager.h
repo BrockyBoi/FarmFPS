@@ -37,6 +37,9 @@ public:
 
 	void TransitionToNextDay();
 
+	void CHEAT_StartDay();
+	void CHEAT_StartNight();
+
 	DECLARE_MULTICAST_DELEGATE(FOnDayStateChange);
 
 	FOnDayStateChange OnDayBegin;

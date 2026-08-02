@@ -4,6 +4,7 @@
 
 // Brock
 #include "Managers/ActorPool.h"
+#include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
 
 AInputOutputStationActor::AInputOutputStationActor()
@@ -38,6 +39,13 @@ void AInputOutputStationActor::BeginPlay()
 
 		_inputInventory->OnResourceCountChanged.AddDynamic(this, &AInputOutputStationActor::OnInputInventoryResourceCountChanged);
 		_outputInventory->OnResourceCountChanged.AddDynamic(this, &AInputOutputStationActor::OnOutputInventoryResourceCountChanged);
+
+	}
+
+	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightCycleManager)))
+	{
+		dayNightCycleManager->OnDayEnd.AddUObject(this, &AInputOutputStationActor::OnDayEnd);
 	}
 }
 
@@ -80,7 +88,18 @@ void AInputOutputStationActor::EndPlay(EEndPlayReason::Type EndPlayReason)
 		_outputInventory->OnResourceCountChanged.RemoveAll(this);
 	}
 
+	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (IsValid(dayNightCycleManager))
+	{
+		dayNightCycleManager->OnDayEnd.RemoveAll(this);
+	}
+
 	Super::EndPlay(EndPlayReason);
+}
+
+void AInputOutputStationActor::OnDayEnd()
+{
+	_resourcesToSpawnFromInputInventory.Empty();
 }
 
 float AInputOutputStationActor::GetTimeBetweenSpawns() const

@@ -4,6 +4,7 @@
 
 // Brock
 #include "Managers/ActorPool.h"
+#include "Managers/DayNightCycleManager.h"
 #include "Projectiles/ConstantCropAffectorArea.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/PerkManager.h"
@@ -70,6 +71,32 @@ AFarmFPSCharacter::AFarmFPSCharacter()
 	// Configure character movement
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 	GetCharacterMovement()->AirControl = 0.5f;
+}
+
+void AFarmFPSCharacter::AddResourcesBrock(FString resourceName, int amount)
+{
+	if (amount > 0)
+	{
+		_inventory->AddResource(FGameplayTag::RequestGameplayTag(FName(resourceName)), amount);
+	}
+}
+
+void AFarmFPSCharacter::StartDayBrock()
+{
+	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightCycleManager)))
+	{
+		dayNightCycleManager->CHEAT_StartDay();
+	}
+}
+
+void AFarmFPSCharacter::EndDayBrock()
+{
+	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightCycleManager)))
+	{
+		dayNightCycleManager->CHEAT_StartNight();
+	}
 }
 
 bool AFarmFPSCharacter::IsPickupInRangeOfPlayer(AResourcePickupActor* pickup) const

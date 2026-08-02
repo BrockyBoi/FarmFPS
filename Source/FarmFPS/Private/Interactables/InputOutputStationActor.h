@@ -31,6 +31,8 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
+	void OnDayEnd();
+
 	virtual float GetTimeBetweenSpawns() const;
 
 	struct ResourcesToSpawnData
