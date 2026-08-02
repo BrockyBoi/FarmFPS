@@ -101,10 +101,10 @@ bool UPurchaseLocation::AttemptPurchase(UPerkManager* perkManager, UResourceInve
 
 void UPurchaseLocation::OnPurchaseSuccess(UPerkManager* perkManager, UResourceInventory* inventory)
 {
+	Cosmetic_OnPurchaseSuccess.Broadcast();
+
 	_purchaseCost *= _purchaseCostMultiplier;
 	_currentPurchaseCount++;
-
-	Cosmetic_OnPurchaseSuccess.Broadcast();
 
 	if (_currentPurchaseCount >= _maxPurchaseCount)
 	{

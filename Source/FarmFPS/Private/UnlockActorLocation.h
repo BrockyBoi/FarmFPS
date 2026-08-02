@@ -38,6 +38,4 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TArray<FUnlockActorLocationData> _unlockActorLocationData;
-
-	int _currentUnlockIndex = 0;
 };

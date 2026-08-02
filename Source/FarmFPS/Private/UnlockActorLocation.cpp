@@ -17,18 +17,11 @@ void UUnlockActorLocation::OnPurchaseSuccess(UPerkManager* perkManager, UResourc
 	Super::OnPurchaseSuccess(perkManager, inventory);
 
 	UnlockActors(true);
-	_currentUnlockIndex++;
-
-	if (_currentUnlockIndex >= _unlockActorLocationData.Num())
-	{
-		SetCanPurchase(false);
-		HidePurchaseLocation(true);
-	}
 }
 
 void UUnlockActorLocation::UnlockActors(bool shouldUnlock)
 {
-	UnlockActors(shouldUnlock, _currentUnlockIndex);
+	UnlockActors(shouldUnlock, _currentPurchaseCount);
 }
 
 void UUnlockActorLocation::UnlockActors(bool shouldUnlock, int index)

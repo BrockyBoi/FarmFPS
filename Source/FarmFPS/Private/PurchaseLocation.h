@@ -52,5 +52,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Purchase")
 	float _purchaseCostMultiplier = 1.5f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Purchase")
+	int _maxPurchaseCount = 5;
+
+	int _currentPurchaseCount = 0;
+
 	bool _canPurchase = true;
 };
