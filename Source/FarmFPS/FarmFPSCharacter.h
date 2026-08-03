@@ -53,6 +53,9 @@ public:
 	UFUNCTION(Exec)
 	void EndDayBrock();
 
+	UFUNCTION(Exec)
+	void StartStormBrock(FString resourceTag, bool isPermanent);
+
 	bool IsPickupInRangeOfPlayer(AResourcePickupActor* pickup) const;
 
 	/** Returns the first person mesh **/

@@ -13,6 +13,8 @@
 // Generated
 #include "Plant.generated.h"
 
+class UWeatherManager;
+
 UCLASS()
 class APlant : public AActor
 {
@@ -23,6 +25,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AddResource(const FGameplayTag& resourceType, float amount);
+	void AddResource(const FGameplayTagContainer& resourceTypes, float amount);
 	const FCropData& GetCropData() const { return _cropData; }
 
 	void DoDamage(int damageAmount);
@@ -67,6 +70,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 	virtual void DestroyPlant();
 
@@ -76,6 +80,18 @@ protected:
 	virtual void OnPlayerDestroyPlant();
 
 	void InitializeInventory();
+
+	void ListenToWeatherManager(bool listen);
+
+	virtual bool ShouldTick() const;
+
+	virtual void CheckShouldTick();
+
+	UFUNCTION()
+	virtual void OnStormBegin();
+
+	UFUNCTION()
+	virtual void OnStormEnd();
 
 	UFUNCTION()
 	virtual void OnDayEnd();
@@ -101,4 +117,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	FCropData _cropData;
+
+	TWeakObjectPtr<UWeatherManager> _weatherManager = nullptr;
 };

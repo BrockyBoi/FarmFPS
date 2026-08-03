@@ -8,6 +8,7 @@
 #include "Projectiles/ConstantCropAffectorArea.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/PerkManager.h"
+#include "Managers/WeatherManager.h"
 #include "Plants/Plant.h"
 #include "Managers/PlayerInventoryItemSelector.h"
 #include "Resources/ResourcePickupActor.h"
@@ -96,6 +97,15 @@ void AFarmFPSCharacter::EndDayBrock()
 	if (ensure(IsValid(dayNightCycleManager)))
 	{
 		dayNightCycleManager->CHEAT_StartNight();
+	}
+}
+
+void AFarmFPSCharacter::StartStormBrock(FString resourceTag, bool isPermanent)
+{
+	UWeatherManager* weatherManager = FarmFPSUtilities::GetWeatherManager(this);
+	if (ensure(IsValid(weatherManager)))
+	{
+		weatherManager->StartStorm(FGameplayTagContainer(FGameplayTag::RequestGameplayTag(*resourceTag)), isPermanent);
 	}
 }
 

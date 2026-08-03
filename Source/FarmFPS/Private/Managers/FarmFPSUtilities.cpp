@@ -12,6 +12,7 @@
 #include "Managers/ObjectiveManager.h"
 #include "Managers/PerkManager.h"
 #include "Managers/TradeOffUpgradeManager.h"
+#include "Managers/WeatherManager.h"
 #include "StatusEffects/EffectManager.h"
 
 // UE
@@ -190,6 +191,22 @@ UEffectManager* FarmFPSUtilities::GetEffectManager(const UObject* WorldContextOb
 	if (ensure(IsValid(effectManager)))
 	{
 		return effectManager;
+	}
+
+	return nullptr;
+}
+
+UWeatherManager* FarmFPSUtilities::GetWeatherManager(const UObject* WorldContextObject)
+{
+	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
+	{
+		return nullptr;
+	}
+
+	UWeatherManager* weatherManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UWeatherManager>();
+	if (ensure(IsValid(weatherManager)))
+	{
+		return weatherManager;
 	}
 
 	return nullptr;

@@ -38,6 +38,8 @@ void ACrop::BeginPlay()
 
 void ACrop::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
+
 	ShowPerfectTimingVisuals();
 }
 
@@ -52,7 +54,7 @@ void ACrop::OnLightAndWaterFilled()
 
 	_isInPerfectTiming = true;
 	GetWorld()->GetTimerManager().SetTimer(_perfectTimingTimerHandle, this, &ACrop::OnPerfectTimingEnd, _perfectTimingDuration.GetModifiedValue(this), false);
-	SetActorTickEnabled(true);
+	CheckShouldTick();
 }
 
 void ACrop::OnPerfectTimingEnd()
@@ -76,6 +78,8 @@ void ACrop::AddActorToPool()
 		farmFPSCharacter->OnShowCropHealth.RemoveAll(this);
 		Cosmetic_OnShouldShowCropHealth(false);
 	}
+
+	ListenToWeatherManager(false);
 
 	Cosmetic_OnAddedToPool();
 }
@@ -113,6 +117,8 @@ void ACrop::RemoveFromPool()
 		farmFPSCharacter->OnShowCropHealth.AddUObject(this, &ACrop::Cosmetic_OnShouldShowCropHealth);
 		Cosmetic_OnShouldShowCropHealth(farmFPSCharacter->IsShowingCropHealth());
 	}
+
+	ListenToWeatherManager(true);
 
 	AffectGrowth();
 }
@@ -221,7 +227,7 @@ void ACrop::ShowPerfectTimingVisuals()
 			if ((currentScale - _cropData.FinalScaleSize).IsNearlyZero(.01))
 			{
 				cropMesh->SetWorldScale3D(FVector::One() * _cropData.FinalScaleSize);
-				SetActorTickEnabled(false);
+				CheckShouldTick();
 			}
 		}
 	}
@@ -246,5 +252,10 @@ void ACrop::DestroyPlant()
 	{
 		actorPool->AddActorToPool(_cropData.ResourceType, this, EPooledActorType::Crop);
 	}
+}
+
+bool ACrop::ShouldTick() const
+{
+	return Super::ShouldTick() || _isInPerfectTiming;
 }
 

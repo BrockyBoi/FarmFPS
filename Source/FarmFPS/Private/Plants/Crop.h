@@ -63,6 +63,8 @@ protected:
 	void SpawnResourceActors();
 	virtual void DestroyPlant() override;
 
+	virtual bool ShouldTick() const override;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Crop Yield")
 	FModifiedFloatValue _perfectTimingYieldBonus = 1.5f;
 

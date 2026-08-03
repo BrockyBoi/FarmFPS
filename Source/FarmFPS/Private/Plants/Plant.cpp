@@ -3,6 +3,8 @@
 #include "Plant.h"
 
 // Brock
+#include "Managers/FarmFPSUtilities.h"
+#include "Managers/WeatherManager.h"
 #include "Resources/ResourceInventory.h"
 #include "Resources/ResourceTypeTags.h"
 
@@ -17,6 +19,20 @@ void APlant::BeginPlay()
 	Super::BeginPlay();
 
 	InitializeInventory();
+	ListenToWeatherManager(true);
+	CheckShouldTick();
+
+	_weatherManager = FarmFPSUtilities::GetWeatherManager(this);
+}
+
+void APlant::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (ensure(_weatherManager.IsValid()) && _weatherManager->IsStorming())
+	{
+		AddResource(_weatherManager->GetCurrentStormTags(), _weatherManager->GetCurrentStormIntensity() * DeltaTime);
+	}
 }
 
 void APlant::AddResource(const FGameplayTag& resourceType, float amount)
@@ -60,6 +76,14 @@ void APlant::AddResource(const FGameplayTag& resourceType, float amount)
 	}
 }
 
+void APlant::AddResource(const FGameplayTagContainer& resourceTypes, float amount)
+{
+	for (const FGameplayTag& resourceType : resourceTypes)
+	{
+		AddResource(resourceType, amount);
+	}
+}
+
 void APlant::DoDamage(int damageAmount)
 {
 	if (_isBroken || _cropData.CropHealth.GetModifiedValue(this) <= 0)
@@ -95,12 +119,49 @@ void APlant::InitializeInventory()
 	}
 }
 
+void APlant::ListenToWeatherManager(bool listen)
+{
+	if (_weatherManager.IsValid())
+	{
+		_weatherManager->OnStormStarted.RemoveAll(this);
+		_weatherManager->OnStormEnded.RemoveAll(this);
+
+		if (listen)
+		{
+			_weatherManager->OnStormStarted.AddUObject(this, &APlant::OnStormBegin);
+			_weatherManager->OnStormEnded.AddUObject(this, &APlant::OnStormEnd);
+		}
+	}
+}
+
+bool APlant::ShouldTick() const
+{
+	return _weatherManager.IsValid() && _weatherManager->IsStorming();
+}
+
+void APlant::CheckShouldTick()
+{
+	SetActorTickEnabled(ShouldTick());
+}
+
+void APlant::OnStormBegin()
+{
+	CheckShouldTick();
+}
+
+void APlant::OnStormEnd()
+{
+	CheckShouldTick();
+}
+
 void APlant::DestroyPlant()
 {
 	if (OnPlantBreak.IsBound())
 	{
 		OnPlantBreak.Broadcast();
 	}
+
+	ListenToWeatherManager(false);
 
 	Destroy();
 }
