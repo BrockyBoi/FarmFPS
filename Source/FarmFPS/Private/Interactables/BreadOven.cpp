@@ -15,11 +15,48 @@ ABreadOven::ABreadOven() : Super()
 
 float ABreadOven::GetHeatMultipler() const
 {
-	if (_ovenHeat >= _idealHeatMin && _ovenHeat <= _idealHeatMax)
+	if (ShouldGainHeatMultiplier())
 	{
 		return _idealHeatSpeedModifier.GetModifiedValue(this);
 	}
 	return 1.0f;
+}
+
+bool ABreadOven::ShouldGainHeatMultiplier() const
+{
+	return _ovenHeat >= _idealHeatMin && _ovenHeat <= _idealHeatMax;
+}
+
+bool ABreadOven::IsHeatTooHigh() const
+{
+	return _ovenHeat >= _heatToDestroyBread;
+}
+
+void ABreadOven::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (ensure(IsValid(_fireTargetCollider)))
+	{
+		_fireTargetCollider->OnComponentBeginOverlap.AddDynamic(this, &ABreadOven::OnFireTargetOverlap);
+	}
+}
+
+void ABreadOven::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	SetHeatLevel(_ovenHeat - (_heatLostPerSecond * DeltaTime));
+}
+
+void ABreadOven::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+	if (IsValid(_fireTargetCollider))
+	{
+		_fireTargetCollider->OnComponentBeginOverlap.RemoveAll(this);
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 void ABreadOven::OnFireTargetOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -29,11 +66,11 @@ void ABreadOven::OnFireTargetOverlap(UPrimitiveComponent* OverlappedComponent, A
 	{
 		if (cropProjectile->GetProjectileType() == ResourceTypeTags::Light)
 		{
-			_ovenHeat = FMath::Clamp(_ovenHeat + cropProjectile->GetCropResourceAmount(this), 0.f, 100.f);
+			SetHeatLevel(_ovenHeat + _heatGainOnLight);
 		}
 		else if (cropProjectile->GetProjectileType() == ResourceTypeTags::Water)
 		{
-			_ovenHeat = FMath::Clamp(_ovenHeat - cropProjectile->GetCropResourceAmount(this), 0.f, 100.f);
+			SetHeatLevel(_ovenHeat - _heatLossOnWater);
 		}
 	}
 }
@@ -45,11 +82,39 @@ float ABreadOven::GetTimeBetweenSpawns() const
 
 void ABreadOven::SpawnResource(ResourcesToSpawnData& data)
 {
-	if (_ovenHeat >= _heatToDestroyBread)
+	if (IsHeatTooHigh())
 	{
 		data.AmountToSpawn--;
 		return;
 	}
 
 	Super::SpawnResource(data);
+}
+
+FLinearColor ABreadOven::GetHeatColorText() const
+{
+	if (_ovenHeat < _idealHeatMin)
+	{
+		return FMath::Lerp(FLinearColor::Blue, FLinearColor::Green, _ovenHeat / _idealHeatMin);
+	}
+	else if (_ovenHeat >= _idealHeatMin && _ovenHeat <= _idealHeatMax)
+	{
+		return FLinearColor::Green;
+	}
+	else if (_ovenHeat > _idealHeatMax && _ovenHeat < _heatToDestroyBread)
+	{
+		return FMath::Lerp(FLinearColor::Green, FLinearColor::Yellow, (_ovenHeat - _idealHeatMax) / (_heatToDestroyBread - _idealHeatMax));
+	}
+	else if (_ovenHeat >= _heatToDestroyBread)
+	{
+		return FLinearColor::Red;
+	}
+	return FLinearColor();
+}
+
+void ABreadOven::SetHeatLevel(float newHeat)
+{
+	_ovenHeat = FMath::Clamp(newHeat, 0.f, 100.f);
+	OnOvenHeatChanged.Broadcast(_ovenHeat);
+	Cosmetic_OnOvenHeatChanged(_ovenHeat);
 }

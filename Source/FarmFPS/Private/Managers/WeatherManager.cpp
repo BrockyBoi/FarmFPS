@@ -20,7 +20,7 @@ void UWeatherManager::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	if (_isStorming)
 	{
 		_currentStormTime += DeltaTime;
-		_currentStormIntensity = FMath::Lerp(0.f, _maxStormIntensity, _currentStormTime / _stormRampUpTime);
+		_currentStormIntensity = FMath::Lerp(0.f, _maxStormIntensity.GetModifiedValue(this), _currentStormTime / _stormRampUpTime);
 		if (_currentStormTime >= _stormRampUpTime)
 		{
 			SetComponentTickEnabled(false);
@@ -48,7 +48,7 @@ void UWeatherManager::StartStorm(const FGameplayTagContainer& resourceContainer,
 	SetComponentTickEnabled(true);
 	if (!isPermanent)
 	{
-		GetWorld()->GetTimerManager().SetTimer(_stormTimerHandle, this, &UWeatherManager::EndStorm, _stormDuration, false);
+		GetWorld()->GetTimerManager().SetTimer(_stormTimerHandle, this, &UWeatherManager::EndStorm, _stormDuration.GetModifiedValue(this), false);
 	}
 }
 

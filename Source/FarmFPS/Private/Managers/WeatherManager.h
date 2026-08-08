@@ -46,7 +46,7 @@ protected:
 	FModifiedFloatValue _stormDuration = 15.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Storm")
-	FModifiedFloatValue _stormRampUpTime = 5.f;
+	float _stormRampUpTime = 5.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Storm")
 	FModifiedFloatValue _maxStormIntensity = 5.f;
