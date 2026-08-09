@@ -71,18 +71,18 @@ private:
 
 	bool _canAddResources = true;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	bool _canAlwaysAddResources = false;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	bool _clearResourcesAtEndOfDay = true;
 
 	UPROPERTY(VisibleAnywhere, Transient)
 	mutable TMap<FGameplayTag, float> _resourcesMap;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	int _defaultResourceCap = 99999;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	mutable TMap<FGameplayTag, float> _resourceCaps;
 };

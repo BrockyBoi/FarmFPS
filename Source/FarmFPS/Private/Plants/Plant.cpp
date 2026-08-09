@@ -3,6 +3,7 @@
 #include "Plant.h"
 
 // Brock
+#include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/WeatherManager.h"
 #include "Resources/ResourceInventory.h"
@@ -18,11 +19,17 @@ void APlant::BeginPlay()
 {
 	Super::BeginPlay();
 
+	_weatherManager = FarmFPSUtilities::GetWeatherManager(this);
+
 	InitializeInventory();
 	ListenToWeatherManager(true);
 	CheckShouldTick();
 
-	_weatherManager = FarmFPSUtilities::GetWeatherManager(this);
+	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightCycle)))
+	{
+		dayNightCycle->OnDayEnd.AddUObject(this, &APlant::OnDayEnd);
+	}
 }
 
 void APlant::Tick(float DeltaTime)
@@ -33,6 +40,19 @@ void APlant::Tick(float DeltaTime)
 	{
 		AddResource(_weatherManager->GetCurrentStormTags(), _weatherManager->GetCurrentStormIntensity() * DeltaTime);
 	}
+}
+
+void APlant::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+	ListenToWeatherManager(false);
+
+	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (IsValid(dayNightCycle))
+	{
+		dayNightCycle->OnDayEnd.RemoveAll(this);
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 void APlant::AddResource(const FGameplayTag& resourceType, float amount)
@@ -196,6 +216,7 @@ void APlant::OnDayEnd()
 	{
 		_resourcesInventory->ClearAllExceptMoney();
 		AffectGrowth();
+		Cosmetic_OnResourceAdded();
 	}
 }
 

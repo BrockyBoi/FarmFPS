@@ -108,6 +108,7 @@ void ACrop::RemoveFromPool()
 			_resourcesInventory->SetCanAddResources(true);
 		}
 
+		dayNightCycle->OnDayEnd.RemoveAll(this);
 		dayNightCycle->OnDayEnd.AddUObject(this, &ACrop::OnDayEnd);
 	}
 
@@ -256,6 +257,6 @@ void ACrop::DestroyPlant()
 
 bool ACrop::ShouldTick() const
 {
-	return Super::ShouldTick() || _isInPerfectTiming;
+	return true;
 }
 

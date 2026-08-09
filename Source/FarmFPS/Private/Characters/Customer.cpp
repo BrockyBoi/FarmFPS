@@ -31,7 +31,6 @@ void ACustomer::BeginPlay()
 	int modifiedMin = _minCanDesire.GetModifiedValue(this);
 	int modifiedMax = _maxCanDesire.GetModifiedValue(this);
 	_amountDesired = FMath::RandRange(modifiedMin, modifiedMax);
-	_amountLeftToBuy = _amountDesired;
 
 	_startLocation = GetActorLocation();
 
@@ -155,45 +154,39 @@ void ACustomer::AttemptBuyBreadAtFrontOfQueue()
 	UResourceInventory* breadInventory = _breadStand->GetInputInventory();
 	if (ensure(IsValid(breadInventory)))
 	{
-		const int amountCanBuy = FMath::Min(_amountDesired, breadInventory->GetResourceCount(GetResourceDesired()));
-		if (amountCanBuy > 0)
+		if (breadInventory->HasResourceAmount(GetResourceDesired(), _amountDesired))
 		{
 			_breadStand->SetIsCurrentlySellingBreadToCustomer(true);
-
-			breadInventory->RemoveResource(GetResourceDesired(), amountCanBuy);
-			_amountLeftToBuy -= amountCanBuy;
+			breadInventory->RemoveResource(GetResourceDesired(), _amountDesired);
 			_breadStand->SetIsCurrentlySellingBreadToCustomer(false);
 
 			const FModifiedResourceValue priceData = _breadStand->GetPriceForResource(GetResourceDesired());
 			const int price = priceData.ModifiedIntValue.GetModifiedValue(this);
 
-			_breadStand->GetOutputInventory()->AddResource(ResourceTypeTags::Money, GetAmountDesired() * price);
+			_breadStand->GetOutputInventory()->AddResource(ResourceTypeTags::Money, _amountDesired * price);
 
 			UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
 			if (ensure(IsValid(objectiveManager)))
 			{
-				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::SellBread, GetResourceDesired(), GetAmountDesired());
+				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::SellBread, GetResourceDesired(), _amountDesired);
 			}
 
 			UBreadRequirementManager* breadRequirementManager = FarmFPSUtilities::GetBreadRequirementManager(this);
 			if (ensure(IsValid(breadRequirementManager)))
 			{
-				breadRequirementManager->SellBread(amountCanBuy);
+				breadRequirementManager->SellBread(_amountDesired);
 			}
 
-			if (_amountLeftToBuy <= 0)
+			_customerQueue->RemoveCustomerFromFrontOfQueue();
+
+			_aiController->ReceiveMoveCompleted.RemoveAll(this);
+
+			if (IsValid(_onBoughtBreadSound))
 			{
-				_customerQueue->RemoveCustomerFromFrontOfQueue();
-
-				_aiController->ReceiveMoveCompleted.RemoveAll(this);
-
-				if (IsValid(_onBoughtBreadSound))
-				{
-					UGameplayStatics::SpawnSoundAtLocation(this, _onBoughtBreadSound, GetActorLocation());
-				}
-
-				MoveOutOfMap();
+				UGameplayStatics::SpawnSoundAtLocation(this, _onBoughtBreadSound, GetActorLocation());
 			}
+
+			MoveOutOfMap();
 		}
 	}
 }

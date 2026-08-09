@@ -304,6 +304,15 @@ void AShooterWeapon::FireProjectile(const FVector& TargetLocation)
 
 FTransform AShooterWeapon::CalculateProjectileSpawnTransform(const FVector& TargetLocation) const
 {
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+
+	if (PlayerController && PlayerController->PlayerCameraManager)
+	{
+		// 2. Fetch data directly from the Player Camera Manager
+		FVector CameraLocation = PlayerController->PlayerCameraManager->GetCameraLocation();
+		return FTransform(UKismetMathLibrary::FindLookAtRotation(CameraLocation, TargetLocation), CameraLocation + PlayerController->PlayerCameraManager->GetActorForwardVector() * 5, FVector::OneVector);
+	}
+	
 	// find the muzzle location
 	const FVector MuzzleLoc = FirstPersonMesh->GetSocketLocation(MuzzleSocketName);
 

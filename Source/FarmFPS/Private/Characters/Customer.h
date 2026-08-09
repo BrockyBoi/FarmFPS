@@ -40,9 +40,11 @@ public:
 	void MoveToNextSpotInQueue(const FVector& nextSpot);
 	void MoveOutOfMap();
 
+	UFUNCTION(BlueprintPure)
 	const FGameplayTag& GetResourceDesired() const { return _resourceDesired; }
+
+	UFUNCTION(BlueprintPure)
 	const int GetAmountDesired() const { return _amountDesired; }
-	const int GetAmountLeftToBuy() const { return _amountLeftToBuy; }
 
 protected:
 	// Called when the game starts or when spawned
@@ -73,7 +75,6 @@ protected:
 	TObjectPtr<USoundBase> _onBoughtBreadSound;
 
 	int _amountDesired = 0;
-	int _amountLeftToBuy = 0;
 
 	UPROPERTY(EditDefaultsOnly)
 	FModifiedIntValue _minCanDesire;
