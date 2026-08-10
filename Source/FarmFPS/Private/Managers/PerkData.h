@@ -13,10 +13,10 @@ struct FPerkData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	float AdditiveValue;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	float MultiplicativeValue;
 
 	FPerkData()

@@ -4,9 +4,11 @@
 
 // Brock
 #include "Characters/Customer.h"
+#include "Managers/BreadRequirementManager.h"
 #include "Managers/CustomerQueue.h"
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
+#include "Resources/ResourceTypeTags.h"
 
 ABreadStand::ABreadStand() : Super()
 {
@@ -73,10 +75,13 @@ void ABreadStand::OnInputInventoryResourceCountChanged(const FGameplayTag& resou
 
 void ABreadStand::OnDayBegin()
 {
-	//SetIsCurrentlySellingBreadToCustomer(true);
 }
 
 void ABreadStand::OnDayEnd()
 {
-	//SetIsCurrentlySellingBreadToCustomer(false);
+	UBreadRequirementManager* breadRequirementManager = FarmFPSUtilities::GetBreadRequirementManager(this);
+	if (ensure(IsValid(breadRequirementManager)) && breadRequirementManager->GetHasSoldBreadRequiredForDay())
+	{
+		GetOutputInventory()->MultiplyResource(ResourceTypeTags::Money, _bonusPriceMultiplierOnAllBreadSold.GetModifiedValue(this));
+	}
 }

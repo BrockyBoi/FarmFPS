@@ -310,7 +310,7 @@ FTransform AShooterWeapon::CalculateProjectileSpawnTransform(const FVector& Targ
 	{
 		// 2. Fetch data directly from the Player Camera Manager
 		FVector CameraLocation = PlayerController->PlayerCameraManager->GetCameraLocation();
-		return FTransform(UKismetMathLibrary::FindLookAtRotation(CameraLocation, TargetLocation), CameraLocation + PlayerController->PlayerCameraManager->GetActorForwardVector() * 5, FVector::OneVector);
+		return FTransform(UKismetMathLibrary::FindLookAtRotation(CameraLocation, TargetLocation), CameraLocation + PlayerController->PlayerCameraManager->GetActorForwardVector() * 50, FVector::OneVector);
 	}
 	
 	// find the muzzle location

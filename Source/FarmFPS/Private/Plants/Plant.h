@@ -100,10 +100,10 @@ protected:
 	bool _isBroken = false;
 	bool _isLightAndWaterFull = false;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	bool _breakCropOnFull = false;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	bool _destroyAtEndOfDay = false;
 
 	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
@@ -116,7 +116,7 @@ protected:
 
 	int _currentPlantHealth = 0;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	FCropData _cropData;
 
 	TWeakObjectPtr<UWeatherManager> _weatherManager = nullptr;

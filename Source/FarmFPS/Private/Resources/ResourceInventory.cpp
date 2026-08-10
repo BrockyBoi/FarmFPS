@@ -34,6 +34,14 @@ void UResourceInventory::AddResource(const FGameplayTag& resourceType, float amo
 	}
 }
 
+void UResourceInventory::MultiplyResource(const FGameplayTag& resourceType, float amount)
+{
+	if (_canAddResources && amount > 0)
+	{
+		SetResourceAmount(resourceType, GetResourceCount(resourceType) * amount);
+	}
+}
+
 void UResourceInventory::SetResourceCap(const FGameplayTag& resourceType, float cap)
 {
 	if (cap > 0)

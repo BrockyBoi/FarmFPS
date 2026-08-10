@@ -21,6 +21,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddResource(const FGameplayTag& resourceType, float amount);
 
+	UFUNCTION(BlueprintCallable)
+	void MultiplyResource(const FGameplayTag& resourceType, float amount);
+
 	void SetResourceCap(const FGameplayTag& resourceType, float cap);
 
 	bool ClearsResourcesAtEndOfDay() const { return _clearResourcesAtEndOfDay; }

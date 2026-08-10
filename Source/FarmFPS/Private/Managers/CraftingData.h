@@ -13,9 +13,9 @@ struct FCraftingData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, Category = "Input", BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, Category = "Input", BlueprintReadOnly)
 	TArray<FModifiedResourceValue> RequiredResources;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Output", BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, Category = "Output", BlueprintReadOnly)
 	TArray<FModifiedResourceValue> ResourceProducts;
 };

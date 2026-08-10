@@ -47,12 +47,18 @@ protected:
 
 	TObjectPtr<AInputOutputStationActor> _parentStation = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ResourceType."), meta = (EditCondition = "_givesResources == false", EditConditionHides), BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, meta = (Categories = "ResourceType."), meta = (EditCondition = "_givesResources == false", EditConditionHides), BlueprintReadOnly)
 	FGameplayTagContainer _resourcesAllowed;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	bool _givesResources = false;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
+	bool _canAccessDuringDay = true;
+
+	UPROPERTY(EditAnywhere)
+	bool _canAccessDuringNight = true;
+
+	UPROPERTY(EditAnywhere)
 	bool _needsToOverlapPlayer = false;
 };

@@ -44,5 +44,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FModifiedResourceValue> _priceDataArray;
 
+	UPROPERTY(EditAnywhere)
+	FModifiedFloatValue _bonusPriceMultiplierOnAllBreadSold = 2.f;
+
 	bool _isCurrentlySellingBreadToCustomer = false;
 };

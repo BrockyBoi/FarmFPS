@@ -35,7 +35,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UResourceConverterComponent* _resourceConverter = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FCraftingData> _craftingRecipes;
 
 	UPROPERTY(EditDefaultsOnly)

@@ -251,5 +251,5 @@ bool APlant::IsLightAndWaterFull() const
 
 bool APlant::IsFullyLoved() const
 {
-	return FMath::IsNearlyEqual(GetCurrentLoveLevel(), _cropData.LoveNeeded.GetModifiedValue(this));
+	return _cropData.LoveNeeded.GetBaseValue() > 0 && FMath::IsNearlyEqual(GetCurrentLoveLevel(), _cropData.LoveNeeded.GetModifiedValue(this));
 }

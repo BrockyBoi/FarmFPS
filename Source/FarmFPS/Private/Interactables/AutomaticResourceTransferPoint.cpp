@@ -4,6 +4,7 @@
 
 // Brock
 #include "Managers/ActorPool.h"
+#include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Interactables/InputOutputStationActor.h"
 #include "Resources/ResourceInventory.h"
@@ -49,40 +50,51 @@ void UAutomaticResourceTransferPoint::SetInventory(UResourceInventory* inventory
 
 void UAutomaticResourceTransferPoint::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (IsValid(OtherActor))
+	if (!IsValid(OtherActor))
 	{
-		if (_needsToOverlapPlayer)
+		return;
+	}
+
+	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightCycleManager)))
+	{
+		if ((dayNightCycleManager->IsDay() && !_canAccessDuringDay) || (dayNightCycleManager->IsNight() && !_canAccessDuringNight))
 		{
-			UResourceInventory* inventory = OtherActor->FindComponentByClass<UResourceInventory>();
-			if (IsValid(inventory) && ensure(_inventory.IsValid()))
+			return;
+		}
+	}
+
+	if (_needsToOverlapPlayer)
+	{
+		UResourceInventory* inventory = OtherActor->FindComponentByClass<UResourceInventory>();
+		if (IsValid(inventory) && ensure(_inventory.IsValid()))
+		{
+			if (_givesResources)
 			{
-				if (_givesResources)
+				inventory->AddAllResourcesInInventory(_inventory.Get());
+			}
+			else
+			{
+				for (const FGameplayTag& resourceType : _resourcesAllowed)
 				{
-					inventory->AddAllResourcesInInventory(_inventory.Get());
-				}
-				else
-				{
-					for (const FGameplayTag& resourceType : _resourcesAllowed)
+					int resourceCount = inventory->GetResourceCount(resourceType);
+					if (resourceCount > 0)
 					{
-						int resourceCount = inventory->GetResourceCount(resourceType);
-						if (resourceCount > 0)
-						{
-							_inventory->AddResource(resourceType, resourceCount);
-							inventory->RemoveResource(resourceType, resourceCount);
-						}
+						_inventory->AddResource(resourceType, resourceCount);
+						inventory->RemoveResource(resourceType, resourceCount);
 					}
 				}
 			}
 		}
-		else
+	}
+	else
+	{
+		AResourcePickupActor* resourcePickup = Cast<AResourcePickupActor>(OtherActor);
+		if (IsValid(resourcePickup) && ensure(_inventory.IsValid()) && ensure(IsValid(_parentStation)) && _resourcesAllowed.HasTag(resourcePickup->GetResourceType()))
 		{
-			AResourcePickupActor* resourcePickup = Cast<AResourcePickupActor>(OtherActor);
-			if (IsValid(resourcePickup) && ensure(_inventory.IsValid()) && ensure(IsValid(_parentStation)) && _resourcesAllowed.HasTag(resourcePickup->GetResourceType()))
+			if (!_givesResources)
 			{
-				if (!_givesResources)
-				{
-					resourcePickup->AttemptMoveToActor(GetOwner(), _inventory.Get(), _parentStation->GetResourceEndPointLocation());
-				}
+				resourcePickup->AttemptMoveToActor(GetOwner(), _inventory.Get(), _parentStation->GetResourceEndPointLocation());
 			}
 		}
 	}

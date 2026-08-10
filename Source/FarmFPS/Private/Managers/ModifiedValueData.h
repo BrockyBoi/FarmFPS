@@ -18,7 +18,7 @@ struct FARMFPS_API FModifiedIntValue
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "PerkModifier."))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Categories = "PerkModifier."))
 	FGameplayTagContainer Modifiers;
 
 	FModifiedIntValue()
@@ -42,7 +42,7 @@ public:
 	}
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int BaseValue;
 };
 
@@ -52,7 +52,7 @@ struct FARMFPS_API FModifiedFloatValue
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, meta = (Categories = "PerkModifier."), BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, meta = (Categories = "PerkModifier."), BlueprintReadOnly)
 	FGameplayTagContainer Modifiers;
 	
 	FModifiedFloatValue()
@@ -76,7 +76,7 @@ public:
 	}
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float BaseValue;
 };
 
@@ -87,10 +87,10 @@ struct FARMFPS_API FModifiedResourceValue
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ResourceType."), BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, meta = (Categories = "ResourceType."), BlueprintReadOnly)
 	FGameplayTag ResourceTag;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FModifiedIntValue ModifiedIntValue;
 };
 

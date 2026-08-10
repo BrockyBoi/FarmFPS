@@ -33,6 +33,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	int GetBreadRequiredForDay() const { return _breadRequiredForCurrentDay; }
 
+	UFUNCTION(BlueprintPure)
+	bool GetHasSoldBreadRequiredForDay() const { return _currentBreadSold >= _breadRequiredForCurrentDay; }
+
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBreadSold, int, BreadSold);
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRequirementsMet);
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDayFailed);
