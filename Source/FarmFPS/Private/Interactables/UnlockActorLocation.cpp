@@ -14,9 +14,9 @@ void UUnlockActorLocation::BeginPlay()
 
 void UUnlockActorLocation::OnPurchaseSuccess(UPerkManager* perkManager, UResourceInventory* inventory)
 {
-	Super::OnPurchaseSuccess(perkManager, inventory);
-
 	UnlockActors(true);
+
+	Super::OnPurchaseSuccess(perkManager, inventory);
 }
 
 void UUnlockActorLocation::UnlockActors(bool shouldUnlock)

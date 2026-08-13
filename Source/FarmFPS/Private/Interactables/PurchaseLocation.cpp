@@ -37,6 +37,8 @@ void UPurchaseLocation::EndPlay(const EEndPlayReason::Type endPlayReason)
 	{
 		_overlappingComponent->OnComponentBeginOverlap.RemoveAll(this);
 	}
+
+	Super::EndPlay(endPlayReason);
 }
 
 void UPurchaseLocation::OnDayBegin()
