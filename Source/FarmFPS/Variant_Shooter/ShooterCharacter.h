@@ -86,7 +86,7 @@ public:
 
 	/** Handles switch weapon input */
 	UFUNCTION(BlueprintCallable, Category = "Input")
-	void DoSwitchWeapon();
+	void DoSwitchWeapon(const FInputActionValue& Value);
 
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	void DoReload();

@@ -62,6 +62,7 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		// Switch weapon
 		EnhancedInputComponent->BindAction(SwitchWeaponAction, ETriggerEvent::Triggered, this, &AShooterCharacter::DoSwitchWeapon);
+		//EnhancedInputComponent->BindAction(SelectInventoryItemAction, ETriggerEvent::Triggered, this, &AShooterCharacter::DoSwitchWeapon);
 
 		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AShooterCharacter::DoReload);
 	}
@@ -144,7 +145,7 @@ void AShooterCharacter::DoStopFiring()
 	}
 }
 
-void AShooterCharacter::DoSwitchWeapon()
+void AShooterCharacter::DoSwitchWeapon(const FInputActionValue& Value)
 {
 	// ensure we have at least two weapons two switch between
 	if (OwnedWeapons.Num() > 1 && !IsDead())
