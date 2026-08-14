@@ -26,7 +26,7 @@ void UUnlockActorLocation::UnlockActors(bool shouldUnlock)
 
 void UUnlockActorLocation::UnlockActors(bool shouldUnlock, int index)
 {
-	if (_unlockActorLocationData.Num() <= 0 || index >= _unlockActorLocationData.Num())
+	if (_unlockActorLocationData.Num() < 0 || index >= _unlockActorLocationData.Num())
 	{
 		return;
 	}
