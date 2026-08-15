@@ -147,6 +147,25 @@ void AShooterCharacter::DoStopFiring()
 
 void AShooterCharacter::DoSwitchWeapon(const FInputActionValue& Value)
 {
+	if (!_canScroll)
+	{
+		return;
+	}
+
+	FTimerHandle scrollTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(scrollTimerHandle, this, &AShooterCharacter::OnScrollTimerEnd, _scrollRate, false);
+	_canScroll = false;
+
+	int increment = 0;
+	if (Value.Get<float>() > 0.0f)
+	{
+		increment = 1;
+	}
+	else if (Value.Get<float>() < 0.0f)
+	{
+		increment = -1;
+	}
+
 	// ensure we have at least two weapons two switch between
 	if (OwnedWeapons.Num() > 1 && !IsDead())
 	{
@@ -156,15 +175,15 @@ void AShooterCharacter::DoSwitchWeapon(const FInputActionValue& Value)
 		// find the index of the current weapon in the owned list
 		int32 WeaponIndex = OwnedWeapons.Find(CurrentWeapon);
 
-		// is this the last weapon?
-		if (WeaponIndex == OwnedWeapons.Num() - 1)
+		if (increment > 0)
 		{
-			// loop back to the beginning of the array
-			WeaponIndex = 0;
+			// if we're incrementing, we want to wrap around to the start of the list
+			WeaponIndex = (WeaponIndex + increment) % OwnedWeapons.Num();
 		}
-		else {
-			// select the next weapon index
-			++WeaponIndex;
+		else
+		{
+			// if we're decrementing, we want to wrap around to the end of the list
+			WeaponIndex = (WeaponIndex + OwnedWeapons.Num() + increment) % OwnedWeapons.Num();
 		}
 
 		// set the new weapon as current

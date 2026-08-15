@@ -152,6 +152,8 @@ protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode = 0) override;
 
+	void OnScrollTimerEnd() { _canScroll = true; }
+
 	/** Pawn mesh: first person view (arms; seen only by self) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* FirstPersonMesh;
@@ -239,6 +241,11 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Fall Slam")
 	float _timeOfFallSlamColliderBonus = 1.f;
+
+	UPROPERTY(EditAnywhere, Category = "Scroll")
+	float _scrollRate = .1f;
+
+	bool _canScroll = true;
 
 	int _startingJumpCount = 0;
 	float _startingJumpHeight = 0;

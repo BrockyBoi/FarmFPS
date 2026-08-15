@@ -169,6 +169,11 @@ void ACropResourceProjectile::OnComponentOverlap(UPrimitiveComponent* Overlapped
 
 void ACropResourceProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
+	if (IsValid(Other) && (Other->IsA<AResourcePickupActor>() || Other->IsA<ACropResourceProjectile>()))
+	{
+		return;
+	}
+
 	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(actorPool)))
 	{

@@ -334,6 +334,15 @@ void AFarmFPSCharacter::DoHideCropHealth()
 
 void AFarmFPSCharacter::DoSelectInventoryItem(const FInputActionValue& Value)
 {
+	if (!_canScroll)
+	{
+		return;
+	}
+
+	FTimerHandle scrollTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(scrollTimerHandle, this, &AFarmFPSCharacter::OnScrollTimerEnd, _scrollRate, false);
+	_canScroll = false;
+
 	if (Value.Get<float>() > 0.0f)
 	{
 		_itemSelector->IncreaseIndex();
