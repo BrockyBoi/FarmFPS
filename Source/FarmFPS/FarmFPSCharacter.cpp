@@ -8,7 +8,7 @@
 #include "Projectiles/ConstantCropAffectorArea.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/PerkManager.h"
-#include "Managers/WeatherManager.h"
+#include "Managers/Weather/WeatherManager.h"
 #include "Plants/Plant.h"
 #include "Managers/PlayerInventoryItemSelector.h"
 #include "Resources/ResourcePickupActor.h"
@@ -106,6 +106,15 @@ void AFarmFPSCharacter::StartStormBrock(FString resourceTag, bool isPermanent)
 	if (ensure(IsValid(weatherManager)))
 	{
 		weatherManager->StartStorm(FGameplayTagContainer(FGameplayTag::RequestGameplayTag(*resourceTag)), isPermanent);
+	}
+}
+
+void AFarmFPSCharacter::SpawnStormCloudBrock()
+{
+	UWeatherManager* weatherManager = FarmFPSUtilities::GetWeatherManager(this);
+	if (ensure(IsValid(weatherManager)))
+	{
+		weatherManager->SpawnStormCloud();
 	}
 }
 

@@ -107,10 +107,10 @@ UDayNightCycleManager* FarmFPSUtilities::GetDayNightCycleManager(const UObject* 
 		return nullptr;
 	}
 
-	UDayNightCycleManager* dayNightCycleManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UDayNightCycleManager>();
-	if (ensure(IsValid(dayNightCycleManager)))
+	UDayNightCycleManager* objectiveManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UDayNightCycleManager>();
+	if (ensure(IsValid(objectiveManager)))
 	{
-		return dayNightCycleManager;
+		return objectiveManager;
 	}
 
 	return nullptr;

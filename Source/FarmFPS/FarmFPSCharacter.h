@@ -56,6 +56,9 @@ public:
 	UFUNCTION(Exec)
 	void StartStormBrock(FString resourceTag, bool isPermanent);
 
+	UFUNCTION(Exec)
+	void SpawnStormCloudBrock();
+
 	bool IsPickupInRangeOfPlayer(AResourcePickupActor* pickup) const;
 
 	/** Returns the first person mesh **/

@@ -25,7 +25,13 @@ public:
 	UWeatherManager();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	void SpawnStormCloud();
+	void StormCloudShot(const FGameplayTag& resourceTag);
+	void StormCloudDisappeared();
+
 	void CHEAT_StartStorm(const FGameplayTagContainer& resourceContainer, bool isPermanent = false);
+
+	void StartStorm(const FGameplayTag& resourceTag, bool isPermanent = false);	
 	void StartStorm(const FGameplayTagContainer& resourceContainer, bool isPermanent = false);
 	void EndStorm();
 
@@ -36,11 +42,32 @@ public:
 	FOnWeatherChangeEvent OnStormStarted;
 	FOnWeatherChangeEvent OnStormEnded;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnWeatherChangeDynamicEvent OnStormStartedDynamic;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnWeatherChangeDynamicEvent OnStormEndedDynamic;
 protected:
 	virtual void BeginPlay() override;
 
+	void CheckIfShouldSpawnStormCloud(float deltaTime);
+	
+	bool _isStormCloudInScene = false;
+
 	bool _isStorming = false;
 	float _currentStormTime = 0.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Storm Spawning")
+	TSubclassOf<AActor> _stormCloudClass;
+
+	UPROPERTY(EditAnywhere, Category = "Storm Spawning")
+	AActor* _stormCloudSpawnLocationActor = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Storm Spawning")
+	FVector _stormCloudSpawnLocation = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Storm Spawning")
+	FModifiedFloatValue _cloudSpawnChancePerSecond = .01f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Storm")
 	FModifiedFloatValue _stormDuration = 15.f;
