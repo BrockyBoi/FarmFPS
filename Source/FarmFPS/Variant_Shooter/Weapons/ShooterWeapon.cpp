@@ -257,7 +257,7 @@ void AShooterWeapon::FireProjectile(const FVector& TargetLocation)
 
 	//AShooterProjectile* Projectile = GetWorld()->SpawnActor<AShooterProjectile>(ProjectileClass, ProjectileTransform, SpawnParams);
 
-	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+	UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(actorPool)))
 	{
 		AShooterProjectile* Projectile = Cast<AShooterProjectile>(actorPool->GetActorFromPool(WeaponResourceType, ProjectileTransform, EPooledActorType::Projectile));

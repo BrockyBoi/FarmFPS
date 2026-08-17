@@ -23,7 +23,7 @@ void UPurchaseLocation::BeginPlay()
 		_overlappingComponent->OnComponentBeginOverlap.AddDynamic(this, &UPurchaseLocation::OnComponentOverlap);
 	}
 
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycle)))
 	{
 		dayNightCycle->OnDayBegin.AddUObject(this, &UPurchaseLocation::OnDayBegin);
@@ -62,7 +62,7 @@ void UPurchaseLocation::HidePurchaseLocation(bool shouldHide)
 
 void UPurchaseLocation::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (!ensure(IsValid(dayNightCycle)) || dayNightCycle->IsDay())
 	{
 		return;

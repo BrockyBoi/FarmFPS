@@ -84,7 +84,7 @@ void AFarmFPSCharacter::AddResourcesBrock(FString resourceName, int amount)
 
 void AFarmFPSCharacter::StartDayBrock()
 {
-	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycleManager)))
 	{
 		dayNightCycleManager->CHEAT_StartDay();
@@ -93,7 +93,7 @@ void AFarmFPSCharacter::StartDayBrock()
 
 void AFarmFPSCharacter::EndDayBrock()
 {
-	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycleManager)))
 	{
 		dayNightCycleManager->CHEAT_StartNight();
@@ -102,7 +102,7 @@ void AFarmFPSCharacter::EndDayBrock()
 
 void AFarmFPSCharacter::StartStormBrock(FString resourceTag, bool isPermanent)
 {
-	UWeatherManager* weatherManager = FarmFPSUtilities::GetWeatherManager(this);
+	UWeatherManager* weatherManager = UFarmFPSUtilities::GetWeatherManager(this);
 	if (ensure(IsValid(weatherManager)))
 	{
 		weatherManager->StartStorm(FGameplayTagContainer(FGameplayTag::RequestGameplayTag(*resourceTag)), isPermanent);
@@ -111,7 +111,7 @@ void AFarmFPSCharacter::StartStormBrock(FString resourceTag, bool isPermanent)
 
 void AFarmFPSCharacter::SpawnStormCloudBrock()
 {
-	UWeatherManager* weatherManager = FarmFPSUtilities::GetWeatherManager(this);
+	UWeatherManager* weatherManager = UFarmFPSUtilities::GetWeatherManager(this);
 	if (ensure(IsValid(weatherManager)))
 	{
 		weatherManager->SpawnStormCloud();
@@ -385,7 +385,7 @@ void AFarmFPSCharacter::ThrowInventoryItem()
 		if (currentResource != ResourceTypeTags::None && _inventory->HasResourceAmount(currentResource, 1))
 		{
 			_inventory->RemoveResource(currentResource, 1);
-			UActorPool* pool = FarmFPSUtilities::GetActorPool(this);
+			UActorPool* pool = UFarmFPSUtilities::GetActorPool(this);
 			if (ensure(IsValid(pool)))
 			{
 				const FVector spawnLocation = GetActorLocation() + (GetActorForwardVector() * 100.f) + FVector(0.f, 0.f, 50.f);

@@ -90,7 +90,7 @@ bool UResourceInventory::CanAddResource(const FGameplayTag& resourceType) const
 
 void UResourceInventory::ListenToDayCycleEvents(bool listen)
 {
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 
 	if (IsValid(dayNightCycle))
 	{

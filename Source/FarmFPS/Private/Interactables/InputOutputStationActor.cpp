@@ -42,7 +42,7 @@ void AInputOutputStationActor::BeginPlay()
 
 	}
 
-	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycleManager)))
 	{
 		dayNightCycleManager->OnDayEnd.AddUObject(this, &AInputOutputStationActor::OnDayEnd);
@@ -88,7 +88,7 @@ void AInputOutputStationActor::EndPlay(EEndPlayReason::Type EndPlayReason)
 		_outputInventory->OnResourceCountChanged.RemoveAll(this);
 	}
 
-	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycleManager))
 	{
 		dayNightCycleManager->OnDayEnd.RemoveAll(this);
@@ -111,7 +111,7 @@ void AInputOutputStationActor::SpawnResource(ResourcesToSpawnData& data)
 {
 	data.AmountToSpawn -= 1;
 
-	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+	UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(actorPool)))
 	{
 		AActor* pooledActor = actorPool->GetActorFromPool(data.ResourceType, _resourceOutputPoint->GetPlayerCollider()->GetComponentLocation(), EPooledActorType::ResourcePickup);

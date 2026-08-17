@@ -34,7 +34,7 @@ void LingeringStatusEffectOnHit::StartEffect()
 {
 	StatusEffect::StartEffect();
 
-	UEffectManager* effectManager = FarmFPSUtilities::GetEffectManager(_cropToAffect.Get());
+	UEffectManager* effectManager = UFarmFPSUtilities::GetEffectManager(_cropToAffect.Get());
 	if (ensure(IsValid(effectManager)))
 	{
 		if (!_canStack && effectManager->HasStatusEffectType(EStatusEffectType::GiveResourceOverTime))
@@ -49,7 +49,7 @@ void LingeringStatusEffectOnHit::StartEffect()
 
 void LingeringStatusEffectOnHit::StopEffect()
 {
-	UEffectManager* effectManager = FarmFPSUtilities::GetEffectManager(_cropToAffect.Get());
+	UEffectManager* effectManager = UFarmFPSUtilities::GetEffectManager(_cropToAffect.Get());
 	if (IsValid(effectManager))
 	{
 		effectManager->RemoveLingeringEffect(this);

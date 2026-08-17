@@ -19,7 +19,7 @@ void ABreadStand::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycle)))
 	{
 		dayNightCycle->OnDayBegin.AddUObject(this, &ABreadStand::OnDayBegin);
@@ -29,7 +29,7 @@ void ABreadStand::BeginPlay()
 
 void ABreadStand::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycle))
 	{
 		dayNightCycle->OnDayBegin.RemoveAll(this);
@@ -79,7 +79,7 @@ void ABreadStand::OnDayBegin()
 
 void ABreadStand::OnDayEnd()
 {
-	UBreadRequirementManager* breadRequirementManager = FarmFPSUtilities::GetBreadRequirementManager(this);
+	UBreadRequirementManager* breadRequirementManager = UFarmFPSUtilities::GetBreadRequirementManager(this);
 	if (ensure(IsValid(breadRequirementManager)) && breadRequirementManager->GetHasSoldBreadRequiredForDay())
 	{
 		GetOutputInventory()->MultiplyResource(ResourceTypeTags::Money, _bonusPriceMultiplierOnAllBreadSold.GetModifiedValue(this));

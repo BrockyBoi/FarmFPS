@@ -17,7 +17,7 @@ void UTradeOffUpgradeManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycleManager)))
 	{
 		dayNightCycleManager->OnWaitingForTradeOff.AddUObject(this, &UTradeOffUpgradeManager::OnTradeOffDayStateReached);
@@ -26,7 +26,7 @@ void UTradeOffUpgradeManager::BeginPlay()
 
 void UTradeOffUpgradeManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycleManager))
 	{
 		dayNightCycleManager->OnWaitingForTradeOff.RemoveAll(this);
@@ -60,7 +60,7 @@ void UTradeOffUpgradeManager::IntializeTradeOffs()
 
 void UTradeOffUpgradeManager::OnTradeOffAccepted()
 {
-	UPerkManager* perkManager = FarmFPSUtilities::GetPlayerPerkManager(this);
+	UPerkManager* perkManager = UFarmFPSUtilities::GetPlayerPerkManager(this);
 	if (ensure(IsValid(perkManager)))
 	{
 		perkManager->ModifyPerkData(_currentTradeOff.PerkType, _currentTradeOff.PerkData);

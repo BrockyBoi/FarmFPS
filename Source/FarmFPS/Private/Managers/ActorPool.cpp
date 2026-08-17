@@ -129,7 +129,7 @@ void UActorPool::AddActorToPool(const FGameplayTag& actorTag, AActor* actor, EPo
 
 void UActorPool::SpawnNewActor(const FGameplayTag& actorTag, const FTransform& spawnTransform, EPooledActorType actorType)
 {
-	UActorLookupComponent* lookupComponent = FarmFPSUtilities::GetResourceActorLookupComponent(this);
+	UActorLookupComponent* lookupComponent = UFarmFPSUtilities::GetResourceActorLookupComponent(this);
 	if (ensure(IsValid(lookupComponent)))
 	{
 		TSubclassOf<AActor> resourceActor = lookupComponent->GetActorReference(actorTag, actorType);
@@ -149,7 +149,7 @@ void UActorPool::SpawnNewActor(const FGameplayTag& actorTag, const FTransform& s
 
 void UActorPool::SpawnNewActor(const FGameplayTag& actorTag, const FVector& spawnLocation, EPooledActorType actorType)
 {
-	UActorLookupComponent* lookupComponent = FarmFPSUtilities::GetResourceActorLookupComponent(this);
+	UActorLookupComponent* lookupComponent = UFarmFPSUtilities::GetResourceActorLookupComponent(this);
 	if (ensure(IsValid(lookupComponent)))
 	{
 		TSubclassOf<AActor> resourceActor = lookupComponent->GetActorReference(actorTag, actorType);

@@ -141,7 +141,7 @@ void AShooterProjectile::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Ot
 	} 
 	else 
 	{
-		UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+		UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
 		if (ensure(IsValid(actorPool)))
 		{
 			actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
@@ -215,7 +215,7 @@ void AShooterProjectile::ProcessHit(AActor* HitActor, UPrimitiveComponent* HitCo
 
 void AShooterProjectile::OnLifeTimeExpired()
 {
-	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+	UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(actorPool)))
 	{
 		actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
@@ -224,7 +224,7 @@ void AShooterProjectile::OnLifeTimeExpired()
 
 void AShooterProjectile::OnDeferredDestruction()
 {
-	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+	UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(actorPool)))
 	{
 		actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);

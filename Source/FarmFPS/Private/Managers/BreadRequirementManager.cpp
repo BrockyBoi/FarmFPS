@@ -15,7 +15,7 @@ void UBreadRequirementManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycleManager)))
 	{
 		if (dayNightCycleManager->IsDay())
@@ -30,7 +30,7 @@ void UBreadRequirementManager::BeginPlay()
 
 void UBreadRequirementManager::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
-	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycleManager))
 	{
 		dayNightCycleManager->OnDayBegin.RemoveAll(this);

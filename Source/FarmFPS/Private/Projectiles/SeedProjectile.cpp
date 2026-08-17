@@ -27,24 +27,24 @@ void ASeedProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CollisionComponent->IgnoreActorWhenMoving(FarmFPSUtilities::GetPlayerCharacter(this), true);
+	CollisionComponent->IgnoreActorWhenMoving(UFarmFPSUtilities::GetPlayerCharacter(this), true);
 }
 
 void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
-	AActor* playerCharacter = FarmFPSUtilities::GetPlayerCharacter(this);
+	AActor* playerCharacter = UFarmFPSUtilities::GetPlayerCharacter(this);
 	ASeedProjectile* otherProjectile = Cast<ASeedProjectile>(Other);
 	if (Other == playerCharacter || IsValid(otherProjectile))
 	{
 		return;
 	}
 
-	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+	UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(GetWorld())) && ensure(IsValid(actorPool)))
 	{
 		actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
 
-		UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+		UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 		UFarmingPlotComponent* farmPlot = Other->FindComponentByClass<UFarmingPlotComponent>();
 		if (IsValid(farmPlot) && farmPlot->GetAllowedSeedTypes().HasTag(ProjectileType) && IsValid(dayNightCycle) && dayNightCycle->IsDay())
 		{

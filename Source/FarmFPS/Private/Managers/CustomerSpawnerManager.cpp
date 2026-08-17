@@ -37,7 +37,7 @@ void UCustomerSpawnerManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycle)))
 	{
 		dayNightCycle->OnDayBegin.AddUObject(this, &UCustomerSpawnerManager::OnDayBegin);
@@ -47,7 +47,7 @@ void UCustomerSpawnerManager::BeginPlay()
 
 void UCustomerSpawnerManager::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycle))
 	{
 		dayNightCycle->OnDayBegin.RemoveAll(this);

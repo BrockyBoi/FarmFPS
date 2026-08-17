@@ -40,7 +40,7 @@ void ACustomer::BeginPlay()
 		movement->MaxWalkSpeed = _customerMoveSpeed.GetModifiedValue(this);
 	}
 
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycle)))
 	{
 		dayNightCycle->OnDayEnd.AddUObject(this, &ACustomer::OnDayEnd);
@@ -49,7 +49,7 @@ void ACustomer::BeginPlay()
 
 void ACustomer::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycle))
 	{
 		dayNightCycle->OnDayEnd.RemoveAll(this);
@@ -72,7 +72,7 @@ void ACustomer::PossessedBy(AController* NewController)
 	{
 		_aiController = aiController;
 
-		_breadStand = FarmFPSUtilities::GetBreadStand(this);
+		_breadStand = UFarmFPSUtilities::GetBreadStand(this);
 		if (ensure(_breadStand.IsValid()) && ensure(IsValid(_breadStand->GetCustomerQueue())))
 		{
 			_customerQueue = _breadStand->GetCustomerQueue();
@@ -105,7 +105,7 @@ void ACustomer::OnMoveFinishedOutOfMap(FAIRequestID RequestID, EPathFollowingRes
 {
 	if (Result == EPathFollowingResult::Success)
 	{
-		UCustomerSpawnerManager* spawnerManager = FarmFPSUtilities::GetCustomerSpawnerManager(this);
+		UCustomerSpawnerManager* spawnerManager = UFarmFPSUtilities::GetCustomerSpawnerManager(this);
 		if (ensure(IsValid(spawnerManager)))
 		{
 			spawnerManager->OnCustomerLeaveMap();
@@ -165,13 +165,13 @@ void ACustomer::AttemptBuyBreadAtFrontOfQueue()
 
 			_breadStand->GetOutputInventory()->AddResource(ResourceTypeTags::Money, _amountDesired * price);
 
-			UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
+			UObjectiveManager* objectiveManager = UFarmFPSUtilities::GetObjectiveManager(this);
 			if (ensure(IsValid(objectiveManager)))
 			{
 				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::SellBread, GetResourceDesired(), _amountDesired);
 			}
 
-			UBreadRequirementManager* breadRequirementManager = FarmFPSUtilities::GetBreadRequirementManager(this);
+			UBreadRequirementManager* breadRequirementManager = UFarmFPSUtilities::GetBreadRequirementManager(this);
 			if (ensure(IsValid(breadRequirementManager)))
 			{
 				breadRequirementManager->SellBread(_amountDesired);

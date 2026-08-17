@@ -20,7 +20,7 @@ void UResourceConverterComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycle)))
 	{
 		dayNightCycle->OnDayEnd.AddUObject(this, &UResourceConverterComponent::OnDayEnd);
@@ -54,7 +54,7 @@ void UResourceConverterComponent::TickComponent(float DeltaTime, ELevelTick Tick
 			data.AmountToSpawn -= 1;
 			_currentOutputInventory->AddResource(data.ResourceType, 1);
 		
-			UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
+			UObjectiveManager* objectiveManager = UFarmFPSUtilities::GetObjectiveManager(this);
 			if (ensure(IsValid(objectiveManager)))
 			{
 				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::CraftResource, data.ResourceType, 1);
@@ -68,7 +68,7 @@ void UResourceConverterComponent::TickComponent(float DeltaTime, ELevelTick Tick
 
 void UResourceConverterComponent::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycle))
 	{
 		dayNightCycle->OnDayEnd.RemoveAll(this);
@@ -152,7 +152,7 @@ void UResourceConverterComponent::ConvertLimitedResources(UResourceInventory* in
 
 			outputInventory->AddResource(outputResourceType, outputCount);
 
-			UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
+			UObjectiveManager* objectiveManager = UFarmFPSUtilities::GetObjectiveManager(this);
 			if (ensure(IsValid(objectiveManager)))
 			{
 				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::CraftResource, outputResourceType, outputCount);

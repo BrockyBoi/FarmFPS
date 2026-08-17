@@ -33,7 +33,7 @@ public:
 
 	int GetModifiedValue(const UObject* WorldContextObject) const
 	{
-		return FarmFPSUtilities::GetModifiedValueByPlayerPerks(WorldContextObject, Modifiers, BaseValue);
+		return UFarmFPSUtilities::GetModifiedValueByPlayerPerks(WorldContextObject, Modifiers, BaseValue);
 	}
 
 	const int GetBaseValue() const
@@ -67,7 +67,7 @@ public:
 
 	float GetModifiedValue(const UObject* WorldContextObject) const
 	{
-		return FarmFPSUtilities::GetModifiedValueByPlayerPerks(WorldContextObject, Modifiers, BaseValue);
+		return UFarmFPSUtilities::GetModifiedValueByPlayerPerks(WorldContextObject, Modifiers, BaseValue);
 	}
 
 	const float GetBaseValue() const

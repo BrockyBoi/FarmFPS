@@ -90,7 +90,7 @@ void ACropResourceProjectile::InteractWithPlant(APlant* plant)
 
 		if (_currentResourceAmount <= 0)
 		{
-			UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+			UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
 			if (ensure(IsValid(actorPool)))
 			{
 				actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
@@ -138,7 +138,7 @@ void ACropResourceProjectile::RemoveFromPool()
 	EnableCropCollider(_enableCropColliderOnRemoveFromPool);
 	EnablePhysicsCollider(true);
 
-	CollisionComponent->IgnoreActorWhenMoving(FarmFPSUtilities::GetPlayerCharacter(this), true);
+	CollisionComponent->IgnoreActorWhenMoving(UFarmFPSUtilities::GetPlayerCharacter(this), true);
 
 	_currentResourceAmount = _resourceAmount.GetModifiedValue(this);
 }
@@ -174,7 +174,7 @@ void ACropResourceProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Oth
 		return;
 	}
 
-	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+	UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(actorPool)))
 	{
 		actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);

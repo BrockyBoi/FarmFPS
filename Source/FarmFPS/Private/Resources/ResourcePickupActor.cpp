@@ -49,7 +49,7 @@ void AResourcePickupActor::Tick(float DeltaTime)
 		{
 			AddResourcesToInventory(_inventoryOfActorMovingTowards.Get());
 
-			UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+			UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
 			if (ensure(IsValid(actorPool)))
 			{
 				actorPool->AddActorToPool(_resourceType, this, EPooledActorType::ResourcePickup);
@@ -92,7 +92,7 @@ void AResourcePickupActor::AddActorToPool()
 
 	GetWorld()->GetTimerManager().ClearTimer(_pickupPreventionTimerHandle);
 
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycle))
 	{
 		dayNightCycle->OnDayEnd.RemoveAll(this);
@@ -123,7 +123,7 @@ void AResourcePickupActor::RemoveFromPool()
 		_capsuleCollider->OnComponentHit.AddDynamic(this, &AResourcePickupActor::OnGroundHit);
 	}
 
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycle)))
 	{
 		dayNightCycle->OnDayEnd.AddUObject(this, &AResourcePickupActor::OnDayEnd);
@@ -188,7 +188,7 @@ void AResourcePickupActor::OnPlayerPickupPreventionTimerEnd()
 {
 	_isPlayerPickupPreventionTimeOver = true;
 	
-	AFarmFPSCharacter* player = Cast<AFarmFPSCharacter>(FarmFPSUtilities::GetPlayerCharacter(this));
+	AFarmFPSCharacter* player = Cast<AFarmFPSCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));
 	if (ensure(IsValid(player)) && CanBeCollectedByPlayer() && player->IsPickupInRangeOfPlayer(this))
 	{
 		_actorToMoveTo = player;
@@ -206,7 +206,7 @@ void AResourcePickupActor::StartMovingTowardsActor()
 
 void AResourcePickupActor::OnDayEnd()
 {
-	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+	UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(actorPool)))
 	{
 		actorPool->AddActorToPool(_resourceType, this, EPooledActorType::ResourcePickup);
@@ -219,7 +219,7 @@ void AResourcePickupActor::AddResourcesToInventory(UResourceInventory* inventory
 	{
 		inventory->AddResource(_resourceType, _resourceAmount);
 
-		UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
+		UObjectiveManager* objectiveManager = UFarmFPSUtilities::GetObjectiveManager(this);
 		if (ensure(IsValid(objectiveManager)))
 		{
 			objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::CollectResource, _resourceType, _resourceAmount);

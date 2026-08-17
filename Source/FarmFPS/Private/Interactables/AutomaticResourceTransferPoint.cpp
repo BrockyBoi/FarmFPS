@@ -55,7 +55,7 @@ void UAutomaticResourceTransferPoint::OnComponentOverlap(UPrimitiveComponent* Ov
 		return;
 	}
 
-	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycleManager)))
 	{
 		if ((dayNightCycleManager->IsDay() && !_canAccessDuringDay) || (dayNightCycleManager->IsNight() && !_canAccessDuringNight))

@@ -90,7 +90,7 @@ void AGrenadeActor::ExplosionAffectActor(AActor* actor)
 
 void AGrenadeActor::OnExplosionTimerFinished()
 {
-	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+	UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
 	if (IsValid(actorPool))
 	{
 		actorPool->AddActorToPool(_resourceType, this, EPooledActorType::ResourcePickup);

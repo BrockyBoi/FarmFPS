@@ -66,13 +66,13 @@ void ACrop::AddActorToPool()
 {
 	_resourcesInventory->ListenToDayCycleEvents(false);
 	_isInPerfectTiming = _hasPerfectTimingPeriodEnded = false;
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycle))
 	{
 		dayNightCycle->OnDayEnd.RemoveAll(this);
 	}
 
-	AFarmFPSCharacter* farmFPSCharacter = Cast<AFarmFPSCharacter>(FarmFPSUtilities::GetPlayerCharacter(this));
+	AFarmFPSCharacter* farmFPSCharacter = Cast<AFarmFPSCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));
 	if (IsValid(farmFPSCharacter))
 	{
 		farmFPSCharacter->OnShowCropHealth.RemoveAll(this);
@@ -92,7 +92,7 @@ void ACrop::RemoveFromPool()
 
 	Cosmetic_OnRemovedFromPool();
 
-	UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
+	UObjectiveManager* objectiveManager = UFarmFPSUtilities::GetObjectiveManager(this);
 	if (ensure(IsValid(objectiveManager)))
 	{
 		objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::PlantCrop, _cropData.ResourceType);
@@ -100,7 +100,7 @@ void ACrop::RemoveFromPool()
 
 	InitializeInventory();
 
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycle)))
 	{
 		if (dayNightCycle->IsDay())
@@ -112,7 +112,7 @@ void ACrop::RemoveFromPool()
 		dayNightCycle->OnDayEnd.AddUObject(this, &ACrop::OnDayEnd);
 	}
 
-	AFarmFPSCharacter* farmFPSCharacter = Cast<AFarmFPSCharacter>(FarmFPSUtilities::GetPlayerCharacter(this));
+	AFarmFPSCharacter* farmFPSCharacter = Cast<AFarmFPSCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));
 	if (ensure(IsValid(farmFPSCharacter)))
 	{
 		farmFPSCharacter->OnShowCropHealth.AddUObject(this, &ACrop::Cosmetic_OnShouldShowCropHealth);
@@ -154,7 +154,7 @@ void ACrop::SpawnResourceActors()
 		seedsToDrop = _cropData.NumberOfLoveSeedsToDrop.GetModifiedValue(this);
 	}
 
-	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+	UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(actorPool)))
 	{
 		for (int i = 0; i < countToDrop; i++)
@@ -186,7 +186,7 @@ void ACrop::SpawnResourceActors()
 		}
 	}
 
-	UObjectiveManager* objectiveManager = FarmFPSUtilities::GetObjectiveManager(this);
+	UObjectiveManager* objectiveManager = UFarmFPSUtilities::GetObjectiveManager(this);
 	if (ensure(IsValid(objectiveManager)))
 	{
 		objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::FinishCrop, _cropData.ResourceType);
@@ -248,7 +248,7 @@ void ACrop::DestroyPlant()
 		OnPlantBreak.Broadcast();
 	}
 
-	UActorPool* actorPool = FarmFPSUtilities::GetActorPool(this);
+	UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
 	if (ensure(IsValid(actorPool)))
 	{
 		actorPool->AddActorToPool(_cropData.ResourceType, this, EPooledActorType::Crop);

@@ -15,7 +15,7 @@ void UMoonHitBox::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycleManager)))
 	{
 		_hitsLeft = _hitsNeeded;
@@ -25,7 +25,7 @@ void UMoonHitBox::BeginPlay()
 
 void UMoonHitBox::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
-	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycleManager))
 	{
 		dayNightCycleManager->OnDayEnd.RemoveAll(this);
@@ -40,7 +40,7 @@ void UMoonHitBox::OnNightStart()
 
 void UMoonHitBox::HitMoon()
 {
-	UDayNightCycleManager* dayNightCycleManager = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (_hitsLeft > 0 && IsValid(dayNightCycleManager) && dayNightCycleManager->GetCurrentDayState() == EDayState::MidNight)
 	{
 		_hitsLeft--;

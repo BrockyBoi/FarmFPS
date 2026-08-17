@@ -19,7 +19,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 
-AActor* FarmFPSUtilities::GetPlayerCharacter(const UObject* WorldContextObject)
+AActor* UFarmFPSUtilities::GetPlayerCharacter(const UObject* WorldContextObject)
 {
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(WorldContextObject, 0);
 	if (ensure(IsValid(playerController)) && ensure(IsValid(playerController->GetPawn())))
@@ -30,7 +30,7 @@ AActor* FarmFPSUtilities::GetPlayerCharacter(const UObject* WorldContextObject)
 	return nullptr;
 }
 
-AGameStateBase* FarmFPSUtilities::GetGameBaseState(const UObject* WorldContextObject)
+AGameStateBase* UFarmFPSUtilities::GetGameBaseState(const UObject* WorldContextObject)
 {
 	if (!ensure(IsValid(WorldContextObject)))
 	{
@@ -46,7 +46,7 @@ AGameStateBase* FarmFPSUtilities::GetGameBaseState(const UObject* WorldContextOb
 	return nullptr;
 }
 
-UPerkManager* FarmFPSUtilities::GetPlayerPerkManager(const UObject* WorldContextObject)
+UPerkManager* UFarmFPSUtilities::GetPlayerPerkManager(const UObject* WorldContextObject)
 {
 	if (ensure(IsValid(GetPlayerCharacter(WorldContextObject))))
 	{
@@ -56,7 +56,7 @@ UPerkManager* FarmFPSUtilities::GetPlayerPerkManager(const UObject* WorldContext
 	return nullptr;
 }
 
-UObjectiveManager* FarmFPSUtilities::GetObjectiveManager(const UObject* WorldContextObject)
+UObjectiveManager* UFarmFPSUtilities::GetObjectiveManager(const UObject* WorldContextObject)
 {
 	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
 	{
@@ -72,7 +72,7 @@ UObjectiveManager* FarmFPSUtilities::GetObjectiveManager(const UObject* WorldCon
 	return nullptr;
 }
 
-ABreadStand* FarmFPSUtilities::GetBreadStand(const UObject* WorldContextObject)
+ABreadStand* UFarmFPSUtilities::GetBreadStand(const UObject* WorldContextObject)
 {
 	TArray<AActor*> breadStands;
 	UGameplayStatics::GetAllActorsOfClass(WorldContextObject, ABreadStand::StaticClass(), breadStands);
@@ -84,7 +84,7 @@ ABreadStand* FarmFPSUtilities::GetBreadStand(const UObject* WorldContextObject)
 	return nullptr;
 }
 
-UCustomerSpawnerManager* FarmFPSUtilities::GetCustomerSpawnerManager(const UObject* WorldContextObject)
+UCustomerSpawnerManager* UFarmFPSUtilities::GetCustomerSpawnerManager(const UObject* WorldContextObject)
 {
 	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
 	{
@@ -100,7 +100,7 @@ UCustomerSpawnerManager* FarmFPSUtilities::GetCustomerSpawnerManager(const UObje
 	return nullptr;
 }
 
-UDayNightCycleManager* FarmFPSUtilities::GetDayNightCycleManager(const UObject* WorldContextObject)
+UDayNightCycleManager* UFarmFPSUtilities::GetDayNightCycleManager(const UObject* WorldContextObject)
 {
 	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
 	{
@@ -116,7 +116,7 @@ UDayNightCycleManager* FarmFPSUtilities::GetDayNightCycleManager(const UObject* 
 	return nullptr;
 }
 
-UActorLookupComponent* FarmFPSUtilities::GetResourceActorLookupComponent(const UObject* WorldContextObject)
+UActorLookupComponent* UFarmFPSUtilities::GetResourceActorLookupComponent(const UObject* WorldContextObject)
 {
 	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
 	{
@@ -132,7 +132,7 @@ UActorLookupComponent* FarmFPSUtilities::GetResourceActorLookupComponent(const U
 	return nullptr;
 }
 
-UActorPool* FarmFPSUtilities::GetActorPool(const UObject* WorldContextObject)
+UActorPool* UFarmFPSUtilities::GetActorPool(const UObject* WorldContextObject)
 {
 	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
 	{
@@ -148,7 +148,7 @@ UActorPool* FarmFPSUtilities::GetActorPool(const UObject* WorldContextObject)
 	return nullptr;
 }
 
-UBreadRequirementManager* FarmFPSUtilities::GetBreadRequirementManager(const UObject* WorldContextObject)
+UBreadRequirementManager* UFarmFPSUtilities::GetBreadRequirementManager(const UObject* WorldContextObject)
 {
 	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
 	{
@@ -164,7 +164,7 @@ UBreadRequirementManager* FarmFPSUtilities::GetBreadRequirementManager(const UOb
 	return nullptr;
 }
 
-UTradeOffUpgradeManager* FarmFPSUtilities::GetTradeOffUpgradeManager(const UObject* WorldContextObject)
+UTradeOffUpgradeManager* UFarmFPSUtilities::GetTradeOffUpgradeManager(const UObject* WorldContextObject)
 {
 	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
 	{
@@ -180,7 +180,7 @@ UTradeOffUpgradeManager* FarmFPSUtilities::GetTradeOffUpgradeManager(const UObje
 	return nullptr;
 }
 
-UEffectManager* FarmFPSUtilities::GetEffectManager(const UObject* WorldContextObject)
+UEffectManager* UFarmFPSUtilities::GetEffectManager(const UObject* WorldContextObject)
 {
 	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
 	{
@@ -196,7 +196,7 @@ UEffectManager* FarmFPSUtilities::GetEffectManager(const UObject* WorldContextOb
 	return nullptr;
 }
 
-UWeatherManager* FarmFPSUtilities::GetWeatherManager(const UObject* WorldContextObject)
+UWeatherManager* UFarmFPSUtilities::GetWeatherManager(const UObject* WorldContextObject)
 {
 	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
 	{
@@ -212,7 +212,7 @@ UWeatherManager* FarmFPSUtilities::GetWeatherManager(const UObject* WorldContext
 	return nullptr;
 }
 
-float FarmFPSUtilities::GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, const FGameplayTag& perkTag, float valueToModify)
+float UFarmFPSUtilities::GetModifiedValueByPlayerPerk(const UObject* WorldContextObject, const FGameplayTag& perkTag, float valueToModify)
 {
 	if (perkTag == FGameplayTag::EmptyTag)
 	{
@@ -228,7 +228,7 @@ float FarmFPSUtilities::GetModifiedValueByPlayerPerks(const UObject* WorldContex
 	return 0.f;
 }
 
-float FarmFPSUtilities::GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, const FGameplayTagContainer& perkTags, float valueToModify)
+float UFarmFPSUtilities::GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, const FGameplayTagContainer& perkTags, float valueToModify)
 {
 	if (perkTags.IsEmpty())
 	{

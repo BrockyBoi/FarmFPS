@@ -44,7 +44,7 @@ void AStormCloudTarget::EndPlay(EEndPlayReason::Type EndPlayReason)
 		_staticMesh->OnComponentBeginOverlap.RemoveAll(this);
 	}
 
-	UWeatherManager* weatherManager = FarmFPSUtilities::GetWeatherManager(this);
+	UWeatherManager* weatherManager = UFarmFPSUtilities::GetWeatherManager(this);
 	if (IsValid(weatherManager) && !_wasShot)
 	{
 		weatherManager->StormCloudDisappeared();
@@ -58,7 +58,7 @@ void AStormCloudTarget::OnComponentOverlap(UPrimitiveComponent* OverlappedCompon
 	ACropResourceProjectile* cropResourceProjectile = Cast<ACropResourceProjectile>(OtherActor);
 	if (IsValid(cropResourceProjectile))
 	{
-		UWeatherManager* weatherManager = FarmFPSUtilities::GetWeatherManager(this);
+		UWeatherManager* weatherManager = UFarmFPSUtilities::GetWeatherManager(this);
 		if (ensure(IsValid(weatherManager)))
 		{
 			weatherManager->StormCloudShot(cropResourceProjectile->GetProjectileType());

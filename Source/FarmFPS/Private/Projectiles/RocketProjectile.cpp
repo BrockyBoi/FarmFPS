@@ -16,7 +16,7 @@ ARocketProjectile::ARocketProjectile() : Super()
 
 void ARocketProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
-	AActor* playerCharacter = FarmFPSUtilities::GetPlayerCharacter(this);
+	AActor* playerCharacter = UFarmFPSUtilities::GetPlayerCharacter(this);
 	if (Other != playerCharacter)
 	{
 		Explode();

@@ -19,13 +19,13 @@ void APlant::BeginPlay()
 {
 	Super::BeginPlay();
 
-	_weatherManager = FarmFPSUtilities::GetWeatherManager(this);
+	_weatherManager = UFarmFPSUtilities::GetWeatherManager(this);
 
 	InitializeInventory();
 	ListenToWeatherManager(true);
 	CheckShouldTick();
 
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycle)))
 	{
 		dayNightCycle->OnDayEnd.AddUObject(this, &APlant::OnDayEnd);
@@ -46,7 +46,7 @@ void APlant::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
 	ListenToWeatherManager(false);
 
-	UDayNightCycleManager* dayNightCycle = FarmFPSUtilities::GetDayNightCycleManager(this);
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycle))
 	{
 		dayNightCycle->OnDayEnd.RemoveAll(this);

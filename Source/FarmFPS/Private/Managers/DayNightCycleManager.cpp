@@ -39,7 +39,7 @@ void UDayNightCycleManager::BeginPlay()
 
 	StartDay();
 
-	UTradeOffUpgradeManager* tradeOffUpgradeManager = FarmFPSUtilities::GetTradeOffUpgradeManager(this);
+	UTradeOffUpgradeManager* tradeOffUpgradeManager = UFarmFPSUtilities::GetTradeOffUpgradeManager(this);
 	if (ensure(IsValid(tradeOffUpgradeManager)))
 	{
 		tradeOffUpgradeManager->OnTradeOffAnyInput.AddDynamic(this, &UDayNightCycleManager::StartDay);
@@ -48,7 +48,7 @@ void UDayNightCycleManager::BeginPlay()
 
 void UDayNightCycleManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	UTradeOffUpgradeManager* tradeOffUpgradeManager = FarmFPSUtilities::GetTradeOffUpgradeManager(this);
+	UTradeOffUpgradeManager* tradeOffUpgradeManager = UFarmFPSUtilities::GetTradeOffUpgradeManager(this);
 	if (IsValid(tradeOffUpgradeManager))
 	{
 		tradeOffUpgradeManager->OnTradeOffAnyInput.RemoveAll(this);
