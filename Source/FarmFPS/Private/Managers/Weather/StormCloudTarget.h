@@ -36,6 +36,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
 	float _speed = 100.0f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> _onStormCloudSpawn;
+
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* _staticMesh = nullptr;
 };

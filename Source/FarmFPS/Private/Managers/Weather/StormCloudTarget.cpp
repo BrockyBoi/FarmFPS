@@ -7,6 +7,9 @@
 #include "Projectiles/CropResourceProjectile.h"
 #include "WeatherManager.h"
 
+// UE
+#include "Kismet/GameplayStatics.h"
+
 AStormCloudTarget::AStormCloudTarget()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -22,6 +25,11 @@ void AStormCloudTarget::BeginPlay()
 	{
 		_staticMesh->OnComponentBeginOverlap.RemoveAll(this);
 		_staticMesh->OnComponentBeginOverlap.AddDynamic(this, &AStormCloudTarget::OnComponentOverlap);
+	}
+
+	if (IsValid(_onStormCloudSpawn))
+	{
+		UGameplayStatics::SpawnSoundAtLocation(this, _onStormCloudSpawn, GetActorLocation());
 	}
 }
 
