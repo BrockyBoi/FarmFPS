@@ -82,6 +82,6 @@ void ABreadStand::OnDayEnd()
 	UBreadRequirementManager* breadRequirementManager = UFarmFPSUtilities::GetBreadRequirementManager(this);
 	if (ensure(IsValid(breadRequirementManager)) && breadRequirementManager->GetHasSoldBreadRequiredForDay())
 	{
-		GetOutputInventory()->MultiplyResource(ResourceTypeTags::Money, _bonusPriceMultiplierOnAllBreadSold.GetModifiedValue(this));
+		GetOutputInventory()->MultiplyResource(ResourceTypeTags::Money, breadRequirementManager->GetBonusMultiplierForBreadSold());
 	}
 }

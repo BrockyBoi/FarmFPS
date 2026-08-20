@@ -28,10 +28,6 @@ class UUnlockActorLocation : public UPurchaseLocation
 {
 	GENERATED_BODY()
 
-public:
-	UFUNCTION(BlueprintPure)
-	AActor* GetNextActorToUnlock() const;
-
 protected:
 	virtual void BeginPlay() override;
 

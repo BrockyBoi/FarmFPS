@@ -81,4 +81,6 @@ void UBreadRequirementManager::RequirementsMet()
 void UBreadRequirementManager::DayFailed()
 {
 	OnDayFailed.Broadcast();
+	_breadRequiredForCurrentDay = 0;
+	_currentBreadSold = 0;
 }

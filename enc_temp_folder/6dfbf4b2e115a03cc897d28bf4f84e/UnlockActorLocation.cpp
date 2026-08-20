@@ -2,22 +2,6 @@
 
 #include "UnlockActorLocation.h"
 
-AActor* UUnlockActorLocation::GetNextActorToUnlock() const
-{
-	if (_unlockActorLocationData.Num() < 0 || _currentPurchaseCount >= _unlockActorLocationData.Num())
-	{
-		return nullptr;
-	}
-
-	const FUnlockActorLocationData& unlockData = _unlockActorLocationData[_currentPurchaseCount];
-	if (unlockData.ActorsInSceneToEnable.Num() <= 0)
-	{
-		return nullptr;
-	}
-
-	return unlockData.ActorsInSceneToEnable[0];
-}
-
 void UUnlockActorLocation::BeginPlay()
 {
 	Super::BeginPlay();

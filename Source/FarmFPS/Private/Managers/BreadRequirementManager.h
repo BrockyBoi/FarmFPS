@@ -23,6 +23,8 @@ public:
 	UBreadRequirementManager();
 
 	void SellBread(int breadAmount = 1);
+	
+	float GetBonusMultiplierForBreadSold() const { return 1 + (_bonusMultiplierPerDaySold.GetModifiedValue(this) * _currentBreadSold); }
 
 	UFUNCTION(BlueprintPure)
 	int GetCurrentBreadSold() const { return _currentBreadSold; }
@@ -59,6 +61,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BreadRequirement", meta = (AllowPrivateAccess = true))
 	FModifiedIntValue _dailyBreadIncreaseAmount = 1;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BreadRequirement", meta = (AllowPrivateAccess = true))
+	FModifiedFloatValue _bonusMultiplierPerDaySold = .1f;
+
 private:
 	UFUNCTION()
 	void OnDayBegin();
@@ -70,6 +75,7 @@ private:
 	void DayFailed();
 
 	int _currentBreadSold = 0;
+	int _consecutiveDaysSoldBreadRequirement = 0;
 	int _breadRequiredForCurrentDay = 0;
 
 	bool _isFirstDay = true;
