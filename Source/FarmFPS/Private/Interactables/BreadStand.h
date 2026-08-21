@@ -15,6 +15,23 @@
 
 class UCustomerQueue;
 
+USTRUCT(BlueprintType)
+struct FBreadPropData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> BreadPropClass;
+
+	UPROPERTY(EditAnywhere)
+	USceneComponent* BreadSpawnLocationComponent;
+
+	UPROPERTY(EditAnywhere)
+	float BreadPropHeight;
+
+	TArray<AActor*> BreadPropsInScene;
+};
+
 UCLASS()
 class ABreadStand : public AInputOutputStationActor
 {
@@ -29,6 +46,12 @@ public:
 
 	void SetIsCurrentlySellingBreadToCustomer(bool isSelling) { _isCurrentlySellingBreadToCustomer = isSelling; }
 	bool GetIsCurrentlySellingBreadToCustomer() const { return _isCurrentlySellingBreadToCustomer; }
+
+	UFUNCTION(BlueprintCallable)
+	FBreadPropData& GetBreadPropData(const FGameplayTag& breadType);
+
+	UFUNCTION(BlueprintCallable)
+	void SetBreadPropDataSpawnLocation(const FGameplayTag& breadType, USceneComponent* sceneComponent);
 
 protected:
 	virtual void BeginPlay() override;
@@ -47,5 +70,10 @@ protected:
 	UPROPERTY(EditAnywhere)
 	FModifiedFloatValue _bonusPriceMultiplierOnAllBreadSold = 2.f;
 
+	UPROPERTY(EditAnywhere)
+	TMap<FGameplayTag, FBreadPropData> _breadPropSpawnDatas;
+
 	bool _isCurrentlySellingBreadToCustomer = false;
+
+	FBreadPropData _emptyData;
 };

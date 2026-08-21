@@ -68,7 +68,12 @@ const FModifiedResourceValue ABreadStand::GetPriceForResource(const FGameplayTag
 
 void ABreadStand::OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, float amount)
 {
-	if (ensure(_breadPropSpawnDatas.Contains(resourceType)))
+	if (_isCurrentlySellingBreadToCustomer)
+	{
+		return;
+	}
+
+	if (_breadPropSpawnDatas.Contains(resourceType))
 	{
 		FBreadPropData& breadPropData = _breadPropSpawnDatas[resourceType];
 		int breadCountDifference = amount - breadPropData.BreadPropsInScene.Num();
@@ -98,11 +103,6 @@ void ABreadStand::OnInputInventoryResourceCountChanged(const FGameplayTag& resou
 				}
 			}
 		}
-	}
-
-	if (_isCurrentlySellingBreadToCustomer)
-	{
-		return;
 	}
 
 	if (ensure(IsValid(_customerQueue)))

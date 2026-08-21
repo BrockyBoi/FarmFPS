@@ -24,7 +24,7 @@ public:
 
 	void SellBread(int breadAmount = 1);
 	
-	float GetBonusMultiplierForBreadSold() const { return 1 + (_bonusMultiplierPerDaySold.GetModifiedValue(this) * _currentBreadSold); }
+	float GetBonusMultiplierForBreadSold() const { return 1 + (_bonusMultiplierPerDaySold.GetModifiedValue(this) * _consecutiveDaysSoldBreadRequirement); }
 
 	UFUNCTION(BlueprintPure)
 	int GetCurrentBreadSold() const { return _currentBreadSold; }
