@@ -3,6 +3,8 @@
 #include "WeatherManager.h"
 
 // Brock
+#include "Managers/DayNightCycleManager.h"
+#include "Managers/FarmFPSUtilities.h"
 #include "StormCloudTarget.h"
 
 UWeatherManager::UWeatherManager()
@@ -14,6 +16,23 @@ UWeatherManager::UWeatherManager()
 void UWeatherManager::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightCycleManager)))
+	{
+		dayNightCycleManager->OnDayBegin.AddUObject(this, &UWeatherManager::OnDayBegin);
+		dayNightCycleManager->OnDayEnd.AddUObject(this, &UWeatherManager::OnDayEnd);
+	}
+}
+
+void UWeatherManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
+	if (IsValid(dayNightCycleManager))
+	{
+		dayNightCycleManager->OnDayBegin.RemoveAll(this);
+		dayNightCycleManager->OnDayEnd.RemoveAll(this);
+	}
 }
 
 void UWeatherManager::CheckIfShouldSpawnStormCloud(float deltaTime)
@@ -30,6 +49,16 @@ void UWeatherManager::CheckIfShouldSpawnStormCloud(float deltaTime)
 	}
 
 	SpawnStormCloud();
+}
+
+void UWeatherManager::OnDayBegin()
+{
+	SetComponentTickEnabled(!FMath::IsNearlyZero(_cloudSpawnChancePerSecond.GetModifiedValue(this)));
+}
+
+void UWeatherManager::OnDayEnd()
+{
+	SetComponentTickEnabled(false);
 }
 
 void UWeatherManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

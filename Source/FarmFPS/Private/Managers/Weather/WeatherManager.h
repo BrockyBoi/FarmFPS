@@ -49,8 +49,12 @@ public:
 	FOnWeatherChangeDynamicEvent OnStormEndedDynamic;
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	void CheckIfShouldSpawnStormCloud(float deltaTime);
+
+	void OnDayBegin();
+	void OnDayEnd();
 	
 	bool _isStormCloudInScene = false;
 
