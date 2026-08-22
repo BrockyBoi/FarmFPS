@@ -8,7 +8,7 @@
 UWeatherManager::UWeatherManager()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	PrimaryComponentTick.bStartWithTickEnabled = false;
+	PrimaryComponentTick.bStartWithTickEnabled = true;
 }
 
 void UWeatherManager::BeginPlay()
@@ -106,7 +106,6 @@ void UWeatherManager::StartStorm(const FGameplayTagContainer& resourceContainer,
 	OnStormStartedDynamic.Broadcast(resourceContainer);
 	_currentStormTime = 0.f;
 	_currentStormIntensity = 0.f;
-	SetComponentTickEnabled(true);
 	if (!isPermanent)
 	{
 		GetWorld()->GetTimerManager().SetTimer(_stormTimerHandle, this, &UWeatherManager::EndStorm, _stormDuration.GetModifiedValue(this), false);
@@ -120,7 +119,6 @@ void UWeatherManager::EndStorm()
 	OnStormEndedDynamic.Broadcast(_currentStormTags);
 	_currentStormIntensity = 0.f;
 	_currentStormTime = 0.f;
-	SetComponentTickEnabled(false);
 
 	_currentStormTags.Reset();
 }

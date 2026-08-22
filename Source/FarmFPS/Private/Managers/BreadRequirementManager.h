@@ -79,4 +79,5 @@ private:
 	int _breadRequiredForCurrentDay = 0;
 
 	bool _isFirstDay = true;
+	bool _metRequirementForDay = false;
 };

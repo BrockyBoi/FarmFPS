@@ -161,6 +161,7 @@ void UDayNightCycleManager::StartDay()
 		if (!IsValid(_musicAudioComponent))
 		{
 			_musicAudioComponent = UGameplayStatics::SpawnSound2D(this, _daytimeMusic);
+			_musicAudioComponent->bAutoDestroy = false;
 		}
 		else
 		{

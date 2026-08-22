@@ -44,7 +44,7 @@ void UBreadRequirementManager::SellBread(int breadAmount)
 {
 	_currentBreadSold += breadAmount;
 	OnBreadSold.Broadcast(_currentBreadSold);
-	if (HasSoldBreadNeeded())
+	if (!_metRequirementForDay && HasSoldBreadNeeded())
 	{
 		RequirementsMet();
 	}
@@ -75,11 +75,14 @@ void UBreadRequirementManager::OnDayEnd()
 
 void UBreadRequirementManager::RequirementsMet()
 {
+	_consecutiveDaysSoldBreadRequirement++;
 	OnRequirementsMet.Broadcast();
+	_metRequirementForDay = true;
 }
 
 void UBreadRequirementManager::DayFailed()
 {
+	_consecutiveDaysSoldBreadRequirement = 0;
 	OnDayFailed.Broadcast();
 	_breadRequiredForCurrentDay = 0;
 	_currentBreadSold = 0;

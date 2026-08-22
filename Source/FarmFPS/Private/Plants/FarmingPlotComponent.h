@@ -26,6 +26,6 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ResourceType."))
+	UPROPERTY(EditAnywhere, meta = (Categories = "ResourceType."))
 	FGameplayTagContainer _allowedSeedTypes;
 };

@@ -74,6 +74,9 @@ protected:
 	float _heatToDestroyBread = 80.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Heat")
+	FModifiedFloatValue _coldHeatSpeedPenalty = 5.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Heat")
 	FModifiedFloatValue _idealHeatSpeedModifier = .5f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Heat")

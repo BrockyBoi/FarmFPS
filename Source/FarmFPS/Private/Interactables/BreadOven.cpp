@@ -19,6 +19,10 @@ float ABreadOven::GetHeatMultipler() const
 	{
 		return _idealHeatSpeedModifier.GetModifiedValue(this);
 	}
+	else if (_ovenHeat < _idealHeatMin)
+	{
+		return _coldHeatSpeedPenalty.GetModifiedValue(this);
+	}
 	return 1.0f;
 }
 
