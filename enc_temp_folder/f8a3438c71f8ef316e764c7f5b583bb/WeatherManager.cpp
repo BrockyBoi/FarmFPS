@@ -23,8 +23,6 @@ void UWeatherManager::BeginPlay()
 		dayNightCycleManager->OnDayBegin.AddUObject(this, &UWeatherManager::OnDayBegin);
 		dayNightCycleManager->OnDayEnd.AddUObject(this, &UWeatherManager::OnDayEnd);
 	}
-
-	SetComponentTickEnabled(true);
 }
 
 void UWeatherManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -55,12 +53,12 @@ void UWeatherManager::CheckIfShouldSpawnStormCloud(float deltaTime)
 
 void UWeatherManager::OnDayBegin()
 {
-	//SetComponentTickEnabled(!FMath::IsNearlyZero(_cloudSpawnChancePerSecond.GetModifiedValue(this)));
+	SetComponentTickEnabled(!FMath::IsNearlyZero(_cloudSpawnChancePerSecond.GetModifiedValue(this)));
 }
 
 void UWeatherManager::OnDayEnd()
 {
-	//SetComponentTickEnabled(false);
+	SetComponentTickEnabled(false);
 }
 
 void UWeatherManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -76,6 +74,10 @@ void UWeatherManager::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	{
 		_currentStormTime += DeltaTime;
 		_currentStormIntensity = FMath::Lerp(0.f, _maxStormIntensity.GetModifiedValue(this), _currentStormTime / _stormRampUpTime);
+		if (_currentStormTime >= _stormRampUpTime)
+		{
+			SetComponentTickEnabled(false);
+		}
 	}
 }
 

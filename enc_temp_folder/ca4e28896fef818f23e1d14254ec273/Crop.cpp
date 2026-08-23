@@ -122,8 +122,6 @@ void ACrop::RemoveFromPool()
 	ListenToWeatherManager(true);
 
 	AffectGrowth();
-
-	CheckShouldTick();
 }
 
 void ACrop::OnPlayerDestroyPlant()
