@@ -308,6 +308,11 @@ void AFarmFPSCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, ui
 	}
 }
 
+void AFarmFPSCharacter::AddForeignMovement(const FVector2D& foreignMovementVector)
+{
+	const FVector vec = FVector(foreignMovementVector.X, foreignMovementVector.Y, 0);
+	AddMovementInput(vec);
+}
 
 void AFarmFPSCharacter::MoveInput(const FInputActionValue& Value)
 {
@@ -316,7 +321,6 @@ void AFarmFPSCharacter::MoveInput(const FInputActionValue& Value)
 
 	// pass the axis values to the move input
 	DoMove(MovementVector.X, MovementVector.Y);
-
 }
 
 void AFarmFPSCharacter::LookInput(const FInputActionValue& Value)
@@ -326,7 +330,6 @@ void AFarmFPSCharacter::LookInput(const FInputActionValue& Value)
 
 	// pass the axis values to the aim input
 	DoAim(LookAxisVector.X, LookAxisVector.Y);
-
 }
 
 void AFarmFPSCharacter::DoShowCropHealth()

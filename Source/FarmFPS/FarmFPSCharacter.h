@@ -76,6 +76,8 @@ public:
 
 	bool IsShowingCropHealth() const { return _isShowingCropHealth; }
 
+	void AddForeignMovement(const FVector2D& foreignMovementVector);
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;

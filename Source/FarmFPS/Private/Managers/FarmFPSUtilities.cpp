@@ -102,7 +102,7 @@ UCustomerSpawnerManager* UFarmFPSUtilities::GetCustomerSpawnerManager(const UObj
 
 UDayNightCycleManager* UFarmFPSUtilities::GetDayNightCycleManager(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
+	if (!ensure(IsValid(WorldContextObject)) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
 		return nullptr;
 	}
