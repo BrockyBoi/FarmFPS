@@ -5,7 +5,7 @@
 // Brock
 #include "PerkData.h"
 #include "PerkManager.h"
-#include "PerkModifierTypeTags.h"
+#include "PerkModifierTypeTag.h"
 
 // FarmFPS
 #include "ShooterCharacter.h"
@@ -42,7 +42,7 @@ void UPlayerPerkModifierHandler::OnPerkLevelChange(const FGameplayTag& perkTag, 
 		return;
 	}
 
-	if (perkTag == PerkModifierTypeTags::PlayerPickupColliderSize)
+	if (perkTag == PerkModifierTypeTag::PlayerPickupColliderSize)
 	{
 		if (ensure(IsValid(_playerPickupCollider)))
 		{

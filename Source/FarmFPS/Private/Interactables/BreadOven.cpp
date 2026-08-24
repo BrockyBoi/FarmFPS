@@ -4,7 +4,7 @@
 
 // Brock
 #include "Projectiles/CropResourceProjectile.h"
-#include "Resources/ResourceTypeTags.h"
+#include "Resources/ResourceTypeTag.h"
 
 ABreadOven::ABreadOven() : Super()
 {
@@ -68,11 +68,11 @@ void ABreadOven::OnFireTargetOverlap(UPrimitiveComponent* OverlappedComponent, A
 	ACropResourceProjectile* cropProjectile = Cast<ACropResourceProjectile>(OtherActor);
 	if (IsValid(cropProjectile))
 	{
-		if (cropProjectile->GetProjectileType() == ResourceTypeTags::Light)
+		if (cropProjectile->GetProjectileType() == ResourceTypeTag::Light)
 		{
 			SetHeatLevel(_ovenHeat + _heatGainOnLight);
 		}
-		else if (cropProjectile->GetProjectileType() == ResourceTypeTags::Water)
+		else if (cropProjectile->GetProjectileType() == ResourceTypeTag::Water)
 		{
 			SetHeatLevel(_ovenHeat - _heatLossOnWater);
 		}

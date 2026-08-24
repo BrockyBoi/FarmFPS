@@ -38,7 +38,7 @@ AGameStateBase* UFarmFPSUtilities::GetGameBaseState(const UObject* WorldContextO
 	}
 
 	AGameStateBase* gameState = WorldContextObject->GetWorld()->GetGameState();
-	if (ensure(IsValid(gameState)))
+	if (IsValid(gameState))
 	{
 		return gameState;
 	}

@@ -6,7 +6,7 @@
 #include "DayNightCycleManager.h"
 #include "FarmFPSUtilities.h"
 #include "PerkManager.h"
-#include "PerkModifierTypeTags.h"
+#include "PerkModifierTypeTag.h"
 
 UTradeOffUpgradeManager::UTradeOffUpgradeManager()
 {
@@ -64,7 +64,7 @@ void UTradeOffUpgradeManager::OnTradeOffAccepted()
 	if (ensure(IsValid(perkManager)))
 	{
 		perkManager->ModifyPerkData(_currentTradeOff.PerkType, _currentTradeOff.PerkData);
-		perkManager->ModifyPerkData(PerkModifierTypeTags::DailyBreadIncreaseAmount, _currentTradeOff.BreadIncreaseAmount);
+		perkManager->ModifyPerkData(PerkModifierTypeTag::DailyBreadIncreaseAmount, _currentTradeOff.BreadIncreaseAmount);
 		_currentTradeOff = FTradeOffData();
 	}
 

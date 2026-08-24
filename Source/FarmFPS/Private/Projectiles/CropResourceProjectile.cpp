@@ -14,7 +14,7 @@
 #include "StatusEffects/ArcResourceToOtherCropOnHit.h"
 #include "StatusEffects/LingeringStatusEffectOnHit.h"
 
-#include "Resources/ResourceTypeTags.h"
+#include "Resources/ResourceTypeTag.h"
 
 ACropResourceProjectile::ACropResourceProjectile() : Super()
 {
@@ -160,7 +160,7 @@ void ACropResourceProjectile::OnComponentOverlap(UPrimitiveComponent* Overlapped
 		}
 
 		UMoonHitBox* moonHitBox = OtherActor->FindComponentByClass<UMoonHitBox>();
-		if (ProjectileType == ResourceTypeTags::Light && IsValid(moonHitBox))
+		if (ProjectileType == ResourceTypeTag::Light && IsValid(moonHitBox))
 		{
 			moonHitBox->HitMoon();
 		}

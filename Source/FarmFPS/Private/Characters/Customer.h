@@ -65,9 +65,6 @@ protected:
 	UFUNCTION()
 	void OnDayEnd();
 
-	UPROPERTY(EditDefaultsOnly, meta = (Categories = "CustomerType."))
-	FGameplayTag _customerType;
-
 	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ResourceType."))
 	FGameplayTag _resourceDesired;
 

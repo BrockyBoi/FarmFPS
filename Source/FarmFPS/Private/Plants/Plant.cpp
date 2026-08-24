@@ -7,7 +7,7 @@
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/Weather/WeatherManager.h"
 #include "Resources/ResourceInventory.h"
-#include "Resources/ResourceTypeTags.h"
+#include "Resources/ResourceTypeTag.h"
 
 APlant::APlant()
 {
@@ -64,7 +64,7 @@ void APlant::AddResource(const FGameplayTag& resourceType, float amount)
 
 	if (ensure(IsValid(_resourcesInventory)))
 	{
-		if (resourceType == ResourceTypeTags::Damage)
+		if (resourceType == ResourceTypeTag::Damage)
 		{
 			DoDamage(amount);
 		}
@@ -129,13 +129,13 @@ void APlant::InitializeInventory()
 	_resourcesInventory = FindComponentByClass<UResourceInventory>();
 	if (ensure(IsValid(_resourcesInventory)))
 	{
-		_resourcesInventory->SetResourceAmount(ResourceTypeTags::Water, 0);
-		_resourcesInventory->SetResourceAmount(ResourceTypeTags::Light, 0);
-		_resourcesInventory->SetResourceAmount(ResourceTypeTags::Love, 0);
+		_resourcesInventory->SetResourceAmount(ResourceTypeTag::Water, 0);
+		_resourcesInventory->SetResourceAmount(ResourceTypeTag::Light, 0);
+		_resourcesInventory->SetResourceAmount(ResourceTypeTag::Love, 0);
 
-		_resourcesInventory->SetResourceCap(ResourceTypeTags::Water, _cropData.WaterNeeded.GetModifiedValue(this));
-		_resourcesInventory->SetResourceCap(ResourceTypeTags::Light, _cropData.LightNeeded.GetModifiedValue(this));
-		_resourcesInventory->SetResourceCap(ResourceTypeTags::Love, _cropData.LoveNeeded.GetModifiedValue(this));
+		_resourcesInventory->SetResourceCap(ResourceTypeTag::Water, _cropData.WaterNeeded.GetModifiedValue(this));
+		_resourcesInventory->SetResourceCap(ResourceTypeTag::Light, _cropData.LightNeeded.GetModifiedValue(this));
+		_resourcesInventory->SetResourceCap(ResourceTypeTag::Love, _cropData.LoveNeeded.GetModifiedValue(this));
 	}
 }
 
@@ -222,17 +222,17 @@ void APlant::OnDayEnd()
 
 float APlant::GetCurrentWaterLevel() const
 {
-	return ensure(IsValid(_resourcesInventory)) ? _resourcesInventory->GetResourceCount(ResourceTypeTags::Water) : 0;
+	return ensure(IsValid(_resourcesInventory)) ? _resourcesInventory->GetResourceCount(ResourceTypeTag::Water) : 0;
 }
 
 float APlant::GetCurrentLightLevel() const
 {
-	return ensure(IsValid(_resourcesInventory)) ? _resourcesInventory->GetResourceCount(ResourceTypeTags::Light) : 0;
+	return ensure(IsValid(_resourcesInventory)) ? _resourcesInventory->GetResourceCount(ResourceTypeTag::Light) : 0;
 }
 
 float APlant::GetCurrentLoveLevel() const
 {
-	return ensure(IsValid(_resourcesInventory)) ? _resourcesInventory->GetResourceCount(ResourceTypeTags::Love) : 0;
+	return ensure(IsValid(_resourcesInventory)) ? _resourcesInventory->GetResourceCount(ResourceTypeTag::Love) : 0;
 }
 
 float APlant::GetCompletionPercentage() const

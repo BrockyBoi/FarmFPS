@@ -7,7 +7,7 @@
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/ObjectiveManager.h"
-#include "Managers/ObjectiveTypeTags.h"
+#include "Managers/ObjectiveTypeTag.h"
 #include "Resources/ResourceInventory.h"
 
 UResourceConverterComponent::UResourceConverterComponent()
@@ -57,7 +57,7 @@ void UResourceConverterComponent::TickComponent(float DeltaTime, ELevelTick Tick
 			UObjectiveManager* objectiveManager = UFarmFPSUtilities::GetObjectiveManager(this);
 			if (ensure(IsValid(objectiveManager)))
 			{
-				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::CraftResource, data.ResourceType, 1);
+				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTag::CraftResource, data.ResourceType, 1);
 			}
 		}
 		_currentCraftingTime = 0.f;
@@ -155,7 +155,7 @@ void UResourceConverterComponent::ConvertLimitedResources(UResourceInventory* in
 			UObjectiveManager* objectiveManager = UFarmFPSUtilities::GetObjectiveManager(this);
 			if (ensure(IsValid(objectiveManager)))
 			{
-				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::CraftResource, outputResourceType, outputCount);
+				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTag::CraftResource, outputResourceType, outputCount);
 			}
 		}
 	}

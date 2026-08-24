@@ -7,12 +7,10 @@
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/PerkManager.h"
-#include "Managers/PerkModifierTypeTags.h"
 #include "Managers/ObjectiveManager.h"
-#include "Managers/ObjectiveTypeTags.h"
+#include "Managers/ObjectiveTypeTag.h"
 #include "Resources/ResourceInventory.h"
 #include "Resources/ResourcePickupActor.h"
-#include "Resources/ResourceTypeTags.h"
 
 // UE
 #include "FarmFPSCharacter.h"
@@ -95,7 +93,7 @@ void ACrop::RemoveFromPool()
 	UObjectiveManager* objectiveManager = UFarmFPSUtilities::GetObjectiveManager(this);
 	if (ensure(IsValid(objectiveManager)))
 	{
-		objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::PlantCrop, _cropData.ResourceType);
+		objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTag::PlantCrop, _cropData.ResourceType);
 	}
 
 	InitializeInventory();
@@ -191,7 +189,7 @@ void ACrop::SpawnResourceActors()
 	UObjectiveManager* objectiveManager = UFarmFPSUtilities::GetObjectiveManager(this);
 	if (ensure(IsValid(objectiveManager)))
 	{
-		objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::FinishCrop, _cropData.ResourceType);
+		objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTag::FinishCrop, _cropData.ResourceType);
 	}
 
 	if (IsValid(_onBreakCropSound))

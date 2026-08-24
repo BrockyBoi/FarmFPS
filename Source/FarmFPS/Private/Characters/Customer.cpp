@@ -10,9 +10,9 @@
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/ObjectiveManager.h"
-#include "Managers/ObjectiveTypeTags.h"
+#include "Managers/ObjectiveTypeTag.h"
 #include "Resources/ResourceInventory.h"
-#include "Resources/ResourceTypeTags.h"
+#include "Resources/ResourceTypeTag.h"
 
 // UE
 #include "GameFramework/CharacterMovementComponent.h"
@@ -163,12 +163,12 @@ void ACustomer::AttemptBuyBreadAtFrontOfQueue()
 			const FModifiedResourceValue priceData = _breadStand->GetPriceForResource(GetResourceDesired());
 			const int price = priceData.ModifiedIntValue.GetModifiedValue(this);
 
-			_breadStand->GetOutputInventory()->AddResource(ResourceTypeTags::Money, _amountDesired * price);
+			_breadStand->GetOutputInventory()->AddResource(ResourceTypeTag::Money, _amountDesired * price);
 
 			UObjectiveManager* objectiveManager = UFarmFPSUtilities::GetObjectiveManager(this);
 			if (ensure(IsValid(objectiveManager)))
 			{
-				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::SellBread, GetResourceDesired(), _amountDesired);
+				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTag::SellBread, GetResourceDesired(), _amountDesired);
 			}
 
 			UBreadRequirementManager* breadRequirementManager = UFarmFPSUtilities::GetBreadRequirementManager(this);

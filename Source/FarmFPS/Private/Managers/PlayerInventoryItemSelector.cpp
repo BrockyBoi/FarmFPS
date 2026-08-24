@@ -4,7 +4,7 @@
 
 // Brock
 #include "Resources/ResourceInventory.h"
-#include "Resources/ResourceTypeTags.h"
+#include "Resources/ResourceTypeTag.h"
 
 UPlayerInventoryItemSelector::UPlayerInventoryItemSelector()
 {
@@ -71,7 +71,7 @@ void UPlayerInventoryItemSelector::SetPlayerInventory(UResourceInventory* player
 
 void UPlayerInventoryItemSelector::OnResourceChanged(const FGameplayTag& resourceType, float newAmount)
 {
-	if (resourceType == ResourceTypeTags::Money)
+	if (resourceType == ResourceTypeTag::Money)
 	{
 		return;
 	}

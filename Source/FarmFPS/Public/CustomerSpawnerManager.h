@@ -14,12 +14,6 @@
 
 class ACustomer;
 
-namespace CustomerTypeTags
-{
-	static const FGameplayTag StandardCustomer = FGameplayTag::RequestGameplayTag(FName("CustomerType.Standard"));
-	static const FGameplayTag GiantCustomer = FGameplayTag::RequestGameplayTag(FName("CustomerType.Giant"));
-}
-
 USTRUCT(BlueprintType)
 struct FCustomerSpawnData
 {
@@ -50,7 +44,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
-	const FGameplayTag& GetNextCustomerTypeToSpawn() const;
+	const FGameplayTag GetNextCustomerTypeToSpawn() const;
 	const TSubclassOf<ACustomer> GetNextCustomerSpawnClass(const FGameplayTag& customerType);
 
 	UFUNCTION()

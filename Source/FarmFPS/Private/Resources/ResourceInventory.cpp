@@ -5,7 +5,7 @@
 // Brock
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
-#include "Resources/ResourceTypeTags.h"
+#include "Resources/ResourceTypeTag.h"
 
 UResourceInventory::UResourceInventory()
 {
@@ -155,7 +155,7 @@ void UResourceInventory::ClearAllExceptMoney()
 	for (auto pair : _resourcesMap)
 	{
 		const FGameplayTag& resourceType = pair.Key;
-		if (!resourceType.MatchesTag(ResourceTypeTags::Money))
+		if (!resourceType.MatchesTag(ResourceTypeTag::Money))
 		{
 			SetResourceAmount(resourceType, 0);
 		}

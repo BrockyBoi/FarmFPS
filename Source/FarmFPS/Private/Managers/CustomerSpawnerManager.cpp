@@ -4,6 +4,7 @@
 
 // Brock
 #include "Characters/Customer.h"
+#include "Characters/CustomerTypeTag.h"
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
 
@@ -57,26 +58,26 @@ void UCustomerSpawnerManager::EndPlay(EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-const FGameplayTag& UCustomerSpawnerManager::GetNextCustomerTypeToSpawn() const
+const FGameplayTag UCustomerSpawnerManager::GetNextCustomerTypeToSpawn() const
 {
 	float randomValue = FMath::RandRange(0.f, 1.f);
 
 	if (_giantCustomerSpawnData.SpawnChance.GetModifiedValue(this) >= randomValue)
 	{
-		return CustomerTypeTags::GiantCustomer;
+		return CustomerTypeTag::GiantCustomer;
 	}
 
-	return CustomerTypeTags::StandardCustomer;
+	return CustomerTypeTag::StandardCustomer;
 }
 
 const TSubclassOf<ACustomer> UCustomerSpawnerManager::GetNextCustomerSpawnClass(const FGameplayTag& customerType)
 {
-	if (customerType.MatchesTag(CustomerTypeTags::GiantCustomer))
+	if (customerType.MatchesTag(CustomerTypeTag::GiantCustomer))
 	{
 		return _giantCustomerSpawnData.CustomerClass;
 	}
 
-	if (customerType.MatchesTag(CustomerTypeTags::StandardCustomer))
+	if (customerType.MatchesTag(CustomerTypeTag::StandardCustomer))
 	{
 		return _defaultCustomerSpawnData.CustomerClass;
 	}

@@ -8,7 +8,7 @@
 #include "Managers/CustomerQueue.h"
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
-#include "Resources/ResourceTypeTags.h"
+#include "Resources/ResourceTypeTag.h"
 
 ABreadStand::ABreadStand() : Super()
 {
@@ -124,6 +124,6 @@ void ABreadStand::OnDayEnd()
 	UBreadRequirementManager* breadRequirementManager = UFarmFPSUtilities::GetBreadRequirementManager(this);
 	if (ensure(IsValid(breadRequirementManager)) && breadRequirementManager->GetHasSoldBreadRequiredForDay())
 	{
-		GetOutputInventory()->MultiplyResource(ResourceTypeTags::Money, breadRequirementManager->GetBonusMultiplierForBreadSold());
+		GetOutputInventory()->MultiplyResource(ResourceTypeTag::Money, breadRequirementManager->GetBonusMultiplierForBreadSold());
 	}
 }

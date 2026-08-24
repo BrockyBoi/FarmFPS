@@ -5,9 +5,9 @@
 // Brock
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/PerkManager.h"
-#include "Managers/PerkModifierTypeTags.h"
+#include "Managers/PerkModifierTypeTag.h"
 #include "Resources/ResourceInventory.h"
-#include "Resources/ResourceTypeTags.h"
+#include "Resources/ResourceTypeTag.h"
 
 UPurchaseLocation::UPurchaseLocation()
 {
@@ -20,14 +20,14 @@ void UPurchaseLocation::BeginPlay()
 
 	if (ensure(IsValid(_overlappingComponent)))
 	{
-		_overlappingComponent->OnComponentBeginOverlap.AddDynamic(this, &UPurchaseLocation::OnComponentOverlap);
+		_overlappingComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnComponentOverlap);
 	}
 
 	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycle)))
 	{
-		dayNightCycle->OnDayBegin.AddUObject(this, &UPurchaseLocation::OnDayBegin);
-		dayNightCycle->OnDayEnd.AddUObject(this, &UPurchaseLocation::OnDayEnd);
+		dayNightCycle->OnDayBegin.AddUObject(this, &ThisClass::OnDayBegin);
+		dayNightCycle->OnDayEnd.AddUObject(this, &ThisClass::OnDayEnd);
 	}
 }
 
@@ -36,6 +36,13 @@ void UPurchaseLocation::EndPlay(const EEndPlayReason::Type endPlayReason)
 	if (IsValid(_overlappingComponent))
 	{
 		_overlappingComponent->OnComponentBeginOverlap.RemoveAll(this);
+	}
+
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
+	if (IsValid(dayNightCycle))
+	{
+		dayNightCycle->OnDayBegin.RemoveAll(this);
+		dayNightCycle->OnDayEnd.RemoveAll(this);
 	}
 
 	Super::EndPlay(endPlayReason);
@@ -90,10 +97,10 @@ bool UPurchaseLocation::AttemptPurchase(UPerkManager* perkManager, UResourceInve
 {
 	if (ensure(IsValid(perkManager)) && ensure(IsValid(inventory)) && _canPurchase)
 	{
-		float moneyNeeded = perkManager->ModifyValueByPerks(PerkModifierTypeTags::MoneyNeededForUpgrades, _purchaseCost);
-		if (inventory->HasResourceAmount(ResourceTypeTags::Money, moneyNeeded))
+		float moneyNeeded = perkManager->ModifyValueByPerks(PerkModifierTypeTag::MoneyNeededForUpgrades, _purchaseCost);
+		if (inventory->HasResourceAmount(ResourceTypeTag::Money, moneyNeeded))
 		{
-			inventory->RemoveResource(ResourceTypeTags::Money, moneyNeeded);
+			inventory->RemoveResource(ResourceTypeTag::Money, moneyNeeded);
 			OnPurchaseSuccess(perkManager, inventory);
 			return true;
 		}

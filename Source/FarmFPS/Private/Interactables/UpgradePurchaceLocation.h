@@ -7,8 +7,6 @@
 #include "PurchaseLocation.h"
 
 // UE
-#include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
 #include "GameplayTagContainer.h"
 
 // Generated

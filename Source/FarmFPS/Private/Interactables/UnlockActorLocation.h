@@ -5,9 +5,6 @@
 // Brock
 #include "PurchaseLocation.h"
 
-// UE 
-#include "CoreMinimal.h"
-
 // Generated
 #include "UnlockActorLocation.generated.h"
 

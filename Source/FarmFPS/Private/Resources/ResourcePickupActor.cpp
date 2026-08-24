@@ -11,7 +11,7 @@
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/ObjectiveManager.h"
-#include "Managers/ObjectiveTypeTags.h"
+#include "Managers/ObjectiveTypeTag.h"
 #include "Resources/ResourceInventory.h"
 
 // UE
@@ -222,7 +222,7 @@ void AResourcePickupActor::AddResourcesToInventory(UResourceInventory* inventory
 		UObjectiveManager* objectiveManager = UFarmFPSUtilities::GetObjectiveManager(this);
 		if (ensure(IsValid(objectiveManager)))
 		{
-			objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTags::CollectResource, _resourceType, _resourceAmount);
+			objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTag::CollectResource, _resourceType, _resourceAmount);
 		}
 	}
 }

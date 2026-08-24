@@ -12,7 +12,7 @@
 // Generated
 #include "PurchaseLocation.generated.h"
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS()
 class UPurchaseLocation : public UActorComponent
 {
 	GENERATED_BODY()

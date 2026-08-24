@@ -13,7 +13,7 @@
 #include "Managers/PlayerInventoryItemSelector.h"
 #include "Resources/ResourcePickupActor.h"
 #include "Resources/ResourceInventory.h"
-#include "Resources/ResourceTypeTags.h"
+#include "Resources/ResourceTypeTag.h"
 
 // UE
 #include "Animation/AnimInstance.h"
@@ -385,7 +385,7 @@ void AFarmFPSCharacter::ThrowInventoryItem()
 	if (ensure(IsValid(_itemSelector)) && ensure(IsValid(_inventory)))
 	{
 		FGameplayTag currentResource = _itemSelector->GetCurrentSelectedItemType();
-		if (currentResource != ResourceTypeTags::None && _inventory->HasResourceAmount(currentResource, 1))
+		if (currentResource != ResourceTypeTag::None && _inventory->HasResourceAmount(currentResource, 1))
 		{
 			_inventory->RemoveResource(currentResource, 1);
 			UActorPool* pool = UFarmFPSUtilities::GetActorPool(this);

@@ -39,7 +39,7 @@ void UWeatherManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void UWeatherManager::CheckIfShouldSpawnStormCloud(float deltaTime)
 {
-	if (_isStormCloudInScene)
+	if (_isStormCloudInScene || FMath::IsNearlyZero(_cloudSpawnChancePerSecond.GetModifiedValue(this)))
 	{
 		return;
 	}
