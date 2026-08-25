@@ -118,9 +118,9 @@ bool UResourceInventory::HasResourceAmount(const FGameplayTag& resourceType, flo
 	return FMath::IsNearlyEqual(currentAmount, amount) || currentAmount > amount;
 }
 
-uint16 UResourceInventory::GetResourceCap(const FGameplayTag& resourceType) const
+float UResourceInventory::GetResourceCap(const FGameplayTag& resourceType) const
 {
-	const float resourceCap = _resourceCaps.FindOrAdd(resourceType, 0.f);
+	const float& resourceCap = _resourceCaps.FindOrAdd(resourceType, 0.f);
 	return resourceCap > 0 ? resourceCap : _defaultResourceCap;
 }
 

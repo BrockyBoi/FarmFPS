@@ -5,30 +5,30 @@
 namespace PerkModifierTypeTag
 {
 	// Base Player Movement
-	UE_DEFINE_GAMEPLAY_TAG(JumpCount, "PerkModifierType.JumpCount");
-	UE_DEFINE_GAMEPLAY_TAG(JumpHeight, "PerkModifierType.JumpHeight");
-	UE_DEFINE_GAMEPLAY_TAG(MoveSpeed, "PerkModifierType.MoveSpeed");
+	UE_DEFINE_GAMEPLAY_TAG(JumpCount, "PerkModifier.JumpCount");
+	UE_DEFINE_GAMEPLAY_TAG(JumpHeight, "PerkModifier.JumpHeight");
+	UE_DEFINE_GAMEPLAY_TAG(MoveSpeed, "PerkModifier.MoveSpeed");
 
 	// Player Components
-	UE_DEFINE_GAMEPLAY_TAG(PlayerPickupColliderSize, "PerkModifierType.PlayerPickupColliderSize");
+	UE_DEFINE_GAMEPLAY_TAG(PlayerPickupColliderSize, "PerkModifier.PlayerPickupColliderSize");
 
 	// Weapon Modifiers
-	UE_DEFINE_GAMEPLAY_TAG(FireRate, "PerkModifierType.FireRate");
+	UE_DEFINE_GAMEPLAY_TAG(FireRate, "PerkModifier.FireRate");
 
 	// Resource Modifiers
-	UE_DEFINE_GAMEPLAY_TAG(BreadPrice, "PerkModifierType.BreadPrice");
-	UE_DEFINE_GAMEPLAY_TAG(LightEfficacy, "PerkModifierType.LightEfficacy");
-	UE_DEFINE_GAMEPLAY_TAG(MoreCropYield, "PerkModifierType.MoreCropYield");
-	UE_DEFINE_GAMEPLAY_TAG(WaterEfficacy, "PerkModifierType.WaterEfficacy");
-	UE_DEFINE_GAMEPLAY_TAG(WheatNeededForBread, "PerkModifierType.WheatNeededForBread");
+	UE_DEFINE_GAMEPLAY_TAG(BreadPrice, "PerkModifier.BreadPrice");
+	UE_DEFINE_GAMEPLAY_TAG(LightEfficacy, "PerkModifier.LightEfficacy");
+	UE_DEFINE_GAMEPLAY_TAG(MoreCropYield, "PerkModifier.MoreCropYield");
+	UE_DEFINE_GAMEPLAY_TAG(WaterEfficacy, "PerkModifier.WaterEfficacy");
+	UE_DEFINE_GAMEPLAY_TAG(WheatNeededForBread, "PerkModifier.WheatNeededForBread");
 
 	// Money Related
-	UE_DEFINE_GAMEPLAY_TAG(MoneyNeededForUpgrades, "PerkModifierType.MoneyNeededForUpgrades");
+	UE_DEFINE_GAMEPLAY_TAG(MoneyNeededForUpgrades, "PerkModifier.MoneyNeededForUpgrades");
 
 	// Customers
-	UE_DEFINE_GAMEPLAY_TAG(CustomerSpawnRateIncrease, "PerkModifierType.CustomerSpawnRateIncrease");
-	UE_DEFINE_GAMEPLAY_TAG(MaxCustomerCount, "PerkModifierType.MaxCustomerCount");
+	UE_DEFINE_GAMEPLAY_TAG(CustomerSpawnRateIncrease, "PerkModifier.CustomerSpawnRateIncrease");
+	UE_DEFINE_GAMEPLAY_TAG(MaxCustomerCount, "PerkModifier.MaxCustomerCount");
 
 	// Bread Related
-	UE_DEFINE_GAMEPLAY_TAG(DailyBreadIncreaseAmount, "PerkModifierType.DailyBreadIncreaseAmount");
+	UE_DEFINE_GAMEPLAY_TAG(DailyBreadIncreaseAmount, "PerkModifier.DailyBreadIncreaseAmount");
 }

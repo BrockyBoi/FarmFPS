@@ -49,7 +49,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool HasResourceAmount(const FGameplayTag& resourceType, float amount) const;
 
-	uint16 GetResourceCap(const FGameplayTag& resourceType) const;
+	float GetResourceCap(const FGameplayTag& resourceType) const;
 	bool IsResourceFull(const FGameplayTag& resourceType) const;
 
 	void ClearAllExceptMoney();

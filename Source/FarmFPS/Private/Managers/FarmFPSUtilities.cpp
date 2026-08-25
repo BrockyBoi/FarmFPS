@@ -58,7 +58,7 @@ UPerkManager* UFarmFPSUtilities::GetPlayerPerkManager(const UObject* WorldContex
 
 UObjectiveManager* UFarmFPSUtilities::GetObjectiveManager(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
+	if (!ensure(IsValid(WorldContextObject)) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
 		return nullptr;
 	}
@@ -86,7 +86,7 @@ ABreadStand* UFarmFPSUtilities::GetBreadStand(const UObject* WorldContextObject)
 
 UCustomerSpawnerManager* UFarmFPSUtilities::GetCustomerSpawnerManager(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
+	if (!ensure(IsValid(WorldContextObject)) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
 		return nullptr;
 	}
@@ -118,7 +118,7 @@ UDayNightCycleManager* UFarmFPSUtilities::GetDayNightCycleManager(const UObject*
 
 UActorLookupComponent* UFarmFPSUtilities::GetResourceActorLookupComponent(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
+	if (!ensure(IsValid(WorldContextObject)) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
 		return nullptr;
 	}
@@ -134,7 +134,7 @@ UActorLookupComponent* UFarmFPSUtilities::GetResourceActorLookupComponent(const 
 
 UActorPool* UFarmFPSUtilities::GetActorPool(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
+	if (!ensure(IsValid(WorldContextObject)) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
 		return nullptr;
 	}
@@ -150,7 +150,7 @@ UActorPool* UFarmFPSUtilities::GetActorPool(const UObject* WorldContextObject)
 
 UBreadRequirementManager* UFarmFPSUtilities::GetBreadRequirementManager(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
+	if (!ensure(IsValid(WorldContextObject)) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
 		return nullptr;
 	}
@@ -166,7 +166,7 @@ UBreadRequirementManager* UFarmFPSUtilities::GetBreadRequirementManager(const UO
 
 UTradeOffUpgradeManager* UFarmFPSUtilities::GetTradeOffUpgradeManager(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
+	if (!ensure(IsValid(WorldContextObject)) || !(IsValid(GetGameBaseState(WorldContextObject))))
 	{
 		return nullptr;
 	}
@@ -182,7 +182,7 @@ UTradeOffUpgradeManager* UFarmFPSUtilities::GetTradeOffUpgradeManager(const UObj
 
 UEffectManager* UFarmFPSUtilities::GetEffectManager(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
+	if (!ensure(IsValid(WorldContextObject)) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
 		return nullptr;
 	}
@@ -198,7 +198,7 @@ UEffectManager* UFarmFPSUtilities::GetEffectManager(const UObject* WorldContextO
 
 UWeatherManager* UFarmFPSUtilities::GetWeatherManager(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(GetGameBaseState(WorldContextObject))))
+	if (!ensure(IsValid(WorldContextObject)) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
 		return nullptr;
 	}

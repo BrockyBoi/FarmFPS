@@ -6,11 +6,11 @@ namespace ResourceTypeTag
 {
 	UE_DEFINE_GAMEPLAY_TAG(None, "None");
 
-	UE_DEFINE_GAMEPLAY_TAG(Bread, "ResourceTypeTag.Bread");
-	UE_DEFINE_GAMEPLAY_TAG(Wheat, "ResourceTypeTag.Wheat");
-	UE_DEFINE_GAMEPLAY_TAG(WaterMelon, "ResourceTypeTag.WaterMelon");
-	UE_DEFINE_GAMEPLAY_TAG(SunFlower, "ResourceTypeTag.SunFlower");
-	UE_DEFINE_GAMEPLAY_TAG(Money, "ResourceTypeTag.Money");
+	UE_DEFINE_GAMEPLAY_TAG(Bread, "ResourceType.Bread");
+	UE_DEFINE_GAMEPLAY_TAG(Wheat, "ResourceType.Wheat");
+	UE_DEFINE_GAMEPLAY_TAG(WaterMelon, "ResourceType.WaterMelon");
+	UE_DEFINE_GAMEPLAY_TAG(SunFlower, "ResourceType.SunFlower");
+	UE_DEFINE_GAMEPLAY_TAG(Money, "ResourceType.Money");
 
 	UE_DEFINE_GAMEPLAY_TAG(Water, "CropResourceType.Water");
 	UE_DEFINE_GAMEPLAY_TAG(Light, "CropResourceType.Light");
