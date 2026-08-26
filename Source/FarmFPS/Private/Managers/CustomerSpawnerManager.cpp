@@ -7,10 +7,12 @@
 #include "Characters/CustomerTypeTag.h"
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
+#include "Resources/ResourceTypeTag.h"
 
 UCustomerSpawnerManager::UCustomerSpawnerManager()
 {
 	PrimaryComponentTick.bCanEverTick = false;
+	_allowedBreadTypesDesired.AddTag(ResourceTypeTag::Bread);
 }
 
 bool UCustomerSpawnerManager::IsRoomForNewCustomer() const

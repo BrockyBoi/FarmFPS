@@ -225,6 +225,7 @@ void AFarmFPSCharacter::OnPerkLevelDataChanged(const FGameplayTag& perkType, con
 	GetCharacterMovement()->JumpZVelocity = _startingJumpHeight + _extraJumpHeight.GetModifiedValue(this);
 	GetCharacterMovement()->MaxWalkSpeed =  _startingMovementSpeed * _movementSpeedMultiplier.GetModifiedValue(this);
 	_meleeCollider->SetBoxExtent(_meleeColliderBounds + FVector(_meleeScale.GetModifiedValue(this)));
+	_resourcePickupCollider->SetSphereRadius(_defaultPickupColliderRadius.GetModifiedValue(this));
 }
 
 void AFarmFPSCharacter::OnGroundSlamComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

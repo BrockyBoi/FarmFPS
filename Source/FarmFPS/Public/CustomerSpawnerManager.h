@@ -68,6 +68,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Customer Types")
 	FCustomerSpawnData _giantCustomerSpawnData;
 
+	UPROPERTY(EditAnywhere)
+	FGameplayTagContainer _allowedBreadTypesDesired;
+
 	int _currentCustomersOnScreen = 0;
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite)

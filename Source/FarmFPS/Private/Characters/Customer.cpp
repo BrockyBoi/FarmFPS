@@ -154,21 +154,26 @@ void ACustomer::AttemptBuyBreadAtFrontOfQueue()
 	UResourceInventory* breadInventory = _breadStand->GetInputInventory();
 	if (ensure(IsValid(breadInventory)))
 	{
-		if (breadInventory->HasResourceAmount(GetResourceDesired(), _amountDesired))
+		for (const FGameplayTag& breadDesired : GetResourcesDesired())
 		{
+			if (!breadInventory->HasResourceAmount(breadDesired, _amountDesired))
+			{
+				continue;
+			}
+
 			_breadStand->SetIsCurrentlySellingBreadToCustomer(true);
-			breadInventory->RemoveResource(GetResourceDesired(), _amountDesired);
+			breadInventory->RemoveResource(breadDesired, _amountDesired);
 			_breadStand->SetIsCurrentlySellingBreadToCustomer(false);
 
-			const FModifiedResourceValue priceData = _breadStand->GetPriceForResource(GetResourceDesired());
-			const int price = priceData.ModifiedIntValue.GetModifiedValue(this);
+			const FModifiedResourceValue priceData = _breadStand->GetPriceForResource(breadDesired);
+			const int price = priceData.ModifiedIntValue.GetModifiedValue(this) * _bonusMoneyValue.GetModifiedValue(this);
 
 			_breadStand->GetOutputInventory()->AddResource(ResourceTypeTag::Money, _amountDesired * price);
 
 			UObjectiveManager* objectiveManager = UFarmFPSUtilities::GetObjectiveManager(this);
 			if (ensure(IsValid(objectiveManager)))
 			{
-				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTag::SellBread, GetResourceDesired(), _amountDesired);
+				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTag::SellBread, breadDesired, _amountDesired);
 			}
 
 			UBreadRequirementManager* breadRequirementManager = UFarmFPSUtilities::GetBreadRequirementManager(this);

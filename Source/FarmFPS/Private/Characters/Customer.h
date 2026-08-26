@@ -41,7 +41,7 @@ public:
 	void MoveOutOfMap();
 
 	UFUNCTION(BlueprintPure)
-	const FGameplayTag& GetResourceDesired() const { return _resourceDesired; }
+	const FGameplayTagContainer& GetResourcesDesired() const { return _resourcesDesired; }
 
 	UFUNCTION(BlueprintPure)
 	const int GetAmountDesired() const { return _amountDesired; }
@@ -65,8 +65,14 @@ protected:
 	UFUNCTION()
 	void OnDayEnd();
 
+	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
+	void Cosmetic_SetBreadDesiredUI();
+
 	UPROPERTY(EditDefaultsOnly, meta = (Categories = "ResourceType."))
-	FGameplayTag _resourceDesired;
+	FGameplayTagContainer _resourcesDesired;
+
+	UPROPERTY(EditDefaultsOnly)
+	FModifiedFloatValue _bonusMoneyValue = 1.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _onBoughtBreadSound;
