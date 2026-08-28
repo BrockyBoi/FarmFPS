@@ -65,7 +65,7 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 	{
 		_timeElapsed += DeltaTime;
 		float dayLength = _dayLength.GetModifiedValue(this);
-		float lerpedPitch = FMath::Lerp(0.f, 180.f, _timeElapsed / dayLength) + 180.f;
+		float lerpedPitch = FMath::Lerp(0.f, _finalDayAngle, _timeElapsed / dayLength) + 180.f;
 
 		FRotator rotation(lerpedPitch, 0.f, 0.f);
 		_sunLight->SetActorRotation(rotation);
@@ -123,6 +123,16 @@ void UDayNightCycleManager::TransitionToNextDay()
 	_currentDayState = EDayState::NightTransitionToDay;
 }
 
+float UDayNightCycleManager::GetPercentageDayElapsed() const
+{
+	if (_currentDayState == EDayState::Day)
+	{
+		return _timeElapsed / _dayLength.GetModifiedValue(this);
+	}
+
+	return 0.0f;
+}
+
 void UDayNightCycleManager::CHEAT_StartDay()
 {
 	if (GetCurrentDayState() == EDayState::MidNight)
@@ -176,7 +186,10 @@ void UDayNightCycleManager::StartDay()
 
 void UDayNightCycleManager::EndDay()
 {
-	_musicAudioComponent->FadeOut(2.f, 0.f);
+	if (ensure(IsValid(_musicAudioComponent)))
+	{
+		_musicAudioComponent->FadeOut(2.f, 0.f);
+	}
 
 	_currentDayState = EDayState::MidNight;
 	if (OnDayEnd.IsBound())

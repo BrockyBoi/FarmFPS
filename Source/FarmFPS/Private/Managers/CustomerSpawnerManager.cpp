@@ -25,6 +25,34 @@ bool UCustomerSpawnerManager::IsSpawnTimerActive() const
 	return ensure(IsValid(GetWorld())) ? GetWorld()->GetTimerManager().IsTimerActive(_spawnTimer) : false;
 }
 
+void UCustomerSpawnerManager::SpawnCustomer_CHEAT()
+{
+	TSubclassOf<ACustomer> customerClass = GetNextCustomerSpawnClass(CustomerTypeTag::StandardCustomer);
+	if (ensure(IsValid(customerClass)))
+	{
+		FActorSpawnParameters spawnParams;
+		ACustomer* customer = GetWorld()->SpawnActor<ACustomer>(customerClass, _customerSpawnPoint, FRotator::ZeroRotator, spawnParams);
+		if (ensure(IsValid(customer)))
+		{
+			_currentCustomersOnScreen++;
+		}
+	}
+}
+
+void UCustomerSpawnerManager::SpawnGiantCustomer_CHEAT()
+{
+	TSubclassOf<ACustomer> customerClass = GetNextCustomerSpawnClass(CustomerTypeTag::GiantCustomer);
+	if (ensure(IsValid(customerClass)))
+	{
+		FActorSpawnParameters spawnParams;
+		ACustomer* customer = GetWorld()->SpawnActor<ACustomer>(customerClass, _customerSpawnPoint, FRotator::ZeroRotator, spawnParams);
+		if (ensure(IsValid(customer)))
+		{
+			_currentCustomersOnScreen++;
+		}
+	}
+}
+
 void UCustomerSpawnerManager::OnCustomerLeaveMap()
 {
 	bool wasRoomForNewCustomer = IsRoomForNewCustomer();

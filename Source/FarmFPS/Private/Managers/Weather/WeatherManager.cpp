@@ -39,7 +39,8 @@ void UWeatherManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void UWeatherManager::CheckIfShouldSpawnStormCloud(float deltaTime)
 {
-	if (_isStormCloudInScene || FMath::IsNearlyZero(_cloudSpawnChancePerSecond.GetModifiedValue(this)))
+	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
+	if (_isStormCloudInScene || FMath::IsNearlyZero(_cloudSpawnChancePerSecond.GetModifiedValue(this)) && (IsValid(dayNightCycleManager) && dayNightCycleManager->IsDay()))
 	{
 		return;
 	}

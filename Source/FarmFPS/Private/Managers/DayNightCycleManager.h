@@ -37,6 +37,9 @@ public:
 
 	void TransitionToNextDay();
 
+	UFUNCTION(BlueprintPure)
+	float GetPercentageDayElapsed() const;
+
 	void CHEAT_StartDay();
 	void CHEAT_StartNight();
 
@@ -65,6 +68,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	float _timeUntilAutoStartNextDay = 10.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float _finalDayAngle = 220.f;
 
 	UPROPERTY(EditDefaultsOnly)
 	TWeakObjectPtr<ADirectionalLight> _sunLight = nullptr;

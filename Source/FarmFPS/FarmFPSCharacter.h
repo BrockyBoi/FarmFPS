@@ -59,6 +59,15 @@ public:
 	UFUNCTION(Exec)
 	void SpawnStormCloudBrock();
 
+	UFUNCTION(Exec)
+	void ResetToSpawnLocationBrock();
+
+	UFUNCTION(Exec)
+	void SpawnCustomerBrock();
+
+	UFUNCTION(Exec)
+	void SpawnGiantCustomerBrock();
+
 	bool IsPickupInRangeOfPlayer(AResourcePickupActor* pickup) const;
 
 	/** Returns the first person mesh **/
@@ -320,5 +329,7 @@ protected:
 
 	bool _startedGroundSlam = false;
 	bool _isShowingCropHealth = false;
+
+	FVector _spawnLocation = FVector::ZeroVector;
 };
 

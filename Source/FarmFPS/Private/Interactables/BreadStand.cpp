@@ -3,6 +3,7 @@
 #include "BreadStand.h"
 
 // Brock
+#include "FarmFPSCharacter.h"
 #include "Characters/Customer.h"
 #include "Managers/BreadRequirementManager.h"
 #include "Managers/CustomerQueue.h"
@@ -125,5 +126,11 @@ void ABreadStand::OnDayEnd()
 	if (ensure(IsValid(breadRequirementManager)) && breadRequirementManager->GetHasSoldBreadRequiredForDay())
 	{
 		GetOutputInventory()->MultiplyResource(ResourceTypeTag::Money, breadRequirementManager->GetBonusMultiplierForBreadSold());
+	}
+
+	AFarmFPSCharacter* player = Cast<AFarmFPSCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));
+	if (ensure(IsValid(player)) && ensure(IsValid(player->GetResourceInventory())))
+	{
+		player->GetResourceInventory()->AddAllResourcesInInventory(GetOutputInventory());
 	}
 }

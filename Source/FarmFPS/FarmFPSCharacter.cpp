@@ -3,14 +3,15 @@
 #include "FarmFPSCharacter.h"
 
 // Brock
+#include "CustomerSpawnerManager.h"
 #include "Managers/ActorPool.h"
 #include "Managers/DayNightCycleManager.h"
-#include "Projectiles/ConstantCropAffectorArea.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/PerkManager.h"
 #include "Managers/Weather/WeatherManager.h"
-#include "Plants/Plant.h"
 #include "Managers/PlayerInventoryItemSelector.h"
+#include "Plants/Plant.h"
+#include "Projectiles/ConstantCropAffectorArea.h"
 #include "Resources/ResourcePickupActor.h"
 #include "Resources/ResourceInventory.h"
 #include "Resources/ResourceTypeTag.h"
@@ -118,6 +119,29 @@ void AFarmFPSCharacter::SpawnStormCloudBrock()
 	}
 }
 
+void AFarmFPSCharacter::ResetToSpawnLocationBrock()
+{
+	SetActorLocation(_spawnLocation);
+}
+
+void AFarmFPSCharacter::SpawnCustomerBrock()
+{
+	UCustomerSpawnerManager* customerSpawner = UFarmFPSUtilities::GetCustomerSpawnerManager(this);
+	if (ensure(IsValid(customerSpawner)))
+	{
+		customerSpawner->SpawnCustomer_CHEAT();
+	}
+}
+
+void AFarmFPSCharacter::SpawnGiantCustomerBrock()
+{
+	UCustomerSpawnerManager* customerSpawner = UFarmFPSUtilities::GetCustomerSpawnerManager(this);
+	if (ensure(IsValid(customerSpawner)))
+	{
+		customerSpawner->SpawnGiantCustomer_CHEAT();
+	}
+}
+
 bool AFarmFPSCharacter::IsPickupInRangeOfPlayer(AResourcePickupActor* pickup) const
 {
 	if (ensure(IsValid(pickup)))
@@ -169,6 +193,8 @@ void AFarmFPSCharacter::BeginPlay()
 	_resourcePickupCollider->OnComponentBeginOverlap.AddDynamic(this, &AFarmFPSCharacter::OnResourcePickupOverlap);
 
 	LandedDelegate.AddDynamic(this, &AFarmFPSCharacter::OnPlayerLanded);
+
+	_spawnLocation = GetActorLocation();
 }
 
 void AFarmFPSCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
