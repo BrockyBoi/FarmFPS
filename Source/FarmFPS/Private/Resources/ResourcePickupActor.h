@@ -13,6 +13,8 @@
 // Generated
 #include "ResourcePickupActor.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnCollected, const FGameplayTag&);
+
 class APawn;
 class UCapsuleComponent;
 class UResourceInventory;
@@ -34,6 +36,8 @@ public:
 	const FGameplayTag& GetResourceType() const { return _resourceType; }
 
 	bool AttemptMoveToActor(AActor* actor, UResourceInventory* actorInventory, const FVector& customEndLocation = FVector::ZeroVector);
+
+	static FOnCollected OnCollected;
 
 protected:
 	virtual void BeginPlay() override;

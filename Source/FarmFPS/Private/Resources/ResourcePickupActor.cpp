@@ -19,6 +19,8 @@
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+FOnCollected AResourcePickupActor::OnCollected;
+
 AResourcePickupActor::AResourcePickupActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -59,6 +61,8 @@ void AResourcePickupActor::Tick(float DeltaTime)
 			{
 				UGameplayStatics::SpawnSoundAtLocation(this, _onCollectResourceSound, GetActorLocation());
 			}
+
+			OnCollected.Broadcast(_resourceType);
 		}
 	}
 	else

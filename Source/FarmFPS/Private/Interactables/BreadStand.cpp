@@ -11,6 +11,8 @@
 #include "Managers/FarmFPSUtilities.h"
 #include "Resources/ResourceTypeTag.h"
 
+FOnBreadAddedToStand ABreadStand::OnBreadAddedToStand;
+
 ABreadStand::ABreadStand() : Super()
 {
 	_customerQueue = CreateDefaultSubobject<UCustomerQueue>("CustomerQueue");
@@ -84,6 +86,8 @@ void ABreadStand::OnInputInventoryResourceCountChanged(const FGameplayTag& resou
 					breadPropData.BreadPropsInScene.Add(breadProp);
 				}
 			}
+
+			OnBreadAddedToStand.Broadcast();
 		}
 		else if (breadCountDifference < 0)
 		{

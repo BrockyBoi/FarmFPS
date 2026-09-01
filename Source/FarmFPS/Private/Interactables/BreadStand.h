@@ -32,6 +32,8 @@ struct FBreadPropData
 	TArray<AActor*> BreadPropsInScene;
 };
 
+DECLARE_MULTICAST_DELEGATE(FOnBreadAddedToStand);
+
 UCLASS()
 class ABreadStand : public AInputOutputStationActor
 {
@@ -52,6 +54,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetBreadPropDataSpawnLocation(const FGameplayTag& breadType, USceneComponent* sceneComponent);
+
+	static FOnBreadAddedToStand OnBreadAddedToStand;
 
 protected:
 	virtual void BeginPlay() override;

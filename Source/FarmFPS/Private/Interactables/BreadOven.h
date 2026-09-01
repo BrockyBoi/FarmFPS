@@ -13,6 +13,8 @@
 // Generated
 #include "BreadOven.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnIngreientAddedToOven, const FGameplayTag&);
+
 UCLASS()
 class ABreadOven : public AResourceConverterStationActor
 {
@@ -36,10 +38,14 @@ public:
 	DECLARE_MULTICAST_DELEGATE_OneParam(FOnOvenHeatChanged, float);
 	FOnOvenHeatChanged OnOvenHeatChanged;
 
+	static FOnIngreientAddedToOven OnIngredientAddedToOven;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
+
+	virtual void OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, float amount) override;
 
 	UFUNCTION()
 	void OnFireTargetOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

@@ -18,6 +18,8 @@ class USkeletalMeshComponent;
 class UAnimMontage;
 class UAnimInstance;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnWeaponCollected, const FGameplayTag&)
+
 /**
  *  Base class for a simple first person shooter weapon
  *  Provides both first person and third person perspective meshes
@@ -79,6 +81,8 @@ public:
 
 	/** Returns the current bullet count */
 	int32 GetBulletCount() const { return CurrentBullets; }
+
+	static FOnWeaponCollected OnWeaponCollected;
 
 protected:
 	

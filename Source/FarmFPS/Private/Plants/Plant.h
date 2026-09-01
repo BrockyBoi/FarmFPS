@@ -13,6 +13,8 @@
 // Generated
 #include "Plant.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnFullyGrown)
+
 class UWeatherManager;
 
 UCLASS()
@@ -67,6 +69,8 @@ public:
 
 	DECLARE_MULTICAST_DELEGATE_OneParam(FOnResourceFullEvent, const FGameplayTag&);
 	FOnResourceFullEvent OnPlantResourceFull;
+
+	static FOnFullyGrown OnFullyGrown;
 
 protected:
 	virtual void BeginPlay() override;

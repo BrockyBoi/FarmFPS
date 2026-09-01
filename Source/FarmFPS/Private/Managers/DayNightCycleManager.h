@@ -12,6 +12,7 @@
 // Generated
 #include "DayNightCycleManager.generated.h"
 
+UENUM()
 enum class EDayState : uint8
 {
 	WaitingForTradeOff,
@@ -21,6 +22,8 @@ enum class EDayState : uint8
 };
 
 class ADirectionalLight;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FStaticOnDayStateChange, EDayState);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UDayNightCycleManager : public UActorComponent
@@ -49,6 +52,8 @@ public:
 	FOnDayStateChange OnDayEnd;
 	FOnDayStateChange OnWaitingForTradeOff;
 
+	static FStaticOnDayStateChange OnDayStateChange;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -57,6 +62,8 @@ private:
 	UFUNCTION()
 	void StartDay();
 	void EndDay();
+
+	void SetDayState(EDayState newDayState);
 
 	void GenerateDailyTradeOff();
 

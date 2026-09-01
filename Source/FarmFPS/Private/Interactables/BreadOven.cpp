@@ -6,6 +6,8 @@
 #include "Projectiles/CropResourceProjectile.h"
 #include "Resources/ResourceTypeTag.h"
 
+FOnIngreientAddedToOven ABreadOven::OnIngredientAddedToOven;
+
 ABreadOven::ABreadOven() : Super()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -61,6 +63,13 @@ void ABreadOven::EndPlay(EEndPlayReason::Type EndPlayReason)
 	}
 
 	Super::EndPlay(EndPlayReason);
+}
+
+void ABreadOven::OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, float amount)
+{
+	Super::OnInputInventoryResourceCountChanged(resourceType, amount);
+
+	OnIngredientAddedToOven.Broadcast(resourceType);
 }
 
 void ABreadOven::OnFireTargetOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

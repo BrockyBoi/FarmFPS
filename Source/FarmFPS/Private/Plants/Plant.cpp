@@ -9,6 +9,8 @@
 #include "Resources/ResourceInventory.h"
 #include "Resources/ResourceTypeTag.h"
 
+FOnFullyGrown APlant::OnFullyGrown;
+
 APlant::APlant()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -89,6 +91,7 @@ void APlant::AddResource(const FGameplayTag& resourceType, float amount)
 			{
 				Cosmetic_OnResourceFull(resourceType);
 				OnPlantResourceFull.Broadcast(resourceType);
+				OnFullyGrown.Broadcast();
 			}
 
 			Cosmetic_OnResourceAdded();

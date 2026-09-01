@@ -11,6 +11,8 @@
 #include "Engine/DirectionalLight.h"
 #include "Kismet/GameplayStatics.h"
 
+FStaticOnDayStateChange UDayNightCycleManager::OnDayStateChange;
+
 UDayNightCycleManager::UDayNightCycleManager()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -151,7 +153,7 @@ void UDayNightCycleManager::CHEAT_StartNight()
 
 void UDayNightCycleManager::StartDay()
 {
-	_currentDayState = EDayState::Day;
+	SetDayState(EDayState::Day);
 	if (OnDayBegin.IsBound())
 	{
 		OnDayBegin.Broadcast();
@@ -191,7 +193,7 @@ void UDayNightCycleManager::EndDay()
 		_musicAudioComponent->FadeOut(2.f, 0.f);
 	}
 
-	_currentDayState = EDayState::MidNight;
+	SetDayState(EDayState::MidNight);
 	if (OnDayEnd.IsBound())
 	{
 		OnDayEnd.Broadcast();
@@ -214,9 +216,15 @@ void UDayNightCycleManager::EndDay()
 	UGameplayStatics::SpawnSound2D(this, _onDayEndSound);
 }
 
+void UDayNightCycleManager::SetDayState(EDayState newDayState)
+{
+	_currentDayState = newDayState;
+	OnDayStateChange.Broadcast(newDayState);
+}
+
 void UDayNightCycleManager::GenerateDailyTradeOff()
 {
-	_currentDayState = EDayState::WaitingForTradeOff;
+	SetDayState(EDayState::WaitingForTradeOff);
 	if (ensure(_sunLight.IsValid()) && ensure(_moonLight.IsValid()))
 	{
 		_sunLight->SetActorHiddenInGame(false);

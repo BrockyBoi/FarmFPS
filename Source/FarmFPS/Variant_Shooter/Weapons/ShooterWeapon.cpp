@@ -20,6 +20,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Pawn.h"
 
+FOnWeaponCollected AShooterWeapon::OnWeaponCollected;
+
 AShooterWeapon::AShooterWeapon()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -60,6 +62,8 @@ void AShooterWeapon::BeginPlay()
 
 	// attach the meshes to the owner
 	WeaponOwner->AttachWeaponMeshes(this);
+
+	OnWeaponCollected.Broadcast(WeaponResourceType);
 }
 
 void AShooterWeapon::Tick(float DeltaTime)
