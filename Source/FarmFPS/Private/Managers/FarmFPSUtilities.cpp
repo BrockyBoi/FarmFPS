@@ -3,16 +3,17 @@
 #include "FarmFPSUtilities.h"
 
 // Brock
+#include "CustomerSpawnerManager.h"
+#include "Interactables/BreadStand.h"
 #include "Managers/ActorLookupComponent.h"
 #include "Managers/ActorPool.h"
 #include "Managers/BreadRequirementManager.h"
-#include "Interactables/BreadStand.h"
-#include "CustomerSpawnerManager.h"
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/ObjectiveManager.h"
 #include "Managers/PerkManager.h"
 #include "Managers/TradeOffUpgradeManager.h"
 #include "Managers/Weather/WeatherManager.h"
+#include "Managers/TutorialScreenManager.h"
 #include "StatusEffects/EffectManager.h"
 
 // UE
@@ -175,6 +176,22 @@ UTradeOffUpgradeManager* UFarmFPSUtilities::GetTradeOffUpgradeManager(const UObj
 	if (ensure(IsValid(tradeOffUpgradeManager)))
 	{
 		return tradeOffUpgradeManager;
+	}
+
+	return nullptr;
+}
+
+UTutorialScreenManager* UFarmFPSUtilities::GetTutorialScreenManager(const UObject* WorldContextObject)
+{
+	if (!ensure(IsValid(WorldContextObject)) || !(IsValid(GetGameBaseState(WorldContextObject))))
+	{
+		return nullptr;
+	}
+
+	UTutorialScreenManager* tutorialScreenManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UTutorialScreenManager>();
+	if (ensure(IsValid(tutorialScreenManager)))
+	{
+		return tutorialScreenManager;
 	}
 
 	return nullptr;

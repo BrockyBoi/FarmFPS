@@ -30,23 +30,32 @@ enum class ETutorialScreenType : uint8
 
 enum class EDayState : uint8;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTutorialScreenShown, ETutorialScreenType, tutorialScreenType);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UTutorialScreenManager : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UTutorialScreenManager();
 
+	UFUNCTION(BlueprintPure, Category = "TutorialScreenManager")
 	bool HasShownTutorialScreen(ETutorialScreenType tutorialScreenType) const;
+
+	UFUNCTION(BlueprintPure, Category = "TutorialScreenManager")
 	bool GetShouldShowTutorials() const { return _shouldShowTutorials; }
 
+	UFUNCTION(BlueprintCallable, Category = "TutorialScreenManager")
 	void PressCloseScreen();
+
+	UFUNCTION(BlueprintCallable, Category = "TutorialScreenManager")
 	void PressStopShowingTutorials();
 
+	UPROPERTY(BlueprintAssignable, Category = "TutorialScreenManager")
+	FOnTutorialScreenShown OnTutorialScreenShown;
+
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 

@@ -23,6 +23,7 @@ class UEffectManager;
 class UPerkManager;
 class UObjectiveManager;
 class UTradeOffUpgradeManager;
+class UTutorialScreenManager;
 class UWeatherManager;
 
 UCLASS()
@@ -63,6 +64,10 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "FarmFPS|Utilities", meta = (WorldContext = "WorldContextObject"))
 	static UTradeOffUpgradeManager* GetTradeOffUpgradeManager(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintPure, Category = "FarmFPS|Utilities", meta = (WorldContext = "WorldContextObject"))
+	static UTutorialScreenManager* GetTutorialScreenManager(const UObject* WorldContextObject);
+
 	UFUNCTION(BlueprintPure, Category = "FarmFPS|Utilities", meta = (WorldContext = "WorldContextObject"))
 	static UEffectManager* GetEffectManager(const UObject* WorldContextObject);
 

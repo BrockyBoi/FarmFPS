@@ -109,7 +109,7 @@ void UTutorialScreenManager::AttemptShowScreen(ETutorialScreenType screenToShow)
 {
 	if (GetShouldShowTutorials() && !HasShownTutorialScreen(screenToShow))
 	{
-		_shownTutorialScreensMap[screenToShow] = true;
-		// Something I guess
+		_shownTutorialScreensMap.Add(screenToShow, true);
+		OnTutorialScreenShown.Broadcast(screenToShow);
 	}
 }
