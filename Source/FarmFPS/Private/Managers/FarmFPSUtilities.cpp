@@ -15,6 +15,7 @@
 #include "Managers/Weather/WeatherManager.h"
 #include "Managers/TutorialScreenManager.h"
 #include "StatusEffects/EffectManager.h"
+#include "SaveSystem/SaveGameManager.h"
 
 // UE
 #include "GameFramework/GameStateBase.h"
@@ -59,7 +60,7 @@ UPerkManager* UFarmFPSUtilities::GetPlayerPerkManager(const UObject* WorldContex
 
 UObjectiveManager* UFarmFPSUtilities::GetObjectiveManager(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !IsValid(GetGameBaseState(WorldContextObject)))
+	if (!IsValid(WorldContextObject) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
 		return nullptr;
 	}
@@ -87,7 +88,7 @@ ABreadStand* UFarmFPSUtilities::GetBreadStand(const UObject* WorldContextObject)
 
 UCustomerSpawnerManager* UFarmFPSUtilities::GetCustomerSpawnerManager(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !IsValid(GetGameBaseState(WorldContextObject)))
+	if (!IsValid(WorldContextObject) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
 		return nullptr;
 	}
@@ -103,7 +104,7 @@ UCustomerSpawnerManager* UFarmFPSUtilities::GetCustomerSpawnerManager(const UObj
 
 UDayNightCycleManager* UFarmFPSUtilities::GetDayNightCycleManager(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !IsValid(GetGameBaseState(WorldContextObject)))
+	if (!IsValid(WorldContextObject) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
 		return nullptr;
 	}
@@ -119,7 +120,7 @@ UDayNightCycleManager* UFarmFPSUtilities::GetDayNightCycleManager(const UObject*
 
 UActorLookupComponent* UFarmFPSUtilities::GetResourceActorLookupComponent(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !IsValid(GetGameBaseState(WorldContextObject)))
+	if (!IsValid(WorldContextObject) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
 		return nullptr;
 	}
@@ -135,7 +136,7 @@ UActorLookupComponent* UFarmFPSUtilities::GetResourceActorLookupComponent(const 
 
 UActorPool* UFarmFPSUtilities::GetActorPool(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !IsValid(GetGameBaseState(WorldContextObject)))
+	if (!IsValid(WorldContextObject) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
 		return nullptr;
 	}
@@ -151,7 +152,7 @@ UActorPool* UFarmFPSUtilities::GetActorPool(const UObject* WorldContextObject)
 
 UBreadRequirementManager* UFarmFPSUtilities::GetBreadRequirementManager(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !IsValid(GetGameBaseState(WorldContextObject)))
+	if (!IsValid(WorldContextObject) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
 		return nullptr;
 	}
@@ -167,7 +168,7 @@ UBreadRequirementManager* UFarmFPSUtilities::GetBreadRequirementManager(const UO
 
 UTradeOffUpgradeManager* UFarmFPSUtilities::GetTradeOffUpgradeManager(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !(IsValid(GetGameBaseState(WorldContextObject))))
+	if (!IsValid(WorldContextObject) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
 		return nullptr;
 	}
@@ -183,7 +184,7 @@ UTradeOffUpgradeManager* UFarmFPSUtilities::GetTradeOffUpgradeManager(const UObj
 
 UTutorialScreenManager* UFarmFPSUtilities::GetTutorialScreenManager(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !(IsValid(GetGameBaseState(WorldContextObject))))
+	if (!IsValid(WorldContextObject) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
 		return nullptr;
 	}
@@ -199,7 +200,7 @@ UTutorialScreenManager* UFarmFPSUtilities::GetTutorialScreenManager(const UObjec
 
 UEffectManager* UFarmFPSUtilities::GetEffectManager(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !IsValid(GetGameBaseState(WorldContextObject)))
+	if (!IsValid(WorldContextObject) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
 		return nullptr;
 	}
@@ -215,7 +216,7 @@ UEffectManager* UFarmFPSUtilities::GetEffectManager(const UObject* WorldContextO
 
 UWeatherManager* UFarmFPSUtilities::GetWeatherManager(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)) || !IsValid(GetGameBaseState(WorldContextObject)))
+	if (!IsValid(WorldContextObject) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
 		return nullptr;
 	}
@@ -224,6 +225,22 @@ UWeatherManager* UFarmFPSUtilities::GetWeatherManager(const UObject* WorldContex
 	if (ensure(IsValid(weatherManager)))
 	{
 		return weatherManager;
+	}
+
+	return nullptr;
+}
+
+USaveGameManager* UFarmFPSUtilities::GetSaveGameManager(const UObject* WorldContextObject)
+{
+	if (!IsValid(WorldContextObject) || !IsValid(GetGameBaseState(WorldContextObject)))
+	{
+		return nullptr;
+	}
+
+	USaveGameManager* saveGameManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<USaveGameManager>();
+	if (ensure(IsValid(saveGameManager)))
+	{
+		return saveGameManager;
 	}
 
 	return nullptr;

@@ -5,6 +5,7 @@
 // Brock
 #include "DayNightCycleManager.h"
 #include "FarmFPSUtilities.h"
+#include "SaveSystem/SaveGameManager.h"
 
 UBreadRequirementManager::UBreadRequirementManager()
 {
@@ -26,6 +27,12 @@ void UBreadRequirementManager::BeginPlay()
 		dayNightCycleManager->OnDayBegin.AddUObject(this, &UBreadRequirementManager::OnDayBegin);
 		dayNightCycleManager->OnDayEnd.AddUObject(this, &UBreadRequirementManager::OnDayEnd);
 	}
+
+	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
+	if (ensure(IsValid(saveGameManager)))
+	{
+		saveGameManager->OnLoadGameData.AddUObject(this, &UBreadRequirementManager::OnGameLoaded);
+	}
 }
 
 void UBreadRequirementManager::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -35,6 +42,12 @@ void UBreadRequirementManager::EndPlay(EEndPlayReason::Type EndPlayReason)
 	{
 		dayNightCycleManager->OnDayBegin.RemoveAll(this);
 		dayNightCycleManager->OnDayEnd.RemoveAll(this);
+	}
+
+	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
+	if (IsValid(saveGameManager))
+	{
+		saveGameManager->OnLoadGameData.RemoveAll(this);
 	}
 
 	Super::EndPlay(EndPlayReason);
@@ -47,6 +60,22 @@ void UBreadRequirementManager::SellBread(int breadAmount)
 	if (!_metRequirementForDay && HasSoldBreadNeeded())
 	{
 		RequirementsMet();
+	}
+}
+
+FBreadRequirementManagerSaveGameData UBreadRequirementManager::GetBreadRequriementSaveGameData() const
+{
+	FBreadRequirementManagerSaveGameData saveData;
+	saveData.DailyRequiredBread = _breadRequiredForCurrentDay;
+
+	return saveData;
+}
+
+void UBreadRequirementManager::OnGameLoaded(UFarmFPSSaveGame* saveGame)
+{
+	if (ensure(saveGame))
+	{
+		_breadRequiredForCurrentDay = saveGame->GetBreadRequirmentSaveData().DailyRequiredBread;
 	}
 }
 

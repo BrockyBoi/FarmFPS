@@ -75,6 +75,9 @@ public:
 	static UWeatherManager* GetWeatherManager(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintPure, Category = "FarmFPS|Utilities", meta = (WorldContext = "WorldContextObject"))
+	static USaveGameManager* GetSaveGameManager(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintPure, Category = "FarmFPS|Utilities", meta = (WorldContext = "WorldContextObject"))
 	static float GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, const FGameplayTagContainer& perkTags, float valueToModify);
 
 	UFUNCTION(BlueprintPure, Category = "FarmFPS|Utilities", meta = (WorldContext = "WorldContextObject"))

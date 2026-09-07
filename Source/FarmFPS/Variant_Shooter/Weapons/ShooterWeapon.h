@@ -82,6 +82,9 @@ public:
 	/** Returns the current bullet count */
 	int32 GetBulletCount() const { return CurrentBullets; }
 
+	const FGameplayTag& GetWeaponResourceType() const { return WeaponResourceType; }
+	const FGameplayTag& GetWeaponTypeTag() const { return WeaponTypeTag; }
+
 	static FOnWeaponCollected OnWeaponCollected;
 
 protected:
@@ -117,6 +120,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, meta = (Categories = "CropResourceType,ResourceType"))
 	FGameplayTag WeaponResourceType;
+
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "WeaponType"))
+	FGameplayTag WeaponTypeTag;
 
 	/** Type of projectiles this weapon will shoot */
 	UPROPERTY(EditAnywhere, Category = "Ammo")

@@ -6,17 +6,21 @@
 #include "Managers/PlayerInventoryItemSelector.h"
 #include "Resources/ResourceInventory.h"
 
-// UE
+// Variant_Shooter
+#include "ShooterGameMode.h"
+#include "ShooterPickup.h"
 #include "ShooterWeapon.h"
-#include "EnhancedInputComponent.h"
+
+// UE
+#include "Camera/CameraComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/PawnNoiseEmitterComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "Components/SkeletalMeshComponent.h"
+#include "EnhancedInputComponent.h"
 #include "Engine/World.h"
-#include "Camera/CameraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "TimerManager.h"
-#include "ShooterGameMode.h"
+
 
 AShooterCharacter::AShooterCharacter()
 {
@@ -66,6 +70,17 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AShooterCharacter::DoReload);
 	}
+}
+
+TArray<FGameplayTag> AShooterCharacter::GetWeaponsUnlocked() const
+{
+	TArray<FGameplayTag> unlockedWeapons;
+	for (AShooterWeapon* weapon : OwnedWeapons)
+	{
+		unlockedWeapons.Add(weapon->GetWeaponTypeTag());
+	}
+
+	return unlockedWeapons;
 }
 
 float AShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -349,6 +364,25 @@ void AShooterCharacter::Die()
 
 	// schedule character respawn
 	GetWorld()->GetTimerManager().SetTimer(RespawnTimer, this, &AShooterCharacter::OnRespawn, RespawnTime, false);
+}
+
+void AShooterCharacter::OnGameLoaded(UFarmFPSSaveGame* saveGame)
+{
+	Super::OnGameLoaded(saveGame);
+
+	FPlayerSaveData playerSaveData = saveGame->GetPlayerSaveData();
+	TArray<FGameplayTag>& unlockedWeaponsTags = playerSaveData.UnlockedWeapons;
+	if (ensure(IsValid(_weaponsDataTable)))
+	{
+		for (FGameplayTag& weaponTag : unlockedWeaponsTags)
+		{
+			FWeaponTableRow* row = _weaponsDataTable->FindRow<FWeaponTableRow>(weaponTag.GetTagName(), TEXT("OnGameLoaded"));
+			if (ensure(row))
+			{
+				AddWeaponClass(row->WeaponToSpawn);
+			}
+		}
+	}
 }
 
 void AShooterCharacter::OnRespawn()

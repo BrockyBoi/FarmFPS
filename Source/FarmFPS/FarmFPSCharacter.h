@@ -4,9 +4,11 @@
 
 // Brock
 #include "Managers/ModifiedValueData.h"
+#include "SaveSystem/Saveable.h"
 
 // UE
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 
@@ -18,15 +20,18 @@ class AResourcePickupActor;
 
 class UBoxComponent;
 class UCameraComponent;
+class UFarmFPSSaveGame;
 class UInputAction;
 class UInputComponent;
 class UPlayerInventoryItemSelector;
+class UPlayerSaveGame;
 class UResourceInventory;
 class USkeletalMeshComponent;
 class USphereComponent;
 
 struct FInputActionValue;
 struct FPerkData;
+struct FPlayerSaveData;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -34,7 +39,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
  *  A basic first person character
  */
 UCLASS(abstract)
-class AFarmFPSCharacter : public ACharacter
+class AFarmFPSCharacter : public ACharacter, public ISaveable
 {
 	GENERATED_BODY()
 	
@@ -68,6 +73,15 @@ public:
 	UFUNCTION(Exec)
 	void SpawnGiantCustomerBrock();
 
+	UFUNCTION(Exec)
+	void SaveGameBrock();
+
+	UFUNCTION(Exec)
+	void LoadGameBrock();
+
+	UFUNCTION(Exec)
+	void DeleteSaveGameBrock();
+
 	bool IsPickupInRangeOfPlayer(AResourcePickupActor* pickup) const;
 
 	/** Returns the first person mesh **/
@@ -87,9 +101,15 @@ public:
 
 	void AddForeignMovement(const FVector2D& foreignMovementVector);
 
+	FPlayerSaveData GetPlayerSaveData() const;
+
+	virtual void OnGameLoaded(UFarmFPSSaveGame* saveGame) override;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
+
+	virtual TArray<FGameplayTag> GetWeaponsUnlocked() const;
 
 	UFUNCTION()
 	void OnPlayerLanded(const FHitResult& HitResult);
@@ -326,6 +346,8 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* _meleeCollider;
+
+
 
 	bool _startedGroundSlam = false;
 	bool _isShowingCropHealth = false;

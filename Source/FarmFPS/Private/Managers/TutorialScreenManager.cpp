@@ -8,6 +8,7 @@
 #include "Interactables/BreadStand.h"
 #include "Resources/ResourcePickupActor.h"
 #include "Resources/ResourceTypeTag.h"
+#include "SaveSystem/SaveGameManager.h"
 #include "ShooterWeapon.h"
 
 UTutorialScreenManager::UTutorialScreenManager()
@@ -25,6 +26,12 @@ void UTutorialScreenManager::BeginPlay()
 	ABreadOven::OnIngredientAddedToOven.AddUObject(this, &UTutorialScreenManager::OnIngredientAddedToOven);
 	ABreadStand::OnBreadAddedToStand.AddUObject(this, &UTutorialScreenManager::OnBreadAddedToStand);
 	UDayNightCycleManager::OnDayStateChange.AddUObject(this, &UTutorialScreenManager::OnDayNightCycleStateChanged);
+
+	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
+	if (ensure(IsValid(saveGameManager)))
+	{
+		saveGameManager->OnLoadGameData.AddUObject(this, &UTutorialScreenManager::OnGameLoaded);
+	}
 }
 
 void UTutorialScreenManager::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -35,6 +42,12 @@ void UTutorialScreenManager::EndPlay(EEndPlayReason::Type EndPlayReason)
 	ABreadOven::OnIngredientAddedToOven.RemoveAll(this);
 	ABreadStand::OnBreadAddedToStand.RemoveAll(this);
 	UDayNightCycleManager::OnDayStateChange.RemoveAll(this);
+
+	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
+	if (IsValid(saveGameManager))
+	{
+		saveGameManager->OnLoadGameData.RemoveAll(this);
+	}
 
 	Super::EndPlay(EndPlayReason);
 }
@@ -50,6 +63,26 @@ void UTutorialScreenManager::PressCloseScreen()
 void UTutorialScreenManager::PressStopShowingTutorials()
 {
 	_shouldShowTutorials = false;
+}
+
+FTutorialSaveGameData UTutorialScreenManager::GetTutorialSaveGameData() const
+{
+	FTutorialSaveGameData saveData;
+	saveData.ShouldShowTutorials = _shouldShowTutorials;
+
+	return saveData;
+}
+
+void UTutorialScreenManager::OnGameLoaded(UFarmFPSSaveGame* saveGame)
+{
+	if (ensure(saveGame))
+	{
+		_shouldShowTutorials = saveGame->GetTutorialSaveData().ShouldShowTutorials;
+		if (!_shouldShowTutorials)
+		{
+			OnTutorialScreenForceClosed.Broadcast();
+		}
+	}
 }
 
 void UTutorialScreenManager::OnWeaponCollected(const FGameplayTag& resourceType)

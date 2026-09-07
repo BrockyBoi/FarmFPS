@@ -15,6 +15,9 @@
 #include "Resources/ResourcePickupActor.h"
 #include "Resources/ResourceInventory.h"
 #include "Resources/ResourceTypeTag.h"
+#include "SaveSystem/FarmFPSSaveGame.h"
+#include "SaveSystem/PlayerSaveData.h"
+#include "SaveSystem/SaveGameManager.h"
 
 // UE
 #include "Animation/AnimInstance.h"
@@ -24,9 +27,10 @@
 #include "Components/SphereComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "EnhancedInputComponent.h"
-#include "InputActionValue.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "FarmFPS.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "InputActionValue.h"
+#include "Kismet/GameplayStatics.h"
 
 AFarmFPSCharacter::AFarmFPSCharacter()
 {
@@ -142,6 +146,33 @@ void AFarmFPSCharacter::SpawnGiantCustomerBrock()
 	}
 }
 
+void AFarmFPSCharacter::SaveGameBrock()
+{
+	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
+	if (ensure(IsValid(saveGameManager)))
+	{
+		saveGameManager->SaveGame();
+	}
+}
+
+void AFarmFPSCharacter::LoadGameBrock()
+{
+	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
+	if (ensure(IsValid(saveGameManager)))
+	{
+		saveGameManager->LoadGame();
+	}
+}
+
+void AFarmFPSCharacter::DeleteSaveGameBrock()
+{
+	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
+	if (ensure(IsValid(saveGameManager)))
+	{
+		saveGameManager->DeleteSaveGame();
+	}
+}
+
 bool AFarmFPSCharacter::IsPickupInRangeOfPlayer(AResourcePickupActor* pickup) const
 {
 	if (ensure(IsValid(pickup)))
@@ -195,6 +226,12 @@ void AFarmFPSCharacter::BeginPlay()
 	LandedDelegate.AddDynamic(this, &AFarmFPSCharacter::OnPlayerLanded);
 
 	_spawnLocation = GetActorLocation();
+
+	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
+	if (ensure(IsValid(saveGameManager)))
+	{
+		saveGameManager->OnLoadGameData.AddUObject(this, &AFarmFPSCharacter::OnGameLoaded);
+	}
 }
 
 void AFarmFPSCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -219,10 +256,40 @@ void AFarmFPSCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
 		_itemSelector->OnIndexChanged.RemoveAll(this);
 	}
 
+	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
+	if (IsValid(saveGameManager))
+	{
+		saveGameManager->OnLoadGameData.RemoveAll(this);
+	}
+
 	LandedDelegate.RemoveAll(this);
 	_resourcePickupCollider->OnComponentBeginOverlap.RemoveAll(this);
 
 	Super::EndPlay(EndPlayReason);
+}
+
+TArray<FGameplayTag> AFarmFPSCharacter::GetWeaponsUnlocked() const
+{
+	// Purposely empty
+	return TArray<FGameplayTag>();
+}
+
+void AFarmFPSCharacter::OnGameLoaded(UFarmFPSSaveGame* saveGame)
+{
+	if (ensure(IsValid(saveGame)))
+	{
+		FPlayerSaveData playerSaveData = saveGame->GetPlayerSaveData();
+
+		if (ensure(IsValid(_perkManager)))
+		{
+			_perkManager->SetAllPerksFromSave(playerSaveData.PlayerUnlockedPerks, playerSaveData.PlayerPerks);
+		}
+
+		if (ensure(IsValid(_inventory)))
+		{
+			_inventory->SetResourceAmount(ResourceTypeTag::Money, playerSaveData.MoneyCount);
+		}
+	}
 }
 
 void AFarmFPSCharacter::OnPlayerLanded(const FHitResult& HitResult)
@@ -339,6 +406,23 @@ void AFarmFPSCharacter::AddForeignMovement(const FVector2D& foreignMovementVecto
 {
 	const FVector vec = FVector(foreignMovementVector.X, foreignMovementVector.Y, 0);
 	AddMovementInput(vec);
+}
+
+FPlayerSaveData AFarmFPSCharacter::GetPlayerSaveData() const
+{
+	FPlayerSaveData saveData;
+	saveData.MoneyCount = _inventory->GetResourceCount(ResourceTypeTag::Money);
+
+	TArray<FGameplayTag> playerPerkTags;
+	TArray<FPerkData> playerPerkData;
+	_perkManager->GetAllActivePerks().GenerateKeyArray(playerPerkTags);
+	_perkManager->GetAllActivePerks().GenerateValueArray(playerPerkData);
+
+	saveData.PlayerPerks = playerPerkData;
+	saveData.PlayerUnlockedPerks = playerPerkTags;
+	saveData.UnlockedWeapons = GetWeaponsUnlocked();
+
+	return saveData;
 }
 
 void AFarmFPSCharacter::MoveInput(const FInputActionValue& Value)

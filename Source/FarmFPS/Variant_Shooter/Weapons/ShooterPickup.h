@@ -2,15 +2,25 @@
 
 #pragma once
 
+// Brock
+#include "SaveSystem/Saveable.h"
+
+// UE
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameplayTagContainer.h"
 #include "Engine/DataTable.h"
 #include "Engine/StaticMesh.h"
+
+// Generated
 #include "ShooterPickup.generated.h"
 
-class USphereComponent;
-class UPrimitiveComponent;
 class AShooterWeapon;
+class UFarmFPSSaveGame;
+class UPrimitiveComponent;
+class USphereComponent;
+
+struct FWeaponPickupSaveGameData;
 
 /**
  *  Holds information about a type of weapon pickup
@@ -27,13 +37,16 @@ struct FWeaponTableRow : public FTableRowBase
 	/** Weapon class to grant on pickup */
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AShooterWeapon> WeaponToSpawn;
+
+	UPROPERTY(EditAnywhere)
+	FGameplayTag WeaponTypeTag;
 };
 
 /**
  *  Simple shooter game weapon pickup
  */
 UCLASS(abstract)
-class FARMFPS_API AShooterPickup : public AActor
+class FARMFPS_API AShooterPickup : public AActor, public ISaveable
 {
 	GENERATED_BODY()
 
@@ -62,9 +75,15 @@ protected:
 	FTimerHandle RespawnTimer;
 
 public:	
-	
 	/** Constructor */
 	AShooterPickup();
+
+	bool HasBeenPickedUp() const { return _hasBeenPickedUp; }
+
+	FWeaponPickupSaveGameData GetWeaponPickupSaveGameData() const;
+	FGameplayTag GetWeaponTypeTag() const;
+
+	virtual void OnGameLoaded(UFarmFPSSaveGame* saveGame) override;
 
 protected:
 
@@ -81,8 +100,6 @@ protected:
 	UFUNCTION()
 	virtual void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-protected:
-
 	/** Called when it's time to respawn this pickup */
 	void RespawnPickup();
 
@@ -93,4 +110,6 @@ protected:
 	/** Enables this pickup after respawning */
 	UFUNCTION(BlueprintCallable, Category="Pickup")
 	void FinishRespawn();
+
+	bool _hasBeenPickedUp = false;
 };

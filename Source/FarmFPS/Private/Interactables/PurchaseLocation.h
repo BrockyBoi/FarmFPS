@@ -4,6 +4,7 @@
 
 // Brock
 #include "Managers/ModifiedValueData.h"
+#include "SaveSystem/Saveable.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -12,8 +13,12 @@
 // Generated
 #include "PurchaseLocation.generated.h"
 
+class UFarmFPSSaveGame;
+
+struct FUpgradeLocationSaveData;
+
 UCLASS()
-class UPurchaseLocation : public UActorComponent
+class UPurchaseLocation : public UActorComponent, public ISaveable
 {
 	GENERATED_BODY()
 
@@ -22,6 +27,19 @@ public:
 
 	void SetCanPurchase(bool canPurchase) { _canPurchase = canPurchase; }
 	bool GetCanPurchase() const { return _canPurchase; }
+
+	virtual void SetCurrentPurchaseCountFromLoad(int count);
+	virtual void SetCurrentPurchaseCostFromLoad(float cost) { _purchaseCost = cost; }
+
+	float GetCurrentPurchaseCost() const { return _purchaseCost; }
+	int GetCurrentPurchaseCount() const { return _currentPurchaseCount; }
+
+	virtual void OnGameLoaded(UFarmFPSSaveGame* saveGame) override;
+
+	FUpgradeLocationSaveData GetUpgradeLocationSaveData() const;
+
+	DECLARE_MULTICAST_DELEGATE(FStaticOnPurchaseSuccess);
+	static FStaticOnPurchaseSuccess StaticOnPurchaseSuccess;
 
 protected:
 	virtual void BeginPlay() override;

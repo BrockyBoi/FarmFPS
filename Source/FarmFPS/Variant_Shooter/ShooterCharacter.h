@@ -91,12 +91,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	void DoReload();
 
+	virtual void OnGameLoaded(UFarmFPSSaveGame* saveGame) override;
+
 	/** Bullet count updated delegate */
 	FBulletCountUpdatedDelegate OnBulletCountUpdated;
 
 	/** Damaged delegate */
 	FDamagedDelegate OnDamaged;
-
 
 protected:
 	/** Gameplay initialization */
@@ -107,6 +108,8 @@ protected:
 
 	/** Set up input action bindings */
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
+
+	virtual TArray<FGameplayTag> GetWeaponsUnlocked() const override;
 
 	/** Returns true if the character already owns a weapon of the given class */
 	AShooterWeapon* FindWeaponOfType(TSubclassOf<AShooterWeapon> WeaponClass) const;
@@ -175,4 +178,7 @@ protected:
 	/** AI Noise emitter component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UPawnNoiseEmitterComponent* PawnNoiseEmitter;
+
+	UPROPERTY(EditAnywhere)
+	UDataTable* _weaponsDataTable;
 };

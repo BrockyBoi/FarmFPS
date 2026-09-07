@@ -22,6 +22,10 @@ public:
 	UPerkManager();
 
 	const FPerkData GetPerkData(const FGameplayTag& perkTag) const;
+	const TMap<FGameplayTag, FPerkData>& GetAllActivePerks() const;
+
+	void SetAllPerksFromSave(const TArray<FGameplayTag>& perkTags, const TArray<FPerkData>& perkData);
+	void SetAllActivePerks(const TMap<FGameplayTag, FPerkData>& newPerks);
 
 	void ModifyAdditiveValue(const FGameplayTag& perkTag, float valueChange);
 	void ModifyMultiplicativeValue(const FGameplayTag& perkTag, float valueToMultiplyBy);

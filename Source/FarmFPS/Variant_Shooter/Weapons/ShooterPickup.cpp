@@ -1,12 +1,21 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-
 #include "ShooterPickup.h"
+
+// Brock
+#include "Managers/FarmFPSUtilities.h"
+#include "SaveSystem/FarmFPSSaveGame.h"
+#include "SaveSystem/WeaponPickupSaveGameData.h"
+#include "SaveSystem/SaveGameManager.h"
+
+// Variant_Shooter
+#include "ShooterWeaponHolder.h"
+#include "ShooterWeapon.h"
+
+// UE
 #include "Components/SceneComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
-#include "ShooterWeaponHolder.h"
-#include "ShooterWeapon.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 
@@ -38,17 +47,6 @@ AShooterPickup::AShooterPickup()
 	Mesh->SetCollisionProfileName(FName("NoCollision"));
 }
 
-void AShooterPickup::OnConstruction(const FTransform& Transform)
-{
-	Super::OnConstruction(Transform);
-
-	if (FWeaponTableRow* WeaponData = WeaponType.GetRow<FWeaponTableRow>(FString()))
-	{
-		// set the mesh
-		Mesh->SetStaticMesh(WeaponData->StaticMesh.LoadSynchronous());
-	}
-}
-
 void AShooterPickup::BeginPlay()
 {
 	Super::BeginPlay();
@@ -58,14 +56,55 @@ void AShooterPickup::BeginPlay()
 		// copy the weapon class
 		WeaponClass = WeaponData->WeaponToSpawn;
 	}
+
+	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
+	if (ensure(IsValid(saveGameManager)))
+	{
+		saveGameManager->OnLoadGameData.AddUObject(this, &AShooterPickup::OnGameLoaded);
+	}
 }
 
 void AShooterPickup::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	Super::EndPlay(EndPlayReason);
-
 	// clear the respawn timer
 	GetWorld()->GetTimerManager().ClearTimer(RespawnTimer);
+
+	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
+	if (IsValid(saveGameManager))
+	{
+		saveGameManager->OnLoadGameData.RemoveAll(this);
+	}
+
+	Super::EndPlay(EndPlayReason);
+}
+
+FWeaponPickupSaveGameData AShooterPickup::GetWeaponPickupSaveGameData() const
+{
+	FWeaponPickupSaveGameData saveData;
+	saveData.HasBeenPickedUp = HasBeenPickedUp();
+	saveData.WeaponTypeTag = GetWeaponTypeTag();
+
+	return saveData;
+}
+
+FGameplayTag AShooterPickup::GetWeaponTypeTag() const
+{
+	if (FWeaponTableRow* WeaponData = WeaponType.GetRow<FWeaponTableRow>(FString()))
+	{
+		return WeaponData->WeaponTypeTag;
+	}
+
+	return FGameplayTag::EmptyTag;
+}
+
+void AShooterPickup::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	if (FWeaponTableRow* WeaponData = WeaponType.GetRow<FWeaponTableRow>(FString()))
+	{
+		Mesh->SetStaticMesh(WeaponData->StaticMesh.LoadSynchronous());
+	}
 }
 
 void AShooterPickup::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -86,6 +125,7 @@ void AShooterPickup::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 
 		// schedule the respawn
 		//GetWorld()->GetTimerManager().SetTimer(RespawnTimer, this, &AShooterPickup::RespawnPickup, RespawnTime, false);
+		_hasBeenPickedUp = true;
 	}
 }
 
@@ -105,4 +145,28 @@ void AShooterPickup::FinishRespawn()
 
 	// enable tick
 	SetActorTickEnabled(true);
+}
+
+void AShooterPickup::OnGameLoaded(UFarmFPSSaveGame* saveGame)
+{
+	if (ensure(IsValid(saveGame)))
+	{
+		TArray<FWeaponPickupSaveGameData> weaponPickupSaveDatas = saveGame->GetWeaponPickupSaveDatas();
+
+		FWeaponPickupSaveGameData* saveData = weaponPickupSaveDatas.FindByPredicate([&](const FWeaponPickupSaveGameData& saveData)
+		{
+			return saveData.WeaponTypeTag == GetWeaponTypeTag();
+		});
+
+		if (saveData)
+		{
+			_hasBeenPickedUp = saveData->HasBeenPickedUp;
+			if (_hasBeenPickedUp)
+			{
+				SetActorHiddenInGame(true);
+				SetActorEnableCollision(false);
+				SetActorTickEnabled(false);
+			}
+		}
+	}
 }

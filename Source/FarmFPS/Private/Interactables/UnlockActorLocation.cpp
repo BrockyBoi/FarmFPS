@@ -66,3 +66,13 @@ void UUnlockActorLocation::UnlockActors(bool shouldUnlock, int index)
 		}
 	}
 }
+
+void UUnlockActorLocation::SetCurrentPurchaseCountFromLoad(int count)
+{
+	Super::SetCurrentPurchaseCountFromLoad(count);
+
+	for (int i = 0; i < count; i++)
+	{
+		UnlockActors(true, i);
+	}
+}

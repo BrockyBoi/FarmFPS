@@ -22,6 +22,7 @@ enum class EDayState : uint8
 };
 
 class ADirectionalLight;
+class UFarmFPSSaveGame;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FStaticOnDayStateChange, EDayState);
 
@@ -33,6 +34,8 @@ class UDayNightCycleManager : public UActorComponent
 public:	
 	UDayNightCycleManager();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	void ForceEndDay();
 
 	bool IsDay() const { return _currentDayState == EDayState::Day; }
 	bool IsNight() const { return _currentDayState == EDayState::MidNight || _currentDayState == EDayState::NightTransitionToDay; }
@@ -62,6 +65,10 @@ private:
 	UFUNCTION()
 	void StartDay();
 	void EndDay();
+
+	TObjectPtr<UAudioComponent> FindOrCreateMusicAudioComponent();
+
+	void EndDayFromLoading(UFarmFPSSaveGame*);
 
 	void SetDayState(EDayState newDayState);
 

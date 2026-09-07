@@ -4,6 +4,9 @@
 
 // Brock
 #include "ModifiedValueData.h"
+#include "SaveSystem/BreadRequirementManagerSaveGameData.h"
+#include "SaveSystem/Saveable.h"
+#include "SaveSystem/SaveGameManager.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -13,9 +16,8 @@
 // Generated
 #include "BreadRequirementManager.generated.h"
 
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class FARMFPS_API UBreadRequirementManager : public UActorComponent
+class FARMFPS_API UBreadRequirementManager : public UActorComponent, public ISaveable
 {
 	GENERATED_BODY()
 
@@ -37,6 +39,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	bool GetHasSoldBreadRequiredForDay() const { return _currentBreadSold >= _breadRequiredForCurrentDay; }
+
+	FBreadRequirementManagerSaveGameData GetBreadRequriementSaveGameData() const;
+	virtual void OnGameLoaded(UFarmFPSSaveGame* saveGame) override;
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBreadSold, int, BreadSold);
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRequirementsMet);

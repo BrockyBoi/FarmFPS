@@ -12,6 +12,28 @@ const FPerkData UPerkManager::GetPerkData(const FGameplayTag& perkTag) const
 	return _activePerks.Contains(perkTag) ? _activePerks[perkTag] : FPerkData();
 }
 
+const TMap<FGameplayTag, FPerkData>& UPerkManager::GetAllActivePerks() const
+{
+	return _activePerks;
+}
+
+void UPerkManager::SetAllPerksFromSave(const TArray<FGameplayTag>& perkTags, const TArray<FPerkData>& perkData)
+{
+	_activePerks.Empty();
+	for (int i = 0; i < perkTags.Num(); ++i)
+	{
+		if (perkData.IsValidIndex(i))
+		{
+			_activePerks.Add(perkTags[i], perkData[i]);
+		}
+	}
+}
+
+void UPerkManager::SetAllActivePerks(const TMap<FGameplayTag, FPerkData>& newPerks)
+{
+	_activePerks = newPerks;
+}
+
 void UPerkManager::ModifyAdditiveValue(const FGameplayTag& perkTag, float valueChange)
 {
 	_activePerks.FindOrAdd(perkTag).AdditiveValue += valueChange;

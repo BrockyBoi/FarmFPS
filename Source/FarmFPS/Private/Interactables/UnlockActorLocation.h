@@ -29,6 +29,8 @@ public:
 	UFUNCTION(BlueprintPure)
 	AActor* GetNextActorToUnlock() const;
 
+	virtual void SetCurrentPurchaseCountFromLoad(int count) override;
+
 protected:
 	virtual void BeginPlay() override;
 

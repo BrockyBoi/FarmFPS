@@ -4,6 +4,8 @@
 
 // Brock
 #include "Managers/DayNightCycleManager.h"
+#include "SaveSystem/Saveable.h"
+#include "SaveSystem/TutorialSaveGameData.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -30,10 +32,11 @@ enum class ETutorialScreenType : uint8
 
 enum class EDayState : uint8;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTutorialScreenForceClose);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTutorialScreenShown, ETutorialScreenType, tutorialScreenType);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UTutorialScreenManager : public UActorComponent
+class UTutorialScreenManager : public UActorComponent, public ISaveable
 {
 	GENERATED_BODY()
 
@@ -52,8 +55,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "TutorialScreenManager")
 	void PressStopShowingTutorials();
 
+	FTutorialSaveGameData GetTutorialSaveGameData() const;
+	virtual void OnGameLoaded(UFarmFPSSaveGame* saveGame) override;
+
 	UPROPERTY(BlueprintAssignable, Category = "TutorialScreenManager")
 	FOnTutorialScreenShown OnTutorialScreenShown;
+
+	UPROPERTY(BlueprintAssignable, Category = "TutorialScreenManager")
+	FOnTutorialScreenForceClose OnTutorialScreenForceClosed;
 
 protected:
 	virtual void BeginPlay() override;

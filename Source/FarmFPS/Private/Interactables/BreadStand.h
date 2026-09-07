@@ -3,8 +3,8 @@
 #pragma once
 
 // Brock
-#include "Managers/ModifiedValueData.h"
 #include "Interactables/InputOutputStationActor.h"
+#include "Managers/ModifiedValueData.h"
 
 // UE
 #include "CoreMinimal.h"
