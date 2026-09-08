@@ -19,10 +19,16 @@ class USaveGameManager : public UActorComponent
 public:	
 	USaveGameManager();
 
+	UFUNCTION(BlueprintCallable)
 	void SaveGame();
+
+	UFUNCTION(BlueprintCallable)
 	void LoadGame();
+
+	UFUNCTION(BlueprintCallable)
 	void DeleteSaveGame();
 
+	UFUNCTION(BlueprintPure)
 	bool HasSaveGame() const;
 
 	DECLARE_MULTICAST_DELEGATE(FOnSavePlayerData);
@@ -37,6 +43,8 @@ protected:
 
 	UFUNCTION()
 	void OnPostLoadMap(UWorld* world);
+
+	void ResetSavableActors();
 
 	UPROPERTY(EditAnywhere, Category = "Save Game")
 	FString _playerSaveGameSlotName = TEXT("PlayerSaveGame");

@@ -30,7 +30,7 @@ void USaveGameManager::BeginPlay()
 	UPurchaseLocation::StaticOnPurchaseSuccess.AddUObject(this, &USaveGameManager::SaveGame);
 
 	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
-	if (IsValid(dayNightCycle))
+	if (ensure(IsValid(dayNightCycle)))
 	{
 		dayNightCycle->OnDayEnd.AddUObject(this, &USaveGameManager::SaveGame);
 	}
