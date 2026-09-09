@@ -2,6 +2,9 @@
 
 #include "SaveSystem/SaveGameManager.h"
 
+// SaveSystem
+#include "PlantSaveData.h"
+
 // FarmFPS
 #include "FarmFPSCharacter.h"
 #include "ShooterPickup.h"
@@ -13,6 +16,7 @@
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/TutorialScreenManager.h"
+#include "Plants/Plant.h"
 
 // UE
 #include "GameFramework/GameModeBase.h"
@@ -80,6 +84,7 @@ void USaveGameManager::SaveGame()
 	FBreadRequirementManagerSaveGameData breadRequirementSaveData;
 	TArray<FUpgradeLocationSaveData> upgradeLocationSaveData;
 	TArray<FWeaponPickupSaveGameData> weaponPickupSaveData;
+	TArray<FPlantSaveData> plantSaveDatas;
 
 	AFarmFPSCharacter* playerCharacter = Cast<AFarmFPSCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (ensure(IsValid(playerCharacter)))
@@ -110,6 +115,17 @@ void USaveGameManager::SaveGame()
 				continue;
 			}
 
+			APlant* plant = Cast<APlant>(saveableActor);
+			if (IsValid(plant))
+			{
+				FPlantSaveData plantSaveData = plant->GetPlantSaveData();
+				if (!plantSaveData.PlantName.IsEmpty())
+				{
+					plantSaveDatas.Add(plantSaveData);
+				}
+				continue;
+			}
+
 			UTutorialScreenManager* tutorialScreenManager = Cast<UTutorialScreenManager>(saveableActor->FindComponentByClass(UTutorialScreenManager::StaticClass()));
 			if (IsValid(tutorialScreenManager))
 			{
@@ -130,6 +146,7 @@ void USaveGameManager::SaveGame()
 	_farmFPSSaveGame->SetWeaponPickupSaveDatas(weaponPickupSaveData);
 	_farmFPSSaveGame->SetTutorialSaveData(tutorialSaveData);
 	_farmFPSSaveGame->SetBreadRequriementSaveData(breadRequirementSaveData);
+	_farmFPSSaveGame->SetPlantSaveDatas(plantSaveDatas);
 
 	UGameplayStatics::SaveGameToSlot(_farmFPSSaveGame, _playerSaveGameSlotName, 0);
 	OnSavePlayerData.Broadcast();

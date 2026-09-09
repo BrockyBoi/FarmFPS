@@ -66,7 +66,7 @@ UObjectiveManager* UFarmFPSUtilities::GetObjectiveManager(const UObject* WorldCo
 	}
 
 	UObjectiveManager* objectiveManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UObjectiveManager>();
-	if (ensure(IsValid(objectiveManager)))
+	if (IsValid(objectiveManager))
 	{
 		return objectiveManager;
 	}
@@ -94,7 +94,7 @@ UCustomerSpawnerManager* UFarmFPSUtilities::GetCustomerSpawnerManager(const UObj
 	}
 
 	UCustomerSpawnerManager* customerSpawnerManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UCustomerSpawnerManager>();
-	if (ensure(IsValid(customerSpawnerManager)))
+	if (IsValid(customerSpawnerManager))
 	{
 		return customerSpawnerManager;
 	}
@@ -110,7 +110,7 @@ UDayNightCycleManager* UFarmFPSUtilities::GetDayNightCycleManager(const UObject*
 	}
 
 	UDayNightCycleManager* dayNightCycleManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UDayNightCycleManager>();
-	if (ensure(IsValid(dayNightCycleManager)))
+	if (IsValid(dayNightCycleManager))
 	{
 		return dayNightCycleManager;
 	}
@@ -126,7 +126,7 @@ UActorLookupComponent* UFarmFPSUtilities::GetResourceActorLookupComponent(const 
 	}
 
 	UActorLookupComponent* lookupComponent = GetGameBaseState(WorldContextObject)->FindComponentByClass<UActorLookupComponent>();
-	if (ensure(IsValid(lookupComponent)))
+	if (IsValid(lookupComponent))
 	{
 		return lookupComponent;
 	}
@@ -142,7 +142,7 @@ UActorPool* UFarmFPSUtilities::GetActorPool(const UObject* WorldContextObject)
 	}
 
 	UActorPool* actorPool = GetGameBaseState(WorldContextObject)->FindComponentByClass<UActorPool>();
-	if (ensure(IsValid(actorPool)))
+	if (IsValid(actorPool))
 	{
 		return actorPool;
 	}
@@ -158,7 +158,7 @@ UBreadRequirementManager* UFarmFPSUtilities::GetBreadRequirementManager(const UO
 	}
 
 	UBreadRequirementManager* breadRequirementManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UBreadRequirementManager>();
-	if (ensure(IsValid(breadRequirementManager)))
+	if (IsValid(breadRequirementManager))
 	{
 		return breadRequirementManager;
 	}
@@ -174,7 +174,7 @@ UTradeOffUpgradeManager* UFarmFPSUtilities::GetTradeOffUpgradeManager(const UObj
 	}
 
 	UTradeOffUpgradeManager* tradeOffUpgradeManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UTradeOffUpgradeManager>();
-	if (ensure(IsValid(tradeOffUpgradeManager)))
+	if (IsValid(tradeOffUpgradeManager))
 	{
 		return tradeOffUpgradeManager;
 	}
@@ -190,7 +190,7 @@ UTutorialScreenManager* UFarmFPSUtilities::GetTutorialScreenManager(const UObjec
 	}
 
 	UTutorialScreenManager* tutorialScreenManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UTutorialScreenManager>();
-	if (ensure(IsValid(tutorialScreenManager)))
+	if (IsValid(tutorialScreenManager))
 	{
 		return tutorialScreenManager;
 	}
@@ -206,7 +206,7 @@ UEffectManager* UFarmFPSUtilities::GetEffectManager(const UObject* WorldContextO
 	}
 
 	UEffectManager* effectManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UEffectManager>();
-	if (ensure(IsValid(effectManager)))
+	if (IsValid(effectManager))
 	{
 		return effectManager;
 	}
@@ -222,7 +222,7 @@ UWeatherManager* UFarmFPSUtilities::GetWeatherManager(const UObject* WorldContex
 	}
 
 	UWeatherManager* weatherManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UWeatherManager>();
-	if (ensure(IsValid(weatherManager)))
+	if (IsValid(weatherManager))
 	{
 		return weatherManager;
 	}
@@ -238,7 +238,7 @@ USaveGameManager* UFarmFPSUtilities::GetSaveGameManager(const UObject* WorldCont
 	}
 
 	USaveGameManager* saveGameManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<USaveGameManager>();
-	if (ensure(IsValid(saveGameManager)))
+	if (IsValid(saveGameManager))
 	{
 		return saveGameManager;
 	}
@@ -254,7 +254,7 @@ float UFarmFPSUtilities::GetModifiedValueByPlayerPerk(const UObject* WorldContex
 	}
 
 	UPerkManager* perkManager = GetPlayerPerkManager(WorldContextObject);
-	if (ensure(IsValid(perkManager)))
+	if (IsValid(perkManager))
 	{
 		return perkManager->ModifyValueByPerks(perkTag, valueToModify);
 	}

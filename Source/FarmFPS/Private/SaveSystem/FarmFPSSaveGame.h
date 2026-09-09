@@ -4,6 +4,7 @@
 
 // Brock
 #include "BreadRequirementManagerSaveGameData.h"
+#include "PlantSaveData.h"
 #include "PlayerSaveData.h"
 #include "TutorialSaveGameData.h"
 #include "UpgradeLocationSaveData.h"
@@ -27,12 +28,14 @@ public:
 	const TArray<FWeaponPickupSaveGameData>& GetWeaponPickupSaveDatas() { return WeaponPickupSaveDatas; }
 	const FTutorialSaveGameData& GetTutorialSaveData() { return TutorialSaveData; }
 	const FBreadRequirementManagerSaveGameData& GetBreadRequirmentSaveData() { return BreadRequirementSaveData; }
+	const TArray<FPlantSaveData>& GetPlantSaveDatas() { return PlantSaveDatas; }
 
 	void SetPlayerSaveData(const FPlayerSaveData& newPlayerSaveData) { PlayerSaveData = newPlayerSaveData; }
 	void SetUpgradeLocationSaveDatas(const TArray<FUpgradeLocationSaveData>& newUpgradeLocationSaveDatas) { UpgradeLocationSaveDatas = newUpgradeLocationSaveDatas; }
 	void SetWeaponPickupSaveDatas(const TArray<FWeaponPickupSaveGameData>& newWeaponPickupSaveDatas) { WeaponPickupSaveDatas = newWeaponPickupSaveDatas; }
 	void SetTutorialSaveData(const FTutorialSaveGameData& tutorialSaveData) { TutorialSaveData = tutorialSaveData; }
 	void SetBreadRequriementSaveData(const FBreadRequirementManagerSaveGameData& breadRequirementSaveData) { BreadRequirementSaveData = breadRequirementSaveData; }
+	void SetPlantSaveDatas(const TArray<FPlantSaveData>& plantSaveDatas) { PlantSaveDatas = plantSaveDatas; }
 
 protected:
 	UPROPERTY()
@@ -46,6 +49,9 @@ protected:
 
 	UPROPERTY()
 	FTutorialSaveGameData TutorialSaveData;
+
+	UPROPERTY()
+	TArray<FPlantSaveData> PlantSaveDatas;
 
 	UPROPERTY()
 	FBreadRequirementManagerSaveGameData BreadRequirementSaveData;

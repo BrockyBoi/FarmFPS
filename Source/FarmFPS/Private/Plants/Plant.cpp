@@ -8,6 +8,7 @@
 #include "Managers/Weather/WeatherManager.h"
 #include "Resources/ResourceInventory.h"
 #include "Resources/ResourceTypeTag.h"
+#include "SaveSystem/SaveGameManager.h"
 
 FOnFullyGrown APlant::OnFullyGrown;
 
@@ -32,6 +33,12 @@ void APlant::BeginPlay()
 	{
 		dayNightCycle->OnDayEnd.AddUObject(this, &APlant::OnDayEnd);
 	}
+
+	USaveGameManager* saveGame = UFarmFPSUtilities::GetSaveGameManager(this);
+	if (ensure(IsValid(saveGame)))
+	{
+		saveGame->OnLoadGameData.AddUObject(this, &APlant::OnGameLoaded);
+	}
 }
 
 void APlant::Tick(float DeltaTime)
@@ -52,6 +59,12 @@ void APlant::EndPlay(EEndPlayReason::Type EndPlayReason)
 	if (IsValid(dayNightCycle))
 	{
 		dayNightCycle->OnDayEnd.RemoveAll(this);
+	}
+
+	USaveGameManager* saveGame = UFarmFPSUtilities::GetSaveGameManager(this);
+	if (IsValid(saveGame))
+	{
+		saveGame->OnLoadGameData.RemoveAll(this);
 	}
 
 	Super::EndPlay(EndPlayReason);
@@ -121,6 +134,34 @@ void APlant::DoDamage(int damageAmount)
 	}
 }
 
+void APlant::OnGameLoaded(UFarmFPSSaveGame* saveGame)
+{
+	if (ensure(saveGame))
+	{
+		const FPlantSaveData* plantSaveData = saveGame->GetPlantSaveDatas().FindByPredicate([this](const FPlantSaveData& data)
+			{
+				return data.PlantName == GetName();
+			});
+
+		if (ensure(plantSaveData) && !plantSaveData->IsEnabled)
+		{
+			OnPlayerDestroyPlant();
+		}
+	}
+}
+
+FPlantSaveData APlant::GetPlantSaveData() const
+{
+	FPlantSaveData saveData;
+	if (!_destroyAtEndOfDay)
+	{
+		saveData.PlantName = GetName();
+		saveData.IsEnabled = _isBroken;
+	}
+
+	return saveData;
+}
+
 void APlant::OnPlayerDestroyPlant()
 {
 	_isBroken = true;
@@ -186,7 +227,8 @@ void APlant::DestroyPlant()
 
 	ListenToWeatherManager(false);
 
-	Destroy();
+	SetActorEnableCollision(false);
+	SetActorHiddenInGame(true);
 }
 
 void APlant::OnLightAndWaterFilled()
@@ -222,6 +264,8 @@ void APlant::OnDayEnd()
 		Cosmetic_OnResourceAdded();
 	}
 }
+
+
 
 float APlant::GetCurrentWaterLevel() const
 {

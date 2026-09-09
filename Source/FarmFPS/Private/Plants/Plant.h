@@ -5,6 +5,8 @@
 // Brock
 #include "Plants/CropData.h"
 #include "Resources/ResourceInventory.h"
+#include "SaveSystem/Saveable.h"
+#include "SaveSystem/PlantSaveData.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -18,7 +20,7 @@ DECLARE_MULTICAST_DELEGATE(FOnFullyGrown)
 class UWeatherManager;
 
 UCLASS()
-class APlant : public AActor
+class APlant : public AActor, public ISaveable
 {
 	GENERATED_BODY()
 	
@@ -32,7 +34,10 @@ public:
 
 	void DoDamage(int damageAmount);
 
+	virtual void OnGameLoaded(UFarmFPSSaveGame* saveGame) override;
+
 	UResourceInventory* GetResourceInventory() const { return _resourcesInventory; }
+	FPlantSaveData GetPlantSaveData() const;
 
 	UFUNCTION(BlueprintPure)
 	float GetCurrentWaterLevel() const;
