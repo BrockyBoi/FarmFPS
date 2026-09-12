@@ -4,6 +4,7 @@
 
 // Brock
 #include "Managers/ActorPool.h"
+#include "Managers/AudioManager.h"
 #include "Plants/Crop.h"
 #include "Managers/DayNightCycleManager.h"
 #include "Plants/FarmingPlotComponent.h"
@@ -14,7 +15,6 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -93,7 +93,7 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 
 			if (IsValid(_onSeedPlantedSound))
 			{
-				UGameplayStatics::SpawnSoundAtLocation(this, _onSeedPlantedSound, GetActorLocation());
+				UAudioManager::SpawnSoundAtLocation(this, _onSeedPlantedSound, GetActorLocation());
 			}
 		}
 	}

@@ -22,6 +22,7 @@ enum class EDayState : uint8
 };
 
 class ADirectionalLight;
+class UAudioManager;
 class UFarmFPSSaveGame;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FStaticOnDayStateChange, EDayState);
@@ -66,13 +67,15 @@ private:
 	void StartDay();
 	void EndDay();
 
-	TObjectPtr<UAudioComponent> FindOrCreateMusicAudioComponent();
+	TObjectPtr<UAudioComponent> GetMusicAudioComponent(TObjectPtr<USoundBase> musicClip);
 
 	void EndDayFromLoading(UFarmFPSSaveGame*);
 
 	void SetDayState(EDayState newDayState);
 
 	void GenerateDailyTradeOff();
+
+	TWeakObjectPtr<UAudioManager> _audioManager;
 
 	UPROPERTY(EditDefaultsOnly)
 	FModifiedFloatValue _dayLength = 60.f;
@@ -91,8 +94,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TWeakObjectPtr<ADirectionalLight> _moonLight = nullptr;
-
-	TObjectPtr<UAudioComponent> _musicAudioComponent = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _onDayStartSound = nullptr;

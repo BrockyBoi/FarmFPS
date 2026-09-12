@@ -12,6 +12,7 @@
 // Brock
 #include "FarmFPSSaveGame.h"
 #include "Interactables/PurchaseLocation.h"
+#include "Managers/AudioManager.h"
 #include "Managers/BreadRequirementManager.h"
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
@@ -62,6 +63,11 @@ void USaveGameManager::OnPostLoadMap(UWorld*)
 	if (HasSaveGame())
 	{
 		LoadGame();
+	}
+
+	if (HasSaveGameSettings())
+	{
+		LoadGameSettings();
 	}
 }
 
@@ -126,13 +132,13 @@ void USaveGameManager::SaveGame()
 				continue;
 			}
 
-			UTutorialScreenManager* tutorialScreenManager = Cast<UTutorialScreenManager>(saveableActor->FindComponentByClass(UTutorialScreenManager::StaticClass()));
+			UTutorialScreenManager* tutorialScreenManager = saveableActor->FindComponentByClass<UTutorialScreenManager>();
 			if (IsValid(tutorialScreenManager))
 			{
 				tutorialSaveData = tutorialScreenManager->GetTutorialSaveGameData();
 			}
 
-			UBreadRequirementManager* breadRequirementManager = Cast<UBreadRequirementManager>(saveableActor->FindComponentByClass(UBreadRequirementManager::StaticClass()));
+			UBreadRequirementManager* breadRequirementManager = saveableActor->FindComponentByClass<UBreadRequirementManager>();
 			if (IsValid(breadRequirementManager))
 			{
 				breadRequirementSaveData = breadRequirementManager->GetBreadRequriementSaveGameData();
@@ -147,9 +153,27 @@ void USaveGameManager::SaveGame()
 	_farmFPSSaveGame->SetTutorialSaveData(tutorialSaveData);
 	_farmFPSSaveGame->SetBreadRequriementSaveData(breadRequirementSaveData);
 	_farmFPSSaveGame->SetPlantSaveDatas(plantSaveDatas);
-
+	
 	UGameplayStatics::SaveGameToSlot(_farmFPSSaveGame, _playerSaveGameSlotName, 0);
 	OnSavePlayerData.Broadcast();
+}
+
+void USaveGameManager::SaveGameSettings()
+{
+	FAudioManagerSaveGameData audioSaveData;
+	if (ensure(IsValid(GetOwner())))
+	{
+		UAudioManager* audioManager = GetOwner()->FindComponentByClass<UAudioManager>();
+		if (IsValid(audioManager))
+		{
+			audioSaveData = audioManager->GetSaveGameData();
+		}
+	}
+
+	_farmFPSSaveGameSettings = Cast<UFarmFPSSaveGameSettings>(UGameplayStatics::CreateSaveGameObject(UFarmFPSSaveGameSettings::StaticClass()));
+	_farmFPSSaveGameSettings->SetAudioManagerSaveData(audioSaveData);
+	UGameplayStatics::SaveGameToSlot(_farmFPSSaveGameSettings, _playerSaveGameSettingsSlotName, 0);
+	OnSavePlayerSettingsData.Broadcast();
 }
 
 void USaveGameManager::LoadGame()
@@ -164,6 +188,18 @@ void USaveGameManager::LoadGame()
 	}
 }
 
+void USaveGameManager::LoadGameSettings()
+{
+	if (HasSaveGameSettings())
+	{
+		if (!IsValid(_farmFPSSaveGameSettings))
+		{
+			_farmFPSSaveGameSettings = Cast<UFarmFPSSaveGameSettings>(UGameplayStatics::LoadGameFromSlot(_playerSaveGameSettingsSlotName, 0));
+		}
+		OnLoadGameSettingsData.Broadcast(_farmFPSSaveGameSettings);
+	}
+}
+
 void USaveGameManager::DeleteSaveGame()
 {
 	if (UGameplayStatics::DoesSaveGameExist(_playerSaveGameSlotName, 0))
@@ -172,7 +208,20 @@ void USaveGameManager::DeleteSaveGame()
 	}
 }
 
+void USaveGameManager::DeleteSaveGameSettings()
+{
+	if (UGameplayStatics::DoesSaveGameExist(_playerSaveGameSettingsSlotName, 0))
+	{
+		UGameplayStatics::DeleteGameInSlot(_playerSaveGameSettingsSlotName, 0);
+	}
+}
+
 bool USaveGameManager::HasSaveGame() const
 {
 	return UGameplayStatics::DoesSaveGameExist(_playerSaveGameSlotName, 0);
+}
+
+bool USaveGameManager::HasSaveGameSettings() const
+{
+	return UGameplayStatics::DoesSaveGameExist(_playerSaveGameSettingsSlotName, 0);
 }

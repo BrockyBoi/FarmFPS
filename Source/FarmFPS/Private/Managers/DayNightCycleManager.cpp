@@ -3,6 +3,7 @@
 #include "DayNightCycleManager.h"
 
 // Brock
+#include "Managers/AudioManager.h"
 #include "SaveSystem/SaveGameManager.h"
 #include "TradeOffUpgradeManager.h"
 
@@ -10,7 +11,6 @@
 #include "Components/AudioComponent.h"
 #include "EngineUtils.h"
 #include "Engine/DirectionalLight.h"
-#include "Kismet/GameplayStatics.h"
 
 FStaticOnDayStateChange UDayNightCycleManager::OnDayStateChange;
 
@@ -110,8 +110,8 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 		if (_timeElapsed >= _timeToReachPeakMoon)
 		{
-			FindOrCreateMusicAudioComponent()->SetSound(_nightTimeMusic);
-			FindOrCreateMusicAudioComponent()->FadeIn(0.5f, 1.f);
+			GetMusicAudioComponent(_nightTimeMusic)->Play();
+			GetMusicAudioComponent(_nightTimeMusic)->FadeIn(0.5f, 1.f);
 		}
 	}
 
@@ -137,8 +137,8 @@ void UDayNightCycleManager::ForceEndDay()
 
 void UDayNightCycleManager::TransitionToNextDay()
 {
-	UGameplayStatics::SpawnSound2D(this, _onNightEndSound);
-	FindOrCreateMusicAudioComponent()->FadeOut(0.5f, 0.f);
+	UAudioManager::SpawnSound2D(this, _onNightEndSound);
+	GetMusicAudioComponent(_nightTimeMusic)->FadeOut(0.5f, 0.f);
 
 	_timeElapsed = 0.f;
 	_currentDayState = EDayState::NightTransitionToDay;
@@ -189,18 +189,20 @@ void UDayNightCycleManager::StartDay()
 
 	if (ensure(IsValid(_onDayStartSound)) && ensure(IsValid(_daytimeMusic)))
 	{
-		TObjectPtr<UAudioComponent> musicAudioComponent = FindOrCreateMusicAudioComponent();
-		musicAudioComponent->SetSound(_daytimeMusic);
-		musicAudioComponent->FadeIn(0.5f, 1.f);
-		musicAudioComponent->Play();
+		TObjectPtr<UAudioComponent> musicAudioComponent = GetMusicAudioComponent(_daytimeMusic);
+		if (ensure(IsValid(musicAudioComponent)))
+		{
+			musicAudioComponent->FadeIn(0.5f, 1.f);
+			musicAudioComponent->Play();
+		}
 	}
 
-	UGameplayStatics::SpawnSound2D(this, _onDayStartSound);
+	UAudioManager::SpawnSound2D(this, _onDayStartSound);
 }
 
 void UDayNightCycleManager::EndDay()
 {
-	FindOrCreateMusicAudioComponent()->FadeOut(2.f, 0.f);
+	GetMusicAudioComponent(_daytimeMusic)->FadeOut(2.f, 0.f);
 
 	SetDayState(EDayState::MidNight);
 	if (OnDayEnd.IsBound())
@@ -222,18 +224,22 @@ void UDayNightCycleManager::EndDay()
 	FTimerHandle timerHandle;
 	//GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &UDayNightCycleManager::StartDay, _timeUntilAutoStartNextDay, false);
 
-	UGameplayStatics::SpawnSound2D(this, _onDayEndSound);
+	UAudioManager::SpawnSound2D(this, _onDayEndSound);
 }
 
-TObjectPtr<UAudioComponent> UDayNightCycleManager::FindOrCreateMusicAudioComponent()
+TObjectPtr<UAudioComponent> UDayNightCycleManager::GetMusicAudioComponent(TObjectPtr<USoundBase> musicClip)
 {
-	if (!IsValid(_musicAudioComponent))
+	if (!_audioManager.IsValid() && ensure(IsValid(GetOwner())))
 	{
-		_musicAudioComponent = UGameplayStatics::SpawnSound2D(this, _daytimeMusic);
-		_musicAudioComponent->bAutoDestroy = false;
+		_audioManager = GetOwner()->FindComponentByClass<UAudioManager>();
 	}
 
-	return _musicAudioComponent;
+	if (ensure(_audioManager.IsValid()))
+	{
+		return _audioManager->GetMusicAudioComponent(musicClip);
+	}
+
+	return nullptr;
 }
 
 void UDayNightCycleManager::EndDayFromLoading(UFarmFPSSaveGame*)

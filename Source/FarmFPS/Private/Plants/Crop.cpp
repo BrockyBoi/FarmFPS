@@ -4,6 +4,7 @@
 
 // Brock
 #include "Managers/ActorPool.h"
+#include "Managers/AudioManager.h"
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/PerkManager.h"
@@ -14,7 +15,6 @@
 
 // UE
 #include "FarmFPSCharacter.h"
-#include "Kismet/GameplayStatics.h"
 
 ACrop::ACrop() : Super()
 {
@@ -194,7 +194,7 @@ void ACrop::SpawnResourceActors()
 
 	if (IsValid(_onBreakCropSound))
 	{
-		UGameplayStatics::SpawnSoundAtLocation(this, _onBreakCropSound, GetActorLocation());
+		UAudioManager::SpawnSoundAtLocation(this, _onBreakCropSound, GetActorLocation());
 	}
 }
 

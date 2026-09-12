@@ -25,3 +25,17 @@ class FARMFPS_API ISaveable
 public:
 	virtual void OnGameLoaded(UFarmFPSSaveGame* saveGame) = 0;
 };
+
+UINTERFACE(MinimalAPI)
+class USaveableSettings : public UInterface
+{
+	GENERATED_BODY()
+};
+
+class FARMFPS_API ISaveableSettings
+{
+	GENERATED_BODY()
+
+public:
+	virtual void OnGameLoaded(UFarmFPSSaveGameSettings* saveGame) = 0;
+};

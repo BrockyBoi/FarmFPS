@@ -7,6 +7,7 @@
 #include "Interactables/BreadStand.h"
 #include "Managers/ActorLookupComponent.h"
 #include "Managers/ActorPool.h"
+#include "Managers/AudioManager.h"
 #include "Managers/BreadRequirementManager.h"
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/ObjectiveManager.h"
@@ -241,6 +242,22 @@ USaveGameManager* UFarmFPSUtilities::GetSaveGameManager(const UObject* WorldCont
 	if (IsValid(saveGameManager))
 	{
 		return saveGameManager;
+	}
+
+	return nullptr;
+}
+
+UAudioManager* UFarmFPSUtilities::GetAudioManager(const UObject* WorldContextObject)
+{
+	if (!IsValid(WorldContextObject) || !IsValid(GetGameBaseState(WorldContextObject)))
+	{
+		return nullptr;
+	}
+
+	UAudioManager* audioManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UAudioManager>();
+	if (IsValid(audioManager))
+	{
+		return audioManager;
 	}
 
 	return nullptr;

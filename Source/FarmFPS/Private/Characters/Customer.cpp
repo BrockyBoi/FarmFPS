@@ -3,6 +3,7 @@
 #include "Customer.h"
 
 // Brock
+#include "Managers/AudioManager.h"
 #include "Managers/BreadRequirementManager.h"
 #include "Interactables/BreadStand.h"
 #include "Managers/CustomerQueue.h"
@@ -16,7 +17,6 @@
 
 // UE
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Kismet/GameplayStatics.h"
 #include "Navigation/PathFollowingComponent.h"
 
 ACustomer::ACustomer()
@@ -188,7 +188,7 @@ void ACustomer::AttemptBuyBreadAtFrontOfQueue()
 
 			if (IsValid(_onBoughtBreadSound))
 			{
-				UGameplayStatics::SpawnSoundAtLocation(this, _onBoughtBreadSound, GetActorLocation());
+				UAudioManager::SpawnSoundAtLocation(this, _onBoughtBreadSound, GetActorLocation());
 			}
 
 			MoveOutOfMap();

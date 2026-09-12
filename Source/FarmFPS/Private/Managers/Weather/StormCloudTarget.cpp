@@ -3,12 +3,10 @@
 #include "StormCloudTarget.h"
 
 // Brock
+#include "Managers/AudioManager.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Projectiles/CropResourceProjectile.h"
 #include "WeatherManager.h"
-
-// UE
-#include "Kismet/GameplayStatics.h"
 
 AStormCloudTarget::AStormCloudTarget()
 {
@@ -29,7 +27,7 @@ void AStormCloudTarget::BeginPlay()
 
 	if (IsValid(_onStormCloudSpawn))
 	{
-		UGameplayStatics::SpawnSoundAtLocation(this, _onStormCloudSpawn, GetActorLocation());
+		UAudioManager::SpawnSoundAtLocation(this, _onStormCloudSpawn, GetActorLocation());
 	}
 }
 

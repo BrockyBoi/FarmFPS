@@ -16,6 +16,7 @@ class ABreadStand;
 class AGameStateBase;
 class UActorLookupComponent;
 class UActorPool;
+class UAudioManager;
 class UBreadRequirementManager;
 class UCustomerSpawnerManager;
 class UDayNightCycleManager;
@@ -76,6 +77,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "FarmFPS|Utilities", meta = (WorldContext = "WorldContextObject"))
 	static USaveGameManager* GetSaveGameManager(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintPure, Category = "FarmFPS|Utilities", meta = (WorldContext = "WorldContextObject"))
+	static UAudioManager* GetAudioManager(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintPure, Category = "FarmFPS|Utilities", meta = (WorldContext = "WorldContextObject"))
 	static float GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, const FGameplayTagContainer& perkTags, float valueToModify);

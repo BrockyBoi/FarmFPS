@@ -7,6 +7,7 @@
 
 //Brock
 #include "Managers/ActorPool.h"
+#include "Managers/AudioManager.h"
 #include "Interactables/AutomaticResourceTransferPoint.h"
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
@@ -17,7 +18,6 @@
 // UE
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
-#include "Kismet/GameplayStatics.h"
 
 FOnCollected AResourcePickupActor::OnCollected;
 
@@ -59,7 +59,7 @@ void AResourcePickupActor::Tick(float DeltaTime)
 
 			if (ensure(IsValid(_onCollectResourceSound)))
 			{
-				UGameplayStatics::SpawnSoundAtLocation(this, _onCollectResourceSound, GetActorLocation());
+				UAudioManager::SpawnSoundAtLocation(this, _onCollectResourceSound, GetActorLocation());
 			}
 
 			OnCollected.Broadcast(_resourceType);

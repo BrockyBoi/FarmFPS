@@ -2,30 +2,25 @@
 
 #pragma once
 
-// Brock
-#include "Managers/PerkData.h"
-
 // UE
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 
 // Generated
-#include "PlayerSaveData.generated.h"
+#include "AudioManagerSaveGameData.generated.h"
 
 USTRUCT(BlueprintType)
-struct FPlayerSaveData
+struct FAudioManagerSaveGameData
 {
 	GENERATED_BODY()
 
+public:
 	UPROPERTY()
-	int MoneyCount;
+	float FXAudioMultiplier;
 
 	UPROPERTY()
-	TArray<FGameplayTag> PlayerUnlockedPerks;
+	float MusicAudioMultiplier;
 
 	UPROPERTY()
-	TArray<FPerkData> PlayerPerks;
-
-	UPROPERTY()
-	TArray<FGameplayTag> UnlockedWeapons;
+	float MasterAudioMultiplier;
 };

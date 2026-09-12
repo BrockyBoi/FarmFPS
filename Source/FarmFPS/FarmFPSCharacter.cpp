@@ -5,6 +5,7 @@
 // Brock
 #include "CustomerSpawnerManager.h"
 #include "Managers/ActorPool.h"
+#include "Managers/AudioManager.h"
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/PerkManager.h"
@@ -30,7 +31,6 @@
 #include "FarmFPS.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputActionValue.h"
-#include "Kismet/GameplayStatics.h"
 
 AFarmFPSCharacter::AFarmFPSCharacter()
 {

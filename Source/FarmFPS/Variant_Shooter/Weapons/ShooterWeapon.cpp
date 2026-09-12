@@ -4,6 +4,7 @@
 
 // Brock
 #include "Managers/ActorPool.h"
+#include "Managers/AudioManager.h"
 #include "Managers/ModifiedValueData.h"
 
 // UE
@@ -208,7 +209,7 @@ void AShooterWeapon::Fire()
 
 	if (IsValid(_onShootSound))
 	{
-		UGameplayStatics::SpawnSoundAtLocation(this, _onShootSound, GetActorLocation());
+		UAudioManager::SpawnSoundAtLocation(this, _onShootSound, GetActorLocation());
 	}
 
 	_currentTimeCharging = 0.f;

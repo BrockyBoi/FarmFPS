@@ -3,6 +3,7 @@
 #pragma once
 
 // Brock
+#include "AudioManagerSaveGameData.h"
 #include "BreadRequirementManagerSaveGameData.h"
 #include "PlantSaveData.h"
 #include "PlayerSaveData.h"
@@ -29,6 +30,7 @@ public:
 	const FTutorialSaveGameData& GetTutorialSaveData() { return TutorialSaveData; }
 	const FBreadRequirementManagerSaveGameData& GetBreadRequirmentSaveData() { return BreadRequirementSaveData; }
 	const TArray<FPlantSaveData>& GetPlantSaveDatas() { return PlantSaveDatas; }
+	const FAudioManagerSaveGameData& GetAudioSaveGameData() { return AudioManagerSaveData; }
 
 	void SetPlayerSaveData(const FPlayerSaveData& newPlayerSaveData) { PlayerSaveData = newPlayerSaveData; }
 	void SetUpgradeLocationSaveDatas(const TArray<FUpgradeLocationSaveData>& newUpgradeLocationSaveDatas) { UpgradeLocationSaveDatas = newUpgradeLocationSaveDatas; }
@@ -36,6 +38,7 @@ public:
 	void SetTutorialSaveData(const FTutorialSaveGameData& tutorialSaveData) { TutorialSaveData = tutorialSaveData; }
 	void SetBreadRequriementSaveData(const FBreadRequirementManagerSaveGameData& breadRequirementSaveData) { BreadRequirementSaveData = breadRequirementSaveData; }
 	void SetPlantSaveDatas(const TArray<FPlantSaveData>& plantSaveDatas) { PlantSaveDatas = plantSaveDatas; }
+	void SetAudioManagerSaveData(const FAudioManagerSaveGameData audioManagerSaveData) { AudioManagerSaveData = audioManagerSaveData; }
 
 protected:
 	UPROPERTY()
@@ -55,4 +58,22 @@ protected:
 
 	UPROPERTY()
 	FBreadRequirementManagerSaveGameData BreadRequirementSaveData;
+
+	UPROPERTY()
+	FAudioManagerSaveGameData AudioManagerSaveData;
+};
+
+UCLASS()
+class UFarmFPSSaveGameSettings : public USaveGame
+{
+	GENERATED_BODY()
+
+public:
+	const FAudioManagerSaveGameData& GetAudioSaveGameData() { return AudioManagerSaveData; }
+
+	void SetAudioManagerSaveData(const FAudioManagerSaveGameData audioManagerSaveData) { AudioManagerSaveData = audioManagerSaveData; }
+
+protected:
+	UPROPERTY()
+	FAudioManagerSaveGameData AudioManagerSaveData;
 };
