@@ -82,7 +82,10 @@ public:
 	/** Returns the current bullet count */
 	int32 GetBulletCount() const { return CurrentBullets; }
 
+	UFUNCTION(BlueprintPure)
 	const FGameplayTag& GetWeaponResourceType() const { return WeaponResourceType; }
+
+	UFUNCTION(BlueprintPure)
 	const FGameplayTag& GetWeaponTypeTag() const { return WeaponTypeTag; }
 
 	static FOnWeaponCollected OnWeaponCollected;

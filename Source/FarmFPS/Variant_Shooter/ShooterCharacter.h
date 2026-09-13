@@ -76,6 +76,9 @@ public:
 	/** Notifies the owner that the weapon cooldown has expired and it's ready to shoot again */
 	virtual void OnSemiWeaponRefire() override;
 
+	UFUNCTION(BlueprintPure)
+	int GetCurrentWeaponIndex() const;
+
 	/** Handles start firing input */
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	void DoStartFiring();
@@ -98,6 +101,14 @@ public:
 
 	/** Damaged delegate */
 	FDamagedDelegate OnDamaged;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponActivated, AShooterWeapon*, ShooterWeapon);
+
+	UPROPERTY(BlueprintAssignable)
+	FOnWeaponActivated OnNewWeaponAdded;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnWeaponActivated OnNewWeaponActivated;
 
 protected:
 	/** Gameplay initialization */

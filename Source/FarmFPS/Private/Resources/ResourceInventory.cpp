@@ -64,11 +64,25 @@ void UResourceInventory::SetResourceAmount(const FGameplayTag& resourceType, flo
 	{
 		return;
 	}
+
+	bool isNewResource = !_resourcesMap.Contains(resourceType);
 	
 	float& resourceCount = _resourcesMap.FindOrAdd(resourceType, 0);
 	resourceCount = FMath::Clamp(newAmount, 0, GetResourceCap(resourceType));
+	int newResourceCount = GetResourceCount(resourceType);
 
-	OnResourceCountChanged.Broadcast(resourceType, GetResourceCount(resourceType));
+	if (isNewResource)
+	{
+		OnNewResourceAdded.Broadcast(resourceType, newResourceCount);
+	}
+
+	OnResourceCountChanged.Broadcast(resourceType, newResourceCount);
+
+	if (!isNewResource && newResourceCount == 0)
+	{
+		OnResourceRemoved.Broadcast(resourceType, 0);
+		_resourcesMap.Remove(resourceType);
+	}
 }
 
 void UResourceInventory::AddAllResourcesInInventory(UResourceInventory* otherInventory)
@@ -109,7 +123,7 @@ void UResourceInventory::ListenToDayCycleEvents(bool listen)
 
 float UResourceInventory::GetResourceCount(const FGameplayTag& resourceType) const
 {
-	return _resourcesMap.FindOrAdd(resourceType, 0.f);
+	return _resourcesMap.Contains(resourceType) ? _resourcesMap[resourceType] : 0.f;
 }
 
 bool UResourceInventory::HasResourceAmount(const FGameplayTag& resourceType, float amount) const

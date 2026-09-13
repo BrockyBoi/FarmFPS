@@ -59,6 +59,12 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnResourceCountChangedEvent, const FGameplayTag&, resourceType, float, newAmount);
 	
 	UPROPERTY(BlueprintAssignable)
+	FOnResourceCountChangedEvent OnNewResourceAdded;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnResourceCountChangedEvent OnResourceRemoved;
+
+	UPROPERTY(BlueprintAssignable)
 	FOnResourceCountChangedEvent OnResourceCountChanged;
 
 protected:

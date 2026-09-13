@@ -290,8 +290,6 @@ void AShooterCharacter::AddWeaponClass(const TSubclassOf<AShooterWeapon>& Weapon
 				CurrentWeapon->DeactivateWeapon();
 			}
 
-			OnNewWeaponAdded.Broadcast(AddedWeapon);
-
 			// switch to the new weapon
 			CurrentWeapon = AddedWeapon;
 			CurrentWeapon->ActivateWeapon();

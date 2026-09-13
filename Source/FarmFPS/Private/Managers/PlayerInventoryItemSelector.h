@@ -23,6 +23,8 @@ public:
 	void IncreaseIndex();
 	void DecreaseIndex();
 	void SetIndexValue(int index);
+
+	UFUNCTION(BlueprintPure)
 	int GetCurrentIndex() const { return _currentSelectedIndex; }
 
 	void SetPlayerInventory(UResourceInventory* playerInventory);
@@ -35,6 +37,11 @@ public:
 
 	DECLARE_MULTICAST_DELEGATE_TwoParams(FOnIndexChangedEvent, int index, FGameplayTag resourceType);
 	FOnIndexChangedEvent OnIndexChanged;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDynamicOnIndexChanged, int, index);
+
+	UPROPERTY(BlueprintAssignable)
+	FDynamicOnIndexChanged OnDynamicIndexChanged;
 
 protected:
 	virtual void BeginPlay() override;
