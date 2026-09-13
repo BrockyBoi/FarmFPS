@@ -136,14 +136,26 @@ void UAudioManager::AddFXAudioComponentToArray(TObjectPtr<UAudioComponent> audio
 void UAudioManager::OnFXAudioComponentStopPlaying()
 {
 	TArray<TObjectPtr<UAudioComponent>> currentlyPlayingAudio = _currentlyPlayingFXAudioComponents;
-	for (auto audioComponent : currentlyPlayingAudio)
+	for (int i = 0; i < currentlyPlayingAudio.Num(); i++)
 	{
-		if (ensure(IsValid(audioComponent)) && !audioComponent->IsPlaying())
+		if (currentlyPlayingAudio.IsValidIndex(i))
 		{
-			audioComponent->OnAudioFinished.RemoveAll(this);
-			_currentlyPlayingFXAudioComponents.Remove(audioComponent);
+			UAudioComponent* audioComponent = currentlyPlayingAudio[i];
+			if (!IsValid(audioComponent))
+			{
+				currentlyPlayingAudio.RemoveAt(i);
+				i--;
+			}
+			else if (!audioComponent->IsPlaying())
+			{
+				audioComponent->OnAudioFinished.RemoveAll(this);
+				currentlyPlayingAudio.RemoveAt(i);
+				i--;
+			}
 		}
 	}
+
+	_currentlyPlayingFXAudioComponents = currentlyPlayingAudio;
 }
 
 TObjectPtr<UAudioComponent> UAudioManager::GetMusicAudioComponent(TObjectPtr<USoundBase> musicClip)

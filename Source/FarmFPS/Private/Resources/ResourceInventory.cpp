@@ -89,10 +89,12 @@ void UResourceInventory::AddAllResourcesInInventory(UResourceInventory* otherInv
 {
 	if (_canAddResources && ensure(IsValid(otherInventory)))
 	{
-		for (auto pair : otherInventory->_resourcesMap)
+		TArray<FGameplayTag> keys;
+		otherInventory->_resourcesMap.GetKeys(keys);
+		for (auto resourceType : keys)
 		{
-			AddResource(pair.Key, pair.Value);
-			otherInventory->RemoveResource(pair.Key, pair.Value);
+			AddResource(resourceType, otherInventory->GetResourceCount(resourceType));
+			otherInventory->SetResourceAmount(resourceType, 0);
 		}
 	}
 }
@@ -166,9 +168,10 @@ void UResourceInventory::OnDayEnd()
 
 void UResourceInventory::ClearAllExceptMoney()
 {
-	for (auto pair : _resourcesMap)
+	TArray<FGameplayTag> keys;
+	_resourcesMap.GetKeys(keys);
+	for (auto resourceType : keys)
 	{
-		const FGameplayTag& resourceType = pair.Key;
 		if (!resourceType.MatchesTag(ResourceTypeTag::Money))
 		{
 			SetResourceAmount(resourceType, 0);

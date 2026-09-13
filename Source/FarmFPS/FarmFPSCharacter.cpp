@@ -496,9 +496,11 @@ void AFarmFPSCharacter::ThrowInventoryItem()
 	if (ensure(IsValid(_itemSelector)) && ensure(IsValid(_inventory)))
 	{
 		FGameplayTag currentResource = _itemSelector->GetCurrentSelectedItemType();
-		if (currentResource != ResourceTypeTag::None && _inventory->HasResourceAmount(currentResource, 1))
+		float throwCount = 1;
+		if (currentResource != ResourceTypeTag::None && _inventory->HasResourceAmount(currentResource, throwCount))
 		{
-			_inventory->RemoveResource(currentResource, 1);
+			bool depleteResources = _inventory->GetResourceCount(currentResource) <= throwCount;
+			_inventory->RemoveResource(currentResource, throwCount);
 			UActorPool* pool = UFarmFPSUtilities::GetActorPool(this);
 			if (ensure(IsValid(pool)))
 			{
@@ -514,8 +516,15 @@ void AFarmFPSCharacter::ThrowInventoryItem()
 				}
 			}
 
-			_throwInterval = FMath::Max(_throwInterval - _throwIntervalSpeedUpPerThrow.GetModifiedValue(this), _minThrowSpeedInterval);
-			GetWorld()->GetTimerManager().SetTimer(_throwTimerHandle, this, &AFarmFPSCharacter::ThrowInventoryItem, _throwInterval, false);
+			if (!depleteResources)
+			{
+				_throwInterval = FMath::Max(_throwInterval - _throwIntervalSpeedUpPerThrow.GetModifiedValue(this), _minThrowSpeedInterval);
+				GetWorld()->GetTimerManager().SetTimer(_throwTimerHandle, this, &AFarmFPSCharacter::ThrowInventoryItem, _throwInterval, false);
+			}
+			else
+			{
+				OnThrowStop();
+			}
 		}
 	}
 }

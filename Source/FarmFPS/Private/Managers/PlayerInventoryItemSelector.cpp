@@ -54,7 +54,7 @@ void UPlayerInventoryItemSelector::SetIndexValue(int index)
 
 	_currentSelectedIndex = FMath::Clamp(index, 0, _currentInventoryItemTypes.Num() - 1);
 
-	if (ensure(_currentInventoryItemTypes.IsValidIndex(index)))
+	if (_currentInventoryItemTypes.IsValidIndex(index))
 	{
 		_currentSelectedIndex = index;
 		OnIndexChanged.Broadcast(_currentSelectedIndex, GetCurrentSelectedItemType());
@@ -84,6 +84,7 @@ void UPlayerInventoryItemSelector::OnResourceChanged(const FGameplayTag& resourc
 	if (!_currentInventoryItemTypes.Contains(resourceType) && newAmount > 0)
 	{
 		_currentInventoryItemTypes.Add(resourceType);
+		SetIndexValue(0);
 	}
 
 	if(startingItemTypeCount == 0 && _currentInventoryItemTypes.Num() > 0)
@@ -91,10 +92,11 @@ void UPlayerInventoryItemSelector::OnResourceChanged(const FGameplayTag& resourc
 		SetIndexValue(0);
 	}
 
-	if (startingItemTypeCount > 0 && newAmount == 0 && _currentInventoryItemTypes.Num() > 1)
+	if (startingItemTypeCount > 0 && newAmount <= 0)
 	{
 		_currentInventoryItemTypes.Remove(resourceType);
-		SetIndexValue(_currentSelectedIndex - 1);
+
+		SetIndexValue(FMath::Clamp(_currentSelectedIndex - 1, 0, _currentInventoryItemTypes.Num() - 1));
 	}
 }
 
