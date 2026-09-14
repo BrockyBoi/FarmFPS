@@ -427,6 +427,11 @@ FPlayerSaveData AFarmFPSCharacter::GetPlayerSaveData() const
 
 void AFarmFPSCharacter::MoveInput(const FInputActionValue& Value)
 {
+	if (GetIsShowingTradeOff())
+	{
+		return;
+	}
+
 	// get the Vector2D move axis
 	FVector2D MovementVector = Value.Get<FVector2D>();
 

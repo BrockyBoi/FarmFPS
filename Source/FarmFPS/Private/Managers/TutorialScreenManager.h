@@ -18,6 +18,7 @@
 UENUM(BlueprintType)
 enum class ETutorialScreenType : uint8
 {
+	OnPlayerSpawned,
 	PickUpLightGun,
 	PickUpWaterGun,
 	PickUpSeedGun,

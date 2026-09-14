@@ -32,6 +32,9 @@ void UTutorialScreenManager::BeginPlay()
 	{
 		saveGameManager->OnLoadGameData.AddUObject(this, &UTutorialScreenManager::OnGameLoaded);
 	}
+
+	FTimerHandle handle;
+	GetWorld()->GetTimerManager().SetTimer(handle, FTimerDelegate::CreateUObject(this, &UTutorialScreenManager::AttemptShowScreen, ETutorialScreenType::OnPlayerSpawned), .5f, false);
 }
 
 void UTutorialScreenManager::EndPlay(EEndPlayReason::Type EndPlayReason)

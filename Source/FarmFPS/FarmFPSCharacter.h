@@ -152,6 +152,12 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	void ThrowInventoryItem();
 
+	UFUNCTION(BlueprintCallable)
+	void SetIsShowingTradeOff(bool isShowingTradeOff) { _isShowingTradeOff = isShowingTradeOff; }
+
+	UFUNCTION(BlueprintPure)
+	bool GetIsShowingTradeOff() const { return _isShowingTradeOff; }
+
 	/** Handles aim inputs from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoAim(float Yaw, float Pitch);
@@ -285,6 +291,8 @@ protected:
 	float _startingJumpHeight = 0;
 
 	bool _isMeleeing = false;
+
+	bool _isShowingTradeOff = false;
 
 	FTimerHandle _meleeTimerHandle;
 
