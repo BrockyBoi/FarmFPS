@@ -16,6 +16,8 @@
 // UE
 #include "FarmFPSCharacter.h"
 
+FOnCropPlanted ACrop::OnCropPlanted;
+
 ACrop::ACrop() : Super()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -32,6 +34,8 @@ UCapsuleComponent* ACrop::GetCapsuleComponent() const
 void ACrop::BeginPlay()
 {
 	Super::BeginPlay();
+
+	OnCropPlanted.Broadcast(_cropData.ResourceType);
 }
 
 void ACrop::Tick(float DeltaTime)

@@ -211,7 +211,7 @@ void AShooterCharacter::DoSwitchWeapon(const FInputActionValue& Value)
 
 void AShooterCharacter::DoReload()
 {
-	if (!IsDead() && OwnedWeapons.Num() > 1 && ensure(IsValid(CurrentWeapon)) && CurrentWeapon->GetBulletCount() > 0)
+	if (!IsDead() && OwnedWeapons.Num() > 0 && ensure(IsValid(CurrentWeapon)) && CurrentWeapon->GetBulletCount() > 0)
 	{
 		CurrentWeapon->StartReload();
 	}

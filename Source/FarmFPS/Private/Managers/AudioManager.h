@@ -52,8 +52,8 @@ public:
 
 	TObjectPtr<UAudioComponent> GetMusicAudioComponent(TObjectPtr<USoundBase> musicClip);
 
-	static void SpawnSoundAtLocation(UObject* worldContext, TObjectPtr<USoundBase> soundClip, const FVector& location);
-	static void SpawnSound2D(UObject* worldContext, TObjectPtr<USoundBase> soundClip);
+	static UAudioComponent* SpawnSoundAtLocation(UObject* worldContext, TObjectPtr<USoundBase> soundClip, const FVector& location);
+	static UAudioComponent* SpawnSound2D(UObject* worldContext, TObjectPtr<USoundBase> soundClip);
 	static TObjectPtr<UAudioComponent> SpawnMusic2D(UObject* worldContext, TObjectPtr<USoundBase> musicClip);
 
 protected:

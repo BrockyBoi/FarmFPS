@@ -3,8 +3,12 @@
 #include "BreadOven.h"
 
 // Brock
+#include "Managers/AudioManager.h"
 #include "Projectiles/CropResourceProjectile.h"
 #include "Resources/ResourceTypeTag.h"
+
+// UE
+#include "Components/AudioComponent.h"
 
 FOnIngreientAddedToOven ABreadOven::OnIngredientAddedToOven;
 
@@ -80,6 +84,7 @@ void ABreadOven::OnFireTargetOverlap(UPrimitiveComponent* OverlappedComponent, A
 		if (cropProjectile->GetProjectileType() == ResourceTypeTag::Light)
 		{
 			SetHeatLevel(_ovenHeat + _heatGainOnLight);
+
 		}
 		else if (cropProjectile->GetProjectileType() == ResourceTypeTag::Water)
 		{
@@ -97,6 +102,7 @@ void ABreadOven::SpawnResource(ResourcesToSpawnData& data)
 {
 	if (IsHeatTooHigh())
 	{
+		UAudioManager::SpawnSoundAtLocation(this, _onFireBurnSound, GetActorLocation());
 		data.AmountToSpawn--;
 		return;
 	}
@@ -127,7 +133,38 @@ FLinearColor ABreadOven::GetHeatColorText() const
 
 void ABreadOven::SetHeatLevel(float newHeat)
 {
+	float previousHeat = _ovenHeat;
 	_ovenHeat = FMath::Clamp(newHeat, 0.f, 100.f);
+
+	// If was at 0 and now higher
+	if (FMath::IsNearlyZero(previousHeat) && !FMath::IsNearlyZero(_ovenHeat))
+	{
+		_fireAudioComponent = UAudioManager::SpawnSoundAtLocation(this, _ambientFireSound, GetActorLocation());
+		if (ensure(_fireAudioComponent.IsValid()))
+		{
+			_fireAudioComponent->bAutoDestroy = false;
+			_fireAudioComponent->bAutoActivate = true;
+		}
+
+		SetActorTickEnabled(true);
+	}
+	// If was higher than 0, but is now 0
+	else if (!FMath::IsNearlyZero(previousHeat) && FMath::IsNearlyZero(_ovenHeat))
+	{
+		SetActorTickEnabled(false);
+
+		if (_fireAudioComponent.IsValid())
+		{
+			_fireAudioComponent->Stop();
+			_fireAudioComponent = nullptr;
+		}
+	}
+
+	if (_fireAudioComponent.IsValid())
+	{
+		_fireAudioComponent->SetVolumeMultiplier(FMath::Lerp(_minFireAmbientVolume, _maxFireAmbientVolume, newHeat / 100.f));
+	}
+
 	OnOvenHeatChanged.Broadcast(_ovenHeat);
 	Cosmetic_OnOvenHeatChanged(_ovenHeat);
 }

@@ -3,6 +3,7 @@
 #include "TutorialScreenManager.h"
 
 // Brock
+#include "Plants/Crop.h"
 #include "Plants/Plant.h"
 #include "Interactables/BreadOven.h"
 #include "Interactables/BreadStand.h"
@@ -26,6 +27,7 @@ void UTutorialScreenManager::BeginPlay()
 	ABreadOven::OnIngredientAddedToOven.AddUObject(this, &UTutorialScreenManager::OnIngredientAddedToOven);
 	ABreadStand::OnBreadAddedToStand.AddUObject(this, &UTutorialScreenManager::OnBreadAddedToStand);
 	UDayNightCycleManager::OnDayStateChange.AddUObject(this, &UTutorialScreenManager::OnDayNightCycleStateChanged);
+	ACrop::OnCropPlanted.AddUObject(this, &UTutorialScreenManager::OnCropPlanted);
 
 	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
 	if (ensure(IsValid(saveGameManager)))
@@ -45,6 +47,7 @@ void UTutorialScreenManager::EndPlay(EEndPlayReason::Type EndPlayReason)
 	ABreadOven::OnIngredientAddedToOven.RemoveAll(this);
 	ABreadStand::OnBreadAddedToStand.RemoveAll(this);
 	UDayNightCycleManager::OnDayStateChange.RemoveAll(this);
+	ACrop::OnCropPlanted.RemoveAll(this);
 
 	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
 	if (IsValid(saveGameManager))
@@ -73,6 +76,15 @@ FTutorialSaveGameData UTutorialScreenManager::GetTutorialSaveGameData() const
 	FTutorialSaveGameData saveData;
 	saveData.ShouldShowTutorials = _shouldShowTutorials;
 
+	TArray<ETutorialScreenType> tutorialsShown;
+	TArray<uint8> tutorialsShownInts;
+	_shownTutorialScreensMap.GetKeys(tutorialsShown);
+	for (auto tutorial : tutorialsShown)
+	{
+		tutorialsShownInts.Add((uint8)tutorial);
+	}
+	saveData.TutorialsShown = tutorialsShownInts;
+
 	return saveData;
 }
 
@@ -84,6 +96,11 @@ void UTutorialScreenManager::OnGameLoaded(UFarmFPSSaveGame* saveGame)
 		if (!_shouldShowTutorials)
 		{
 			OnTutorialScreenForceClosed.Broadcast();
+		}
+
+		for (uint8 tutorialType : saveGame->GetTutorialSaveData().TutorialsShown)
+		{
+			_shownTutorialScreensMap.Add((ETutorialScreenType)tutorialType, true);
 		}
 	}
 }
@@ -134,6 +151,11 @@ void UTutorialScreenManager::OnResourceCollected(const FGameplayTag& resourceTyp
 	{
 		AttemptShowScreen(ETutorialScreenType::ObtainFirstBread);
 	}
+}
+
+void UTutorialScreenManager::OnCropPlanted(const FGameplayTag& resourceType)
+{
+	AttemptShowScreen(ETutorialScreenType::PlantFirstSeed);
 }
 
 void UTutorialScreenManager::OnPlantFullyGrown()

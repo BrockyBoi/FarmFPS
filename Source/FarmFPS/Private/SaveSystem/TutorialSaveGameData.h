@@ -17,4 +17,7 @@ struct FTutorialSaveGameData
 public:
 	UPROPERTY()
 	bool ShouldShowTutorials;
+
+	UPROPERTY()
+	TArray<uint8> TutorialsShown;
 };

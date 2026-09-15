@@ -87,6 +87,10 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 				else
 				{
 					actorPool->AddActorToPool(ProjectileType, crop, EPooledActorType::Crop);
+					if (IsValid(_unableToPlantSound))
+					{
+						UAudioManager::SpawnSoundAtLocation(this, _unableToPlantSound, GetActorLocation());
+					}
 					return;
 				}
 			}

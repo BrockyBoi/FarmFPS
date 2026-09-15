@@ -22,6 +22,7 @@ enum class ETutorialScreenType : uint8
 	PickUpLightGun,
 	PickUpWaterGun,
 	PickUpSeedGun,
+	PlantFirstSeed,
 	FullyGrowCrop,
 	PickUpFirstResource,
 	ThrowResourceIntoOven,
@@ -84,6 +85,9 @@ private:
 
 	UFUNCTION()
 	void OnResourceCollected(const FGameplayTag& resourceType);
+
+	UFUNCTION()
+	void OnCropPlanted(const FGameplayTag& resourceType);
 
 	UFUNCTION()
 	void OnPlantFullyGrown();

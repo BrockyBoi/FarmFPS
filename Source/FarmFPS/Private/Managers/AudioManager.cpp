@@ -168,22 +168,25 @@ TObjectPtr<UAudioComponent> UAudioManager::GetMusicAudioComponent(TObjectPtr<USo
 	return SpawnMusic2D(this, musicClip);
 }
 
-void UAudioManager::SpawnSoundAtLocation(UObject* worldContext, TObjectPtr<USoundBase> soundClip, const FVector& location)
+UAudioComponent* UAudioManager::SpawnSoundAtLocation(UObject* worldContext, TObjectPtr<USoundBase> soundClip, const FVector& location)
 {
 	UAudioManager* audioManager = UFarmFPSUtilities::GetAudioManager(worldContext);
 	if (ensure(IsValid(audioManager)) && ensure(IsValid(soundClip)))
 	{
-		auto audioComponent = UGameplayStatics::SpawnSoundAtLocation(worldContext, soundClip, location, FRotator::ZeroRotator, audioManager->GetModifiedFXMultiplier());
+		UAudioComponent* audioComponent = UGameplayStatics::SpawnSoundAtLocation(worldContext, soundClip, location, FRotator::ZeroRotator, audioManager->GetModifiedFXMultiplier());
 		if (ensure(IsValid(audioComponent)))
 		{
 			audioComponent->bAutoDestroy = true;
 			audioComponent->OnAudioFinished.AddDynamic(audioManager, &UAudioManager::OnFXAudioComponentStopPlaying);
 			audioManager->AddFXAudioComponentToArray(audioComponent);
+			return audioComponent;
 		}
 	}
+
+	return nullptr;
 }
 
-void UAudioManager::SpawnSound2D(UObject* worldContext, TObjectPtr<USoundBase> soundClip)
+UAudioComponent* UAudioManager::SpawnSound2D(UObject* worldContext, TObjectPtr<USoundBase> soundClip)
 {
 	UAudioManager* audioManager = UFarmFPSUtilities::GetAudioManager(worldContext);
 	if (ensure(IsValid(audioManager)) && ensure(IsValid(soundClip)))
@@ -194,8 +197,11 @@ void UAudioManager::SpawnSound2D(UObject* worldContext, TObjectPtr<USoundBase> s
 			audioComponent->bAutoDestroy = true;
 			audioComponent->OnAudioFinished.AddDynamic(audioManager, &UAudioManager::OnFXAudioComponentStopPlaying);
 			audioManager->AddFXAudioComponentToArray(audioComponent);
+			return audioComponent;
 		}
 	}
+
+	return nullptr;
 }
 
 TObjectPtr<UAudioComponent> UAudioManager::SpawnMusic2D(UObject* worldContext, TObjectPtr<USoundBase> musicClip)

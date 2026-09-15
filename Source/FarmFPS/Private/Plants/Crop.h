@@ -20,6 +20,8 @@ class AResourcePickupActor;
 class UCapsuleComponent;
 class UResourceInventory;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnCropPlanted, const FGameplayTag&);
+
 UCLASS()
 class ACrop : public APlant, public IPoolableActor
 {
@@ -35,6 +37,8 @@ public:
 	bool GetIsInPerfectTiming() const { return _isInPerfectTiming; }
 
 	UCapsuleComponent* GetCapsuleComponent() const;
+
+	static FOnCropPlanted OnCropPlanted;
 
 protected:
 	virtual void BeginPlay() override;

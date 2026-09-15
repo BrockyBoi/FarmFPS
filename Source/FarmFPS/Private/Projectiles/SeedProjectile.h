@@ -35,6 +35,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _onSeedPlantedSound;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> _unableToPlantSound;
+
 	UPROPERTY(EditDefaultsOnly)
 	FModifiedFloatValue _minDistanceFromNearestCrop = 15.f;
 

@@ -93,4 +93,18 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	USphereComponent* _fireTargetCollider = nullptr;
+
+	TWeakObjectPtr<UAudioComponent> _fireAudioComponent = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	float _minFireAmbientVolume = .35f;
+
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	float _maxFireAmbientVolume = .75f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> _ambientFireSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> _onFireBurnSound;
 };
