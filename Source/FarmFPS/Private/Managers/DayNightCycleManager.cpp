@@ -141,7 +141,7 @@ void UDayNightCycleManager::TransitionToNextDay()
 	GetMusicAudioComponent(_nightTimeMusic)->FadeOut(0.5f, 0.f);
 
 	_timeElapsed = 0.f;
-	_currentDayState = EDayState::NightTransitionToDay;
+	SetDayState(EDayState::NightTransitionToDay);
 }
 
 float UDayNightCycleManager::GetPercentageDayElapsed() const

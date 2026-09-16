@@ -147,9 +147,9 @@ void UTutorialScreenManager::OnDayNightCycleStateChanged(EDayState newDayState)
 	{
 		AttemptShowScreen(ETutorialScreenType::FirstNight);
 	}
-	else if (newDayState == EDayState::WaitingForTradeOff)
+	else if (newDayState == EDayState::NightTransitionToDay)
 	{
-		AttemptShowScreen(ETutorialScreenType::FirstNight);
+		AttemptShowScreen(ETutorialScreenType::MoonGoDown);
 	}
 }
 
