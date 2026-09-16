@@ -190,7 +190,6 @@ void UTutorialScreenManager::AllowTutorialScreenToClose()
 {
 	_allowTutorialScreenClose = true;
 	OnAllowTutorialScreenToClose.Broadcast();
-	_timeElapsedSinceTutorialOpen = 0.f;
 
 	SetComponentTickEnabled(false);
 }

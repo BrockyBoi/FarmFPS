@@ -34,6 +34,7 @@ enum class ETutorialScreenType : uint8
 
 enum class EDayState : uint8;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllowTutorialScreenClose);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTutorialScreenForceClose);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTutorialScreenShown, ETutorialScreenType, tutorialScreenType);
 
@@ -44,6 +45,11 @@ class UTutorialScreenManager : public UActorComponent, public ISaveable
 
 public:	
 	UTutorialScreenManager();
+
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UFUNCTION(BlueprintPure)
+	bool CanCloseTutorialScreen() const;
 
 	UFUNCTION(BlueprintPure, Category = "TutorialScreenManager")
 	bool HasShownTutorialScreen(ETutorialScreenType tutorialScreenType) const;
@@ -62,6 +68,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "TutorialScreenManager")
 	FOnTutorialScreenShown OnTutorialScreenShown;
+
+	UPROPERTY(BlueprintAssignable, Category = "TutorialScreenManager")
+	FOnAllowTutorialScreenClose OnAllowTutorialScreenToClose;
 
 	UPROPERTY(BlueprintAssignable, Category = "TutorialScreenManager")
 	FOnTutorialScreenForceClose OnTutorialScreenForceClosed;
@@ -94,6 +103,15 @@ private:
 
 	void AttemptShowScreen(ETutorialScreenType screenToShow);
 
+	UFUNCTION()
+	void AllowTutorialScreenToClose();
+
 	TMap<ETutorialScreenType, bool> _shownTutorialScreensMap;
 	bool _shouldShowTutorials = true;
+	bool _allowTutorialScreenClose = false;
+
+	UPROPERTY(EditAnywhere)
+	float _timeBeforeTutorialCanBeClosed = 1.5f;
+
+	float _timeElapsedSinceTutorialOpen = 0.f;
 };
