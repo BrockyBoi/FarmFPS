@@ -4,6 +4,7 @@
 
 // Brock
 #include "Managers/AudioManager.h"
+#include "Managers/TutorialScreenManager.h"
 #include "SaveSystem/SaveGameManager.h"
 #include "TradeOffUpgradeManager.h"
 
@@ -83,6 +84,14 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 	{
 		_timeElapsed += DeltaTime;
 		float dayLength = _dayLength.GetModifiedValue(this);
+
+		// If player has not finished basic tutorial then simply keep the timer at mid day until it's completed
+		UTutorialScreenManager* tutorialManager = UFarmFPSUtilities::GetTutorialScreenManager(this);
+		if (ensure(IsValid(tutorialManager)) && !tutorialManager->HasPlayerCompletedBasicTutorial())
+		{
+			_timeElapsed = FMath::Clamp(_timeElapsed, 0, dayLength / 2);
+		}
+
 		float lerpedPitch = FMath::Lerp(0.f, _finalDayAngle, _timeElapsed / dayLength) + 180.f;
 
 		FRotator rotation(lerpedPitch, 0.f, 0.f);
@@ -133,6 +142,12 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 void UDayNightCycleManager::ForceEndDay()
 {
 	EndDay();
+}
+
+void UDayNightCycleManager::ForceSetTimeLeft(float secondsLeftInDay)
+{
+	float dayLength = _dayLength.GetModifiedValue(this);
+	_timeElapsed = FMath::Clamp(dayLength - secondsLeftInDay, 0, dayLength);
 }
 
 void UDayNightCycleManager::TransitionToNextDay()

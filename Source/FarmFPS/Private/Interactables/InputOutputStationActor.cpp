@@ -107,7 +107,7 @@ float AInputOutputStationActor::GetTimeBetweenSpawns() const
 	return _defaultTimeBetweenSpawns.GetModifiedValue(this);
 }
 
-void AInputOutputStationActor::SpawnResource(ResourcesToSpawnData& data)
+AActor* AInputOutputStationActor::SpawnResource(ResourcesToSpawnData& data)
 {
 	data.AmountToSpawn -= 1;
 
@@ -120,6 +120,7 @@ void AInputOutputStationActor::SpawnResource(ResourcesToSpawnData& data)
 			if (ensure(IsValid(pooledActor->FindComponentByClass<UPrimitiveComponent>())))
 			{
 				pooledActor->FindComponentByClass<UPrimitiveComponent>()->AddImpulse(_launchVector);
+				return pooledActor;
 			}
 		}
 		else
@@ -127,6 +128,8 @@ void AInputOutputStationActor::SpawnResource(ResourcesToSpawnData& data)
 			UE_LOG(LogTemp, Warning, TEXT("Failed to get pooled actor for resource type %s"), *data.ResourceType.ToString());
 		}
 	}
+
+	return nullptr;
 }
 
 void AInputOutputStationActor::OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, float amount)

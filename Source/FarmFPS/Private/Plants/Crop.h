@@ -20,7 +20,7 @@ class AResourcePickupActor;
 class UCapsuleComponent;
 class UResourceInventory;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnCropPlanted, const FGameplayTag&);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnCropPlanted, ACrop*);
 
 UCLASS()
 class ACrop : public APlant, public IPoolableActor

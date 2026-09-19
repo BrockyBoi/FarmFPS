@@ -10,7 +10,7 @@
 // UE
 #include "Components/AudioComponent.h"
 
-FOnIngreientAddedToOven ABreadOven::OnIngredientAddedToOven;
+FOnBreadSpawned ABreadOven::OnBreadSpawned;
 
 ABreadOven::ABreadOven() : Super()
 {
@@ -69,13 +69,6 @@ void ABreadOven::EndPlay(EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-void ABreadOven::OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, float amount)
-{
-	Super::OnInputInventoryResourceCountChanged(resourceType, amount);
-
-	OnIngredientAddedToOven.Broadcast(resourceType);
-}
-
 void ABreadOven::OnFireTargetOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	ACropResourceProjectile* cropProjectile = Cast<ACropResourceProjectile>(OtherActor);
@@ -98,16 +91,23 @@ float ABreadOven::GetTimeBetweenSpawns() const
 	return Super::GetTimeBetweenSpawns() * GetHeatMultipler();
 }
 
-void ABreadOven::SpawnResource(ResourcesToSpawnData& data)
+AActor* ABreadOven::SpawnResource(ResourcesToSpawnData& data)
 {
 	if (IsHeatTooHigh())
 	{
 		UAudioManager::SpawnSoundAtLocation(this, _onFireBurnSound, GetActorLocation());
 		data.AmountToSpawn--;
-		return;
+		return nullptr;
 	}
 
-	Super::SpawnResource(data);
+	AActor* bread = Super::SpawnResource(data);
+	if (ensure(IsValid(bread)))
+	{
+		OnBreadSpawned.Broadcast(bread);
+		return bread;
+	}
+
+	return nullptr;
 }
 
 FLinearColor ABreadOven::GetHeatColorText() const

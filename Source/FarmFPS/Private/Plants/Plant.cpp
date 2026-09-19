@@ -122,7 +122,7 @@ void APlant::AddResource(const FGameplayTagContainer& resourceTypes, float amoun
 
 void APlant::DoDamage(int damageAmount)
 {
-	if (_isBroken || _cropData.CropHealth.GetModifiedValue(this) <= 0)
+	if (_isBroken || _cropData.CropHealth.GetModifiedValue(this) <= 0 || _isInvincible)
 	{
 		return;
 	}
@@ -132,6 +132,11 @@ void APlant::DoDamage(int damageAmount)
 	{
 		OnPlayerDestroyPlant();
 	}
+}
+
+void APlant::SetIsInvincible(bool isInvincible)
+{
+	_isInvincible = isInvincible;
 }
 
 void APlant::OnGameLoaded(UFarmFPSSaveGame* saveGame)

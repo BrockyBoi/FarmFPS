@@ -7,6 +7,8 @@
 #include "Resources/ResourceConverterComponent.h"
 #include "Resources/ResourceInventory.h"
 
+FOnStartConvertingResources AResourceConverterStationActor::OnStartConvertingResources;
+
 AResourceConverterStationActor::AResourceConverterStationActor() : Super()
 {
 	_resourceConverter = CreateDefaultSubobject<UResourceConverterComponent>("ResourceConverterComponent");
@@ -36,7 +38,10 @@ void AResourceConverterStationActor::TryConvertAllResources()
 	{
 		for (FCraftingData& craftingData : _craftingRecipes)
 		{
-			_resourceConverter->TryConvertAllResources(_inputInventory, _outputInventory, craftingData);
+			if (_resourceConverter->TryConvertAllResources(_inputInventory, _outputInventory, craftingData))
+			{
+				OnStartConvertingResources.Broadcast();
+			}
 		}
 	}
 }
@@ -47,8 +52,10 @@ void AResourceConverterStationActor::TryConvertLimitedAmount(int amountToCraft)
 	{
 		for (FCraftingData& craftingData : _craftingRecipes)
 		{
-			_resourceConverter->TryConvertResources(_inputInventory, _outputInventory, craftingData, amountToCraft);
-
+			if (_resourceConverter->TryConvertResources(_inputInventory, _outputInventory, craftingData, amountToCraft))
+			{
+				OnStartConvertingResources.Broadcast();
+			}
 		}
 	}
 }

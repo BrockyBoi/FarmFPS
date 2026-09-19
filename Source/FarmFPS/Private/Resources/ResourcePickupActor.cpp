@@ -20,6 +20,7 @@
 #include "Components/SphereComponent.h"
 
 FOnCollected AResourcePickupActor::OnCollected;
+FOnResourceSpawned AResourcePickupActor::OnResourceSpawned;
 
 AResourcePickupActor::AResourcePickupActor()
 {
@@ -134,6 +135,8 @@ void AResourcePickupActor::RemoveFromPool()
 	}
 
 	SetActorTickEnabled(true);
+
+	OnResourceSpawned.Broadcast(this);
 }
 
 bool AResourcePickupActor::AttemptMoveToActor(AActor* actor, UResourceInventory* actorInventory, const FVector& customEndLocation)

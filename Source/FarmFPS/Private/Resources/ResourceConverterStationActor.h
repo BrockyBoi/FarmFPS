@@ -17,6 +17,8 @@ class UAutomaticResourceTransferPoint;
 class UResourceConverterComponent;
 class UResourceInventory;
 
+DECLARE_MULTICAST_DELEGATE(FOnStartConvertingResources);
+
 UCLASS()
 class AResourceConverterStationActor : public AInputOutputStationActor
 {
@@ -26,6 +28,8 @@ public:
 	AResourceConverterStationActor();
 	void TryConvertAllResources();
 	void TryConvertLimitedAmount(int amountToCraft);
+
+	static FOnStartConvertingResources OnStartConvertingResources;
 
 protected:
 	virtual void BeginPlay() override;

@@ -5,6 +5,7 @@
 // Brock
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
+#include "Managers/TutorialScreenManager.h"
 
 UMoonHitBox::UMoonHitBox()
 {
@@ -40,6 +41,12 @@ void UMoonHitBox::OnNightStart()
 
 void UMoonHitBox::HitMoon()
 {
+	UTutorialScreenManager* tutorialManager = UFarmFPSUtilities::GetTutorialScreenManager(this);
+	if (ensure(IsValid(tutorialManager)) && !tutorialManager->HasShownTutorialScreen(ETutorialScreenType::FirstUpgradePurchase))
+	{
+		return;
+	}
+
 	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (_hitsLeft > 0 && IsValid(dayNightCycleManager) && dayNightCycleManager->GetCurrentDayState() == EDayState::MidNight)
 	{

@@ -23,16 +23,24 @@ enum class ETutorialScreenType : uint8
 	PickUpWaterGun,
 	PickUpSeedGun,
 	PlantFirstSeed,
+	FillFirstCropWithLight,
 	FullyGrowCrop,
 	PickUpFirstResource,
 	ThrowResourceIntoOven,
+	FirstBreadSpawned,
 	ObtainFirstBread,
 	GiveBreadToStand,
 	FirstNight,
+	FirstUpgradePurchase,
 	MoonGoDown
 };
 
+class ACrop;
+class AResourcePickupActor;
+class AShooterWeapon;
+class ATutorialShineActor;
 enum class EDayState : uint8;
+enum class EShineSize : uint8;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllowTutorialScreenClose);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTutorialScreenForceClose);
@@ -66,6 +74,8 @@ public:
 	FTutorialSaveGameData GetTutorialSaveGameData() const;
 	virtual void OnGameLoaded(UFarmFPSSaveGame* saveGame) override;
 
+	bool HasPlayerCompletedBasicTutorial() const;
+
 	UPROPERTY(BlueprintAssignable, Category = "TutorialScreenManager")
 	FOnTutorialScreenShown OnTutorialScreenShown;
 
@@ -81,10 +91,13 @@ protected:
 
 private:
 	UFUNCTION()
-	void OnWeaponCollected(const FGameplayTag& resourceType);
+	void OnWeaponCollected(AShooterWeapon* weapon);
 
 	UFUNCTION()
-	void OnIngredientAddedToOven(const FGameplayTag& ingredientType);
+	void OnStartBakingBread();
+
+	UFUNCTION()
+	void OnFirstBreadSpawned(AActor* breadActor);
 
 	UFUNCTION()
 	void OnBreadAddedToStand();
@@ -96,22 +109,57 @@ private:
 	void OnResourceCollected(const FGameplayTag& resourceType);
 
 	UFUNCTION()
-	void OnCropPlanted(const FGameplayTag& resourceType);
+	void OnCropPlanted(ACrop* crop);
 
 	UFUNCTION()
 	void OnPlantFullyGrown();
 
-	void AttemptShowScreen(ETutorialScreenType screenToShow);
+	UFUNCTION()
+	void OnResourceSpawned(AResourcePickupActor* resourcePickupActor);
+
+	UFUNCTION()
+	void OnLevelReady();
+
+	UFUNCTION()
+	void OnFirstUpgradePurchased();
+
+	bool AttemptShowScreen(ETutorialScreenType screenToShow);
+
+	void HideTutorialShineObject();
+	void TutorialShineObjectOnActor(AActor* actorToFollow, EShineSize shineSize);
+	void TutorialShineObjectFollowActor(AActor* actorToFollow, EShineSize shineSize);
 
 	UFUNCTION()
 	void AllowTutorialScreenToClose();
+
+	void OnFirstCropResourceFilled(const FGameplayTag& resource);
 
 	TMap<ETutorialScreenType, bool> _shownTutorialScreensMap;
 	bool _shouldShowTutorials = true;
 	bool _allowTutorialScreenClose = false;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<ATutorialShineActor> _tutorialShineObjectClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AActor> _wheatPlotBPClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AActor> _weaponPickupBPClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AActor> _upgradePointBPClass;
+
+	TWeakObjectPtr<ATutorialShineActor> _tutorialShineObject = nullptr;
+	TWeakObjectPtr<AActor> _waterPistol = nullptr;
+	TWeakObjectPtr<AActor> _wheatPistol = nullptr;
+	TWeakObjectPtr<ACrop> _firstCrop = nullptr;
+
 	UPROPERTY(EditAnywhere)
 	float _timeBeforeTutorialCanBeClosed = 1.5f;
 
 	float _timeElapsedSinceTutorialOpen = 0.f;
+
+	bool _hasFirstWheatSpawned = false;
+	bool _hasFirstBreadSpawned = false;
 };

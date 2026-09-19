@@ -41,7 +41,7 @@ protected:
 		int AmountToSpawn;
 	};
 
-	virtual void SpawnResource(ResourcesToSpawnData& data);
+	virtual AActor* SpawnResource(ResourcesToSpawnData& data);
 
 	UFUNCTION()
 	virtual void OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, float amount);

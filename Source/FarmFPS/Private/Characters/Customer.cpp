@@ -12,6 +12,7 @@
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/ObjectiveManager.h"
 #include "Managers/ObjectiveTypeTag.h"
+#include "Managers/TutorialScreenManager.h"
 #include "Resources/ResourceInventory.h"
 #include "Resources/ResourceTypeTag.h"
 
@@ -30,6 +31,13 @@ void ACustomer::BeginPlay()
 	
 	int modifiedMin = _minCanDesire.GetModifiedValue(this);
 	int modifiedMax = _maxCanDesire.GetModifiedValue(this);
+
+	// If tutorial has not been completed then ensure that customer can only ever desire one bread
+	UTutorialScreenManager* tutorialManager = UFarmFPSUtilities::GetTutorialScreenManager(this);
+	if (ensure(IsValid(tutorialManager)) && !tutorialManager->HasShownTutorialScreen(ETutorialScreenType::GiveBreadToStand))
+	{
+		modifiedMax = modifiedMin;
+	}
 	_amountDesired = FMath::RandRange(modifiedMin, modifiedMax);
 
 	_startLocation = GetActorLocation();

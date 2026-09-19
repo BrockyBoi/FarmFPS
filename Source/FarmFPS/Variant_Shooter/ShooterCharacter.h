@@ -73,6 +73,13 @@ public:
 	/** Deactivates the passed weapon */
 	virtual void OnWeaponDeactivated(AShooterWeapon* Weapon) override;
 
+	/** Returns true if the character already owns a weapon of the given class */
+	AShooterWeapon* FindWeaponOfType(TSubclassOf<AShooterWeapon> WeaponClass) const;
+	AShooterWeapon* FindWeaponOfType(const FGameplayTag& weaponType) const;
+
+	void ForceWeaponEquip(const FGameplayTag& weaponType);
+	void StopForcingWeaponEquip();
+
 	/** Notifies the owner that the weapon cooldown has expired and it's ready to shoot again */
 	virtual void OnSemiWeaponRefire() override;
 
@@ -102,13 +109,17 @@ public:
 	/** Damaged delegate */
 	FDamagedDelegate OnDamaged;
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponActivated, AShooterWeapon*, ShooterWeapon);
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnWeaponActivated, AShooterWeapon*);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDynamicOnWeaponActivated, AShooterWeapon*, ShooterWeapon);
 
-	UPROPERTY(BlueprintAssignable)
 	FOnWeaponActivated OnNewWeaponAdded;
+	FOnWeaponActivated OnNewWeaponActivated;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnWeaponActivated OnNewWeaponActivated;
+	FDynamicOnWeaponActivated OnDynamicNewWeaponAdded;
+
+	UPROPERTY(BlueprintAssignable)
+	FDynamicOnWeaponActivated OnDynamicNewWeaponActivated;
 
 protected:
 	/** Gameplay initialization */
@@ -121,9 +132,6 @@ protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 
 	virtual TArray<FGameplayTag> GetWeaponsUnlocked() const override;
-
-	/** Returns true if the character already owns a weapon of the given class */
-	AShooterWeapon* FindWeaponOfType(TSubclassOf<AShooterWeapon> WeaponClass) const;
 
 	/** Called when this character's HP is depleted */
 	void Die();
@@ -179,6 +187,8 @@ protected:
 
 	/** Weapon currently equipped and ready to shoot with */
 	TObjectPtr<AShooterWeapon> CurrentWeapon;
+
+	bool HasForcedWeapon = false;
 
 	UPROPERTY(EditAnywhere, Category = "Destruction", meta = (ClampMin = 0, ClampMax = 10, Units = "s"))
 	float RespawnTime = 5.0f;

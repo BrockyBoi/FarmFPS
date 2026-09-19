@@ -162,7 +162,7 @@ void AShooterCharacter::DoStopFiring()
 
 void AShooterCharacter::DoSwitchWeapon(const FInputActionValue& Value)
 {
-	if (!_canScroll)
+	if (!_canScroll || HasForcedWeapon)
 	{
 		return;
 	}
@@ -291,6 +291,7 @@ void AShooterCharacter::AddWeaponClass(const TSubclassOf<AShooterWeapon>& Weapon
 			}
 
 			OnNewWeaponAdded.Broadcast(AddedWeapon);
+			OnDynamicNewWeaponAdded.Broadcast(AddedWeapon);
 
 			// switch to the new weapon
 			CurrentWeapon = AddedWeapon;
@@ -308,6 +309,7 @@ void AShooterCharacter::OnWeaponActivated(AShooterWeapon* Weapon)
 	GetFirstPersonMesh()->SetAnimInstanceClass(Weapon->GetFirstPersonAnimInstanceClass());
 	GetMesh()->SetAnimInstanceClass(Weapon->GetThirdPersonAnimInstanceClass());
 	OnNewWeaponActivated.Broadcast(Weapon);
+	OnDynamicNewWeaponActivated.Broadcast(Weapon);
 }
 
 void AShooterCharacter::OnWeaponDeactivated(AShooterWeapon* Weapon)
@@ -330,7 +332,7 @@ AShooterWeapon* AShooterCharacter::FindWeaponOfType(TSubclassOf<AShooterWeapon> 
 	// check each owned weapon
 	for (AShooterWeapon* Weapon : OwnedWeapons)
 	{
-		if (Weapon->IsA(WeaponClass))
+		if (ensure(IsValid(Weapon)) && Weapon->IsA(WeaponClass))
 		{
 			return Weapon;
 		}
@@ -339,6 +341,43 @@ AShooterWeapon* AShooterCharacter::FindWeaponOfType(TSubclassOf<AShooterWeapon> 
 	// weapon not found
 	return nullptr;
 
+}
+
+AShooterWeapon* AShooterCharacter::FindWeaponOfType(const FGameplayTag& weaponType) const
+{
+	for (AShooterWeapon* Weapon : OwnedWeapons)
+	{
+		if (ensure(IsValid(Weapon)) && Weapon->GetWeaponTypeTag() == weaponType)
+		{
+			return Weapon;
+		}
+	}
+
+	// weapon not found
+	return nullptr;
+}
+
+void AShooterCharacter::ForceWeaponEquip(const FGameplayTag& weaponType)
+{
+	if (ensure(IsValid(CurrentWeapon)))
+	{
+		CurrentWeapon->DeactivateWeapon();
+	}
+
+	// set the new weapon as current
+	CurrentWeapon = FindWeaponOfType(weaponType);
+
+	// activate the new weapon
+	if (ensure(IsValid(CurrentWeapon)))
+	{
+		CurrentWeapon->ActivateWeapon();
+		HasForcedWeapon = true;
+	}
+}
+
+void AShooterCharacter::StopForcingWeaponEquip()
+{
+	HasForcedWeapon = false;
 }
 
 void AShooterCharacter::Die()

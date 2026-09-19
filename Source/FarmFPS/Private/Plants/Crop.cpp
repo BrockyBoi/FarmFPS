@@ -35,7 +35,7 @@ void ACrop::BeginPlay()
 {
 	Super::BeginPlay();
 
-	OnCropPlanted.Broadcast(_cropData.ResourceType);
+	OnCropPlanted.Broadcast(this);
 }
 
 void ACrop::Tick(float DeltaTime)

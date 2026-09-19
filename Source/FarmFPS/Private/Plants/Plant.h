@@ -33,6 +33,7 @@ public:
 	const FCropData& GetCropData() const { return _cropData; }
 
 	void DoDamage(int damageAmount);
+	void SetIsInvincible(bool isInvincible);
 
 	virtual void OnGameLoaded(UFarmFPSSaveGame* saveGame) override;
 
@@ -114,6 +115,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	bool _destroyAtEndOfDay = false;
+
+	UPROPERTY(EditAnywhere)
+	bool _isInvincible = false;
 
 	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
 	void Cosmetic_OnResourceAdded();

@@ -13,6 +13,7 @@
 // Generated
 #include "ResourcePickupActor.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnResourceSpawned, AResourcePickupActor*);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCollected, const FGameplayTag&);
 
 class APawn;
@@ -37,6 +38,7 @@ public:
 
 	bool AttemptMoveToActor(AActor* actor, UResourceInventory* actorInventory, const FVector& customEndLocation = FVector::ZeroVector);
 
+	static FOnResourceSpawned OnResourceSpawned;
 	static FOnCollected OnCollected;
 
 protected:

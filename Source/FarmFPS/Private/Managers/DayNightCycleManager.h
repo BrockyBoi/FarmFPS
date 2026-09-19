@@ -37,6 +37,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void ForceEndDay();
+	void ForceSetTimeLeft(float secondsLeftInDay);
 
 	bool IsDay() const { return _currentDayState == EDayState::Day; }
 	bool IsNight() const { return _currentDayState == EDayState::MidNight || _currentDayState == EDayState::NightTransitionToDay; }
