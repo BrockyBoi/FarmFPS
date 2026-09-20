@@ -34,8 +34,6 @@ UCapsuleComponent* ACrop::GetCapsuleComponent() const
 void ACrop::BeginPlay()
 {
 	Super::BeginPlay();
-
-	OnCropPlanted.Broadcast(this);
 }
 
 void ACrop::Tick(float DeltaTime)
@@ -126,6 +124,20 @@ void ACrop::RemoveFromPool()
 	AffectGrowth();
 
 	CheckShouldTick();
+
+
+}
+
+void ACrop::SetWasPlantedSuccessfully(bool wasSuccessful)
+{
+	if (wasSuccessful)
+	{
+		OnCropPlanted.Broadcast(this);
+	}
+	else
+	{
+
+	}
 }
 
 void ACrop::OnPlayerDestroyPlant()

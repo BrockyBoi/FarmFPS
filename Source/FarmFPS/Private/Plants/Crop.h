@@ -33,6 +33,8 @@ public:
 	void AddActorToPool();
 	void RemoveFromPool();
 
+	void SetWasPlantedSuccessfully(bool wasSuccessful);
+
 	UFUNCTION(BlueprintPure)
 	bool GetIsInPerfectTiming() const { return _isInPerfectTiming; }
 

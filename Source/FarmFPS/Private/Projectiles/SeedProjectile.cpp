@@ -83,6 +83,8 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 				{
 					crop->SetActorLocation(modifiedVector);
 					crop->SetActorRotation(Other->GetActorRotation());
+
+					crop->SetWasPlantedSuccessfully(true);
 				}
 				else
 				{
@@ -91,6 +93,8 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 					{
 						UAudioManager::SpawnSoundAtLocation(this, _unableToPlantSound, GetActorLocation());
 					}
+
+					crop->SetWasPlantedSuccessfully(false);
 					return;
 				}
 			}
