@@ -3,6 +3,7 @@
 #pragma once
 
 // Brock
+#include "Misc/CachedModifiableValueDataTableRowHandle.h"
 #include "Managers/PerkData.h"
 #include "PurchaseLocation.h"
 
@@ -18,6 +19,11 @@ class UUpgradePurchaceLocation : public UPurchaseLocation
 	GENERATED_BODY()
 
 protected:
+	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintPure)
+	FString GetPerkDescriptionString() const;
+
 	virtual void OnPurchaseSuccess(class UPerkManager* perkManager, class UResourceInventory* inventory) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Upgrade", meta = (Categories = "PerkModifier."))
@@ -25,4 +31,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Upgrade")
 	FPerkData _perkUpgradeAmount;
+
+	UPROPERTY(EditAnywhere)
+	FCachedModifiableValueDataTableRowHandle _baseValueRowData;
+
+	UPROPERTY(EditAnywhere)
+	FDataTableRowHandle blerg;
 };

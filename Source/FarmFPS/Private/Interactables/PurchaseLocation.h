@@ -17,6 +17,18 @@ class UFarmFPSSaveGame;
 
 struct FUpgradeLocationSaveData;
 
+USTRUCT(BlueprintType)
+struct FUnlockActorLocationData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<AActor*> ActorsInSceneToEnable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<AActor*> ActorsInSceneToDisable;
+};
+
 UCLASS()
 class UPurchaseLocation : public UActorComponent, public ISaveable
 {

@@ -8,17 +8,6 @@
 // Generated
 #include "UnlockActorLocation.generated.h"
 
-USTRUCT(BlueprintType)
-struct FUnlockActorLocationData
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<AActor*> ActorsInSceneToEnable;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<AActor*> ActorsInSceneToDisable;
-};
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class UUnlockActorLocation : public UPurchaseLocation
