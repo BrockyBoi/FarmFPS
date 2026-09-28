@@ -90,7 +90,7 @@ void UBreadRequirementManager::OnDayBegin()
 	}
 	else
 	{
-		_breadRequiredForCurrentDay += _dailyBreadIncreaseAmount.GetModifiedValue(this);
+		_breadRequiredForCurrentDay += _dailyBreadIncreaseAmount.GetValue().GetModifiedValue(this);
 	}
 }
 

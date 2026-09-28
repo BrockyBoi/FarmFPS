@@ -41,6 +41,8 @@ void UPurchaseLocation::BeginPlay()
 	{
 		saveGameManager->OnLoadGameData.AddUObject(this, &ThisClass::OnGameLoaded);
 	}
+
+	StaticOnPurchaseSuccess.AddUObject(this, &UPurchaseLocation::OnAnyPurchaseSuccess);
 }
 
 void UPurchaseLocation::EndPlay(const EEndPlayReason::Type endPlayReason)
@@ -62,6 +64,8 @@ void UPurchaseLocation::EndPlay(const EEndPlayReason::Type endPlayReason)
 	{
 		saveGameManager->OnLoadGameData.RemoveAll(this);
 	}
+
+	StaticOnPurchaseSuccess.RemoveAll(this);
 
 	Super::EndPlay(endPlayReason);
 }
@@ -139,6 +143,11 @@ void UPurchaseLocation::OnPurchaseSuccess(UPerkManager* perkManager, UResourceIn
 		SetCanPurchase(false);
 		HidePurchaseLocation(true);
 	}
+}
+
+void UPurchaseLocation::OnAnyPurchaseSuccess()
+{
+	Cosmetic_OnAnyUpgradePurchaseSuccess.Broadcast();
 }
 
 void UPurchaseLocation::OnGameLoaded(UFarmFPSSaveGame* saveGame)

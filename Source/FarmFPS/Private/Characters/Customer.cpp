@@ -29,16 +29,16 @@ void ACustomer::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	int modifiedMin = _minCanDesire.GetModifiedValue(this);
-	int modifiedMax = _maxCanDesire.GetModifiedValue(this);
+	//int modifiedMin = _minCanDesire.GetModifiedValue(this);
+	//int modifiedMax = _maxCanDesire.GetModifiedValue(this);
 
 	// If tutorial has not been completed then ensure that customer can only ever desire one bread
-	UTutorialScreenManager* tutorialManager = UFarmFPSUtilities::GetTutorialScreenManager(this);
-	if (ensure(IsValid(tutorialManager)) && !tutorialManager->HasShownTutorialScreen(ETutorialScreenType::GiveBreadToStand))
-	{
-		modifiedMax = modifiedMin;
-	}
-	_amountDesired = FMath::RandRange(modifiedMin, modifiedMax);
+	//UTutorialScreenManager* tutorialManager = UFarmFPSUtilities::GetTutorialScreenManager(this);
+	//if (ensure(IsValid(tutorialManager)) && !tutorialManager->HasShownTutorialScreen(ETutorialScreenType::GiveBreadToStand))
+	//{
+	//	modifiedMax = modifiedMin;
+	//}
+	//_amountDesired = FMath::RandRange(modifiedMin, modifiedMax);
 
 	_startLocation = GetActorLocation();
 
@@ -164,30 +164,31 @@ void ACustomer::AttemptBuyBreadAtFrontOfQueue()
 	{
 		for (const FGameplayTag& breadDesired : GetResourcesDesired())
 		{
-			if (!breadInventory->HasResourceAmount(breadDesired, _amountDesired))
+			int breadAmount = FMath::RoundToInt(_amountBreadDesired.GetValue().GetModifiedValue(this));
+			if (!breadInventory->HasResourceAmount(breadDesired, breadAmount))
 			{
 				continue;
 			}
 
 			_breadStand->SetIsCurrentlySellingBreadToCustomer(true);
-			breadInventory->RemoveResource(breadDesired, _amountDesired);
+			breadInventory->RemoveResource(breadDesired, breadAmount);
 			_breadStand->SetIsCurrentlySellingBreadToCustomer(false);
 
 			const FModifiedResourceValue priceData = _breadStand->GetPriceForResource(breadDesired);
 			const int price = priceData.ModifiedIntValue.GetModifiedValue(this) * _bonusMoneyValue.GetModifiedValue(this);
 
-			_breadStand->GetOutputInventory()->AddResource(ResourceTypeTag::Money, _amountDesired * price);
+			_breadStand->GetOutputInventory()->AddResource(ResourceTypeTag::Money, breadAmount * price);
 
 			UObjectiveManager* objectiveManager = UFarmFPSUtilities::GetObjectiveManager(this);
 			if (ensure(IsValid(objectiveManager)))
 			{
-				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTag::SellBread, breadDesired, _amountDesired);
+				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTag::SellBread, breadDesired, breadAmount);
 			}
 
 			UBreadRequirementManager* breadRequirementManager = UFarmFPSUtilities::GetBreadRequirementManager(this);
 			if (ensure(IsValid(breadRequirementManager)))
 			{
-				breadRequirementManager->SellBread(_amountDesired);
+				breadRequirementManager->SellBread(breadAmount);
 			}
 
 			_customerQueue->RemoveCustomerFromFrontOfQueue();

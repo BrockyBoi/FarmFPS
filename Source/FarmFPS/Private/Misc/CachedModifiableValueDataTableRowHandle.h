@@ -17,6 +17,16 @@ struct FARMFPS_API FCachedModifiableValueDataTableRowHandle
 {
 	GENERATED_BODY()
 
+	FCachedModifiableValueDataTableRowHandle()
+	{
+
+	}
+
+	FCachedModifiableValueDataTableRowHandle(float value)
+	{
+		DefaultValue = value;
+	}
+
 	FModifiedFloatValue& GetValue() const
 	{
 		if (!_isCachedValueSet)

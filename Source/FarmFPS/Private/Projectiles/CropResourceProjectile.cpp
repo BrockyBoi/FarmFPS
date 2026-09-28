@@ -140,7 +140,7 @@ void ACropResourceProjectile::RemoveFromPool()
 
 	CollisionComponent->IgnoreActorWhenMoving(UFarmFPSUtilities::GetPlayerCharacter(this), true);
 
-	_currentResourceAmount = _resourceAmount.GetModifiedValue(this);
+	_currentResourceAmount = _resourceAmount.GetValue().GetModifiedValue(this);
 }
 
 void ACropResourceProjectile::ModifyThroughChargingWeapon(float percentageCharged)

@@ -40,13 +40,13 @@ void UWeatherManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void UWeatherManager::CheckIfShouldSpawnStormCloud(float deltaTime)
 {
 	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
-	if (_isStormCloudInScene || FMath::IsNearlyZero(_cloudSpawnChancePerSecond.GetModifiedValue(this)) || (IsValid(dayNightCycleManager) && dayNightCycleManager->IsNight()))
+	if (_isStormCloudInScene || FMath::IsNearlyZero(_cloudSpawnChancePerSecond.GetValue().GetModifiedValue(this)) || (IsValid(dayNightCycleManager) && dayNightCycleManager->IsNight()))
 	{
 		return;
 	}
 
 	float randomChance = FMath::RandRange(0.f, 1.f);
-	if (randomChance > _cloudSpawnChancePerSecond.GetModifiedValue(this) * deltaTime)
+	if (randomChance > _cloudSpawnChancePerSecond.GetValue().GetModifiedValue(this) * deltaTime)
 	{
 		return;
 	}
@@ -76,7 +76,7 @@ void UWeatherManager::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	if (_isStorming)
 	{
 		_currentStormTime += DeltaTime;
-		_currentStormIntensity = FMath::Lerp(0.f, _maxStormIntensity.GetModifiedValue(this), _currentStormTime / _stormRampUpTime);
+		_currentStormIntensity = FMath::Lerp(0.f, _maxStormIntensity.GetValue().GetModifiedValue(this), _currentStormTime / _stormRampUpTime);
 	}
 }
 
@@ -136,7 +136,7 @@ void UWeatherManager::StartStorm(const FGameplayTagContainer& resourceContainer,
 	_currentStormIntensity = 0.f;
 	if (!isPermanent)
 	{
-		GetWorld()->GetTimerManager().SetTimer(_stormTimerHandle, this, &UWeatherManager::EndStorm, _stormDuration.GetModifiedValue(this), false);
+		GetWorld()->GetTimerManager().SetTimer(_stormTimerHandle, this, &UWeatherManager::EndStorm, _stormDuration.GetValue().GetModifiedValue(this), false);
 	}
 }
 

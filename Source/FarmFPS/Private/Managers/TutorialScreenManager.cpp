@@ -106,6 +106,24 @@ void UTutorialScreenManager::PressStopShowingTutorials()
 {
 	_shouldShowTutorials = false;
 	HideTutorialShineObject();
+
+	if (ensure(_waterPistol.IsValid()))
+	{
+		_waterPistol->SetActorEnableCollision(true);
+		_waterPistol->SetActorHiddenInGame(false);
+	}
+
+	if (ensure(_wheatPistol.IsValid()))
+	{
+		_wheatPistol->SetActorEnableCollision(true);
+		_wheatPistol->SetActorHiddenInGame(false);
+	}
+
+	AShooterCharacter* player = Cast<AShooterCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));
+	if (ensure(IsValid(player)))
+	{
+		player->StopForcingWeaponEquip();
+	}
 }
 
 FTutorialSaveGameData UTutorialScreenManager::GetTutorialSaveGameData() const

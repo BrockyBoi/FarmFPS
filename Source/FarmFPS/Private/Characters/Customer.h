@@ -4,6 +4,7 @@
 
 // Brock
 #include "Managers/ModifiedValueData.h"
+#include "Misc/CachedModifiableValueDataTableRowHandle.h"
 
 // UE
 #include "AIController.h"
@@ -44,7 +45,7 @@ public:
 	const FGameplayTagContainer& GetResourcesDesired() const { return _resourcesDesired; }
 
 	UFUNCTION(BlueprintPure)
-	const int GetAmountDesired() const { return _amountDesired; }
+	const int GetAmountDesired() const { return _amountBreadDesired.GetValue().GetModifiedValue(this); }
 
 protected:
 	// Called when the game starts or when spawned
@@ -77,13 +78,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _onBoughtBreadSound;
 
-	int _amountDesired = 0;
+	//int _amountDesired = 0;
 
-	UPROPERTY(EditDefaultsOnly)
-	FModifiedIntValue _minCanDesire;
+	UPROPERTY(EditDefaultsOnly, Category = "Tunables")
+	FCachedModifiableValueDataTableRowHandle _amountBreadDesired = 1;
 
-	UPROPERTY(EditDefaultsOnly)
-	FModifiedIntValue _maxCanDesire;
+	//UPROPERTY(EditDefaultsOnly)
+	//FModifiedIntValue _minCanDesire;
+
+	//UPROPERTY(EditDefaultsOnly)
+	//FModifiedIntValue _maxCanDesire;
 
 	UPROPERTY(EditDefaultsOnly)
 	float _moveAcceptanceRadius = 5.f;

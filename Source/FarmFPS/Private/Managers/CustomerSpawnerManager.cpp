@@ -17,7 +17,7 @@ UCustomerSpawnerManager::UCustomerSpawnerManager()
 
 bool UCustomerSpawnerManager::IsRoomForNewCustomer() const
 {
-	return _currentCustomersOnScreen < _totalCustomersAllowedOnScreenAtOnce.GetModifiedValue(this);
+	return _currentCustomersOnScreen < _totalCustomersAllowedOnScreenAtOnce.GetValue().GetModifiedValue(this);
 }
 
 bool UCustomerSpawnerManager::IsSpawnTimerActive() const
@@ -92,7 +92,7 @@ const FGameplayTag UCustomerSpawnerManager::GetNextCustomerTypeToSpawn() const
 {
 	float randomValue = FMath::RandRange(0.f, 1.f);
 
-	if (_giantCustomerSpawnData.SpawnChance.GetModifiedValue(this) >= randomValue)
+	if (_giantCustomerSpawnData.SpawnChance.GetValue().GetModifiedValue(this) >= randomValue)
 	{
 		return CustomerTypeTag::GiantCustomer;
 	}

@@ -153,7 +153,7 @@ void ACrop::SpawnResourceActors()
 		return;
 	}
 
-	int countToDrop = _cropData.NumberOfPickupsToDrop.GetModifiedValue(this);
+	int countToDrop = _cropData.NumberOfPickupsToDrop.GetValue().GetModifiedValue(this);
 	int seedsToDrop = 0;
 	if (_isInPerfectTiming)
 	{
@@ -167,7 +167,7 @@ void ACrop::SpawnResourceActors()
 	float loveAmount = GetCurrentLoveLevel();
 	if (IsFullyLoved())
 	{
-		seedsToDrop = _cropData.NumberOfLoveSeedsToDrop.GetModifiedValue(this);
+		seedsToDrop = _cropData.NumberOfLoveSeedsToDrop.GetValue().GetModifiedValue(this);
 	}
 
 	UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);

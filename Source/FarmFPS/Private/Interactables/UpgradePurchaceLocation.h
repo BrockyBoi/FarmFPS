@@ -3,8 +3,8 @@
 #pragma once
 
 // Brock
-#include "Misc/CachedModifiableValueDataTableRowHandle.h"
 #include "Managers/PerkData.h"
+#include "Misc/CachedModifiableValueDataTableRowHandle.h"
 #include "PurchaseLocation.h"
 
 // UE
@@ -32,9 +32,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Upgrade")
 	FPerkData _perkUpgradeAmount;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Tunables")
 	FCachedModifiableValueDataTableRowHandle _baseValueRowData;
-
-	UPROPERTY(EditAnywhere)
-	FDataTableRowHandle blerg;
 };

@@ -58,7 +58,7 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 				{
 					int maxAttemptsAllowed = 24;
 					int currentAttempt = 0;
-					float distFromHit = _minDistanceFromNearestCrop.GetModifiedValue(this);
+					float distFromHit = _minDistanceFromNearestCrop.GetValue().GetModifiedValue(this);
 					FVector randVector = FVector::Zero();
 					FRotator slopeRotator = UKismetMathLibrary::MakeRotFromZ(HitNormal);
 					FVector slopeForward = FRotationMatrix(slopeRotator).GetUnitAxis(EAxis::X);

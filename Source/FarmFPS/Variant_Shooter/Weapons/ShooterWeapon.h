@@ -4,6 +4,7 @@
 
 // Brock
 #include "Managers/ModifiedValueData.h"
+#include "Misc/CachedModifiableValueDataTableRowHandle.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -58,7 +59,7 @@ public:
 
 	virtual void StartReload();
 
-	float GetFireRate() const { return RefireRate * FireRateMultiplier.GetModifiedValue(this); }
+	float GetFireRate() const { return RefireRate.GetValue().GetModifiedValue(this); }
 	float GetCurrentTimeCharging() const { return _currentTimeCharging; }
 	float GetPercentCharged() const { return bIsChargeableWeapon ? _currentTimeCharging / MaxChargeTime : 0.f; }
 
@@ -77,7 +78,7 @@ public:
 	const TSubclassOf<UAnimInstance>& GetThirdPersonAnimInstanceClass() const;
 
 	/** Returns the magazine size */
-	int32 GetMagazineSize() const { return MagazineSize.GetModifiedValue(this); };
+	int32 GetMagazineSize() const { return FMath::RoundToInt(MagazineSize.GetValue().GetModifiedValue(this)); };
 
 	/** Returns the current bullet count */
 	int32 GetBulletCount() const { return CurrentBullets; }
@@ -132,8 +133,8 @@ protected:
 	TSubclassOf<AShooterProjectile> ProjectileClass;
 
 	/** Number of bullets in a magazine */
-	UPROPERTY(EditAnywhere, Category = "Ammo")
-	FModifiedIntValue MagazineSize = 10;
+	UPROPERTY(EditAnywhere, Category = "Tunable|Ammo")
+	FCachedModifiableValueDataTableRowHandle MagazineSize = 10;
 
 	/** Number of bullets in the current magazine */
 	int32 CurrentBullets = 0;
@@ -181,14 +182,11 @@ protected:
 	float _currentTimeCharging = 0.f;
 
 	/** Time between shots for this weapon. Affects both full auto and semi auto modes */
-	UPROPERTY(EditAnywhere, Category = "Refire", meta = (ClampMin = 0, ClampMax = 5, Units = "s"))
-	float RefireRate = 0.5f;
+	UPROPERTY(EditAnywhere, Category = "Tunable|Refire", meta = (ClampMin = 0, ClampMax = 5, Units = "s"))
+	FCachedModifiableValueDataTableRowHandle RefireRate = 0.5f;
 
-	UPROPERTY(EditAnywhere, Category = "Refire")
-	FModifiedFloatValue FireRateMultiplier = 1.f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Reload")
-	FModifiedFloatValue ReloadTime = 1.5f;
+	UPROPERTY(EditDefaultsOnly, Category = "Tunable|Reload")
+	FCachedModifiableValueDataTableRowHandle ReloadTime = 1.5f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
 	bool _hasPhysicalRecoil = false;

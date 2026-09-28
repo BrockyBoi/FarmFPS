@@ -83,7 +83,7 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 	if (GetCurrentDayState() == EDayState::Day && ensure(_sunLight.IsValid()))
 	{
 		_timeElapsed += DeltaTime;
-		float dayLength = _dayLength.GetModifiedValue(this);
+		float dayLength = _dayLength.GetValue().GetModifiedValue(this);
 
 		// If player has not finished basic tutorial then simply keep the timer at mid day until it's completed
 		UTutorialScreenManager* tutorialManager = UFarmFPSUtilities::GetTutorialScreenManager(this);
@@ -146,7 +146,7 @@ void UDayNightCycleManager::ForceEndDay()
 
 void UDayNightCycleManager::ForceSetTimeLeft(float secondsLeftInDay)
 {
-	float dayLength = _dayLength.GetModifiedValue(this);
+	float dayLength = _dayLength.GetValue().GetModifiedValue(this);
 	_timeElapsed = FMath::Clamp(dayLength - secondsLeftInDay, 0, dayLength);
 }
 
@@ -163,7 +163,7 @@ float UDayNightCycleManager::GetPercentageDayElapsed() const
 {
 	if (_currentDayState == EDayState::Day)
 	{
-		return _timeElapsed / _dayLength.GetModifiedValue(this);
+		return _timeElapsed / _dayLength.GetValue().GetModifiedValue(this);
 	}
 
 	return 0.0f;

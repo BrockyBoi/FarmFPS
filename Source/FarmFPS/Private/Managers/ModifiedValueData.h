@@ -80,7 +80,6 @@ protected:
 	float BaseValue;
 };
 
-
 USTRUCT(BlueprintType)
 struct FARMFPS_API FModifiedResourceValue
 {

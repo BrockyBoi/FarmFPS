@@ -7,6 +7,7 @@
 // Brock
 #include "Managers/ModifiedValueData.h"
 #include "Managers/PoolableActor.h"
+#include "Misc/CachedModifiableValueDataTableRowHandle.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -38,8 +39,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _unableToPlantSound;
 
-	UPROPERTY(EditDefaultsOnly)
-	FModifiedFloatValue _minDistanceFromNearestCrop = 15.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Tunables")
+	FCachedModifiableValueDataTableRowHandle _minDistanceFromNearestCrop = 15.f;
 
 	UPROPERTY(EditDefaultsOnly)
 	TEnumAsByte<ECollisionChannel> _collisionChannelToCheck;

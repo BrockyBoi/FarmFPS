@@ -4,6 +4,7 @@
 
 // Brock
 #include "Managers/ModifiedValueData.h"
+#include "Misc/CachedModifiableValueDataTableRowHandle.h"
 #include "StatusEffects/EffectManager.h"
 
 // Shooter
@@ -57,8 +58,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	bool _enableCropColliderOnRemoveFromPool = true;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Crop Resource")
-	FModifiedFloatValue _resourceAmount = 1.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Tunables|Crop Resource")
+	FCachedModifiableValueDataTableRowHandle _resourceAmount;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Crop Resource")
 	FModifiedFloatValue _resourceDecayOnHit = .1f;

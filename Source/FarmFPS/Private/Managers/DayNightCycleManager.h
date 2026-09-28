@@ -3,6 +3,7 @@
 #pragma once
 
 // Brock
+#include "Misc/CachedModifiableValueDataTableRowHandle.h"
 #include "ModifiedValueData.h"
 
 // UE
@@ -78,8 +79,8 @@ private:
 
 	TWeakObjectPtr<UAudioManager> _audioManager;
 
-	UPROPERTY(EditDefaultsOnly)
-	FModifiedFloatValue _dayLength = 60.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Tunables")
+	FCachedModifiableValueDataTableRowHandle _dayLength = 60.f;
 
 	UPROPERTY(EditDefaultsOnly)
 	float _timeToReachPeakMoon = 2.f;

@@ -59,7 +59,7 @@ void AShooterWeapon::BeginPlay()
 	PawnOwner = Cast<APawn>(GetOwner());
 
 	// fill the first ammo clip
-	CurrentBullets = MagazineSize.GetModifiedValue(this);
+	CurrentBullets = GetMagazineSize();
 
 	// attach the meshes to the owner
 	WeaponOwner->AttachWeaponMeshes(this);
@@ -218,15 +218,15 @@ void AShooterWeapon::Fire()
 
 void AShooterWeapon::StartReload()
 {
-	if (!bIsReloading && CurrentBullets < MagazineSize.GetModifiedValue(this))
+	if (!bIsReloading && CurrentBullets < GetMagazineSize())
 	{
 		bIsFiring = false;
 		bIsReloading = true;
 
 		CurrentBullets = 0;
-		WeaponOwner->UpdateWeaponHUD(CurrentBullets, MagazineSize.GetModifiedValue(this));
+		WeaponOwner->UpdateWeaponHUD(CurrentBullets, GetMagazineSize());
 
-		GetWorld()->GetTimerManager().SetTimer(ReloadTimer, this, &AShooterWeapon::OnReloadFinish, ReloadTime.GetModifiedValue(this), false);
+		GetWorld()->GetTimerManager().SetTimer(ReloadTimer, this, &AShooterWeapon::OnReloadFinish, ReloadTime.GetValue().GetModifiedValue(this), false);
 	}
 }
 
@@ -234,10 +234,10 @@ void AShooterWeapon::OnReloadFinish()
 {
 	bIsReloading = false;
 
-	CurrentBullets = MagazineSize.GetModifiedValue(this);
+	CurrentBullets = GetMagazineSize();
 
 	// update the weapon HUD
-	WeaponOwner->UpdateWeaponHUD(CurrentBullets, MagazineSize.GetModifiedValue(this));
+	WeaponOwner->UpdateWeaponHUD(CurrentBullets, GetMagazineSize());
 
 	bIsFiring = GetWorld()->GetTimerManager().IsTimerActive(RefireTimer);
 }
@@ -291,7 +291,7 @@ void AShooterWeapon::FireProjectile(const FVector& TargetLocation)
 			}
 
 			// update the weapon HUD
-			WeaponOwner->UpdateWeaponHUD(CurrentBullets, MagazineSize.GetModifiedValue(this));
+			WeaponOwner->UpdateWeaponHUD(CurrentBullets, GetMagazineSize());
 		}
 	}
 

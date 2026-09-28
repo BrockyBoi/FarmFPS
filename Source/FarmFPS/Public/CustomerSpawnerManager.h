@@ -3,6 +3,7 @@
 #pragma once
 
 // Brock
+#include "Misc/CachedModifiableValueDataTableRowHandle.h"
 #include "Managers/CraftingData.h"
 
 // UE
@@ -22,8 +23,8 @@ struct FCustomerSpawnData
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ACustomer> CustomerClass;
 
-	UPROPERTY(EditDefaultsOnly)
-	FModifiedFloatValue SpawnChance = 0.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Tunables")
+	FCachedModifiableValueDataTableRowHandle SpawnChance = 0.f;
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -62,8 +63,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Spawn Rate")
 	FModifiedFloatValue _spawnRate;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Spawn Amount")
-	FModifiedIntValue _totalCustomersAllowedOnScreenAtOnce;
+	UPROPERTY(EditDefaultsOnly, Category = "Tunables|Spawn Amount")
+	FCachedModifiableValueDataTableRowHandle _totalCustomersAllowedOnScreenAtOnce = 8;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Customer Types")
 	FCustomerSpawnData _defaultCustomerSpawnData;

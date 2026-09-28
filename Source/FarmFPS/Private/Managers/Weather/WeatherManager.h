@@ -4,6 +4,7 @@
 
 // Brock
 #include "Managers/ModifiedValueData.h"
+#include "Misc/CachedModifiableValueDataTableRowHandle.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -70,17 +71,17 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Storm Spawning")
 	FVector _stormCloudSpawnLocation = FVector::ZeroVector;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Storm Spawning")
-	FModifiedFloatValue _cloudSpawnChancePerSecond = .01f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tunables|Storm Spawning")
+	FCachedModifiableValueDataTableRowHandle _cloudSpawnChancePerSecond = .01f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Storm")
-	FModifiedFloatValue _stormDuration = 15.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tunables|Storm")
+	FCachedModifiableValueDataTableRowHandle _stormDuration = 15.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Storm")
 	float _stormRampUpTime = 5.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Storm")
-	FModifiedFloatValue _maxStormIntensity = 5.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tunables|Storm")
+	FCachedModifiableValueDataTableRowHandle _maxStormIntensity = 5.f;
 
 	float _currentStormIntensity = 0.f;
 

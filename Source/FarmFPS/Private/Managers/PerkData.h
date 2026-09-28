@@ -33,19 +33,26 @@ struct FPerkData
 
 	float GetModifiedValue(float baseValue)
 	{
-		return (baseValue * MultiplicativeValue) + (baseValue + AdditiveValue);
+		return (baseValue * MultiplicativeValue) + AdditiveValue;
 	}
 
 	FString GetDescriptionText() const
 	{
 		FString perkValueString = TEXT("");
+		FString numberString;
+
+		FNumberFormattingOptions Opts;
+		Opts.SetMinimumFractionalDigits(0);
+		Opts.SetMaximumFractionalDigits(2);
 		if (!FMath::IsNearlyEqual(MultiplicativeValue, 1.f))
 		{
-			perkValueString = FString::Printf(TEXT(" times %f"), MultiplicativeValue);
+			numberString = FText::AsNumber(MultiplicativeValue, &Opts).ToString();
+			perkValueString = FString::Printf(TEXT(" * %s"), *numberString);
 		}
 		else if (!FMath::IsNearlyZero(AdditiveValue))
 		{
-			perkValueString = AdditiveValue > 0 ? FString::Printf(TEXT(" plus %f"), AdditiveValue) : FString::Printf(TEXT(" minus %f"), AdditiveValue);
+			numberString = FText::AsNumber(AdditiveValue, &Opts).ToString();
+			perkValueString = AdditiveValue > 0 ? FString::Printf(TEXT(" + %s"), *numberString) : FString::Printf(TEXT(" - %s"), *numberString);
 		}
 
 		return perkValueString;

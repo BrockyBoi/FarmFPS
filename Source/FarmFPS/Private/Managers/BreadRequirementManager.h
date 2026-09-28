@@ -3,6 +3,7 @@
 #pragma once
 
 // Brock
+#include "Misc/CachedModifiableValueDataTableRowHandle.h"
 #include "ModifiedValueData.h"
 #include "SaveSystem/BreadRequirementManagerSaveGameData.h"
 #include "SaveSystem/Saveable.h"
@@ -26,7 +27,7 @@ public:
 
 	void SellBread(int breadAmount = 1);
 	
-	float GetBonusMultiplierForBreadSold() const { return 1 + (_bonusMultiplierPerDaySold.GetModifiedValue(this) * _consecutiveDaysSoldBreadRequirement); }
+	float GetBonusMultiplierForBreadSold() const { return 1 + (_bonusMultiplierPerDaySold.GetValue().GetModifiedValue(this) * _consecutiveDaysSoldBreadRequirement); }
 
 	UFUNCTION(BlueprintPure)
 	int GetCurrentBreadSold() const { return _currentBreadSold; }
@@ -63,11 +64,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BreadRequirement", meta = (AllowPrivateAccess = true))
 	int _startingBreadRequired = 1;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BreadRequirement", meta = (AllowPrivateAccess = true))
-	FModifiedIntValue _dailyBreadIncreaseAmount = 1;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tunables|BreadRequirement", meta = (AllowPrivateAccess = true))
+	FCachedModifiableValueDataTableRowHandle _dailyBreadIncreaseAmount = 1;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BreadRequirement", meta = (AllowPrivateAccess = true))
-	FModifiedFloatValue _bonusMultiplierPerDaySold = .1f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tunables|BreadRequirement", meta = (AllowPrivateAccess = true))
+	FCachedModifiableValueDataTableRowHandle _bonusMultiplierPerDaySold = .1f;
 
 private:
 	UFUNCTION()

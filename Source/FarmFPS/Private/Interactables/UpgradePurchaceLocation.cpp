@@ -13,10 +13,15 @@ void UUpgradePurchaceLocation::BeginPlay()
 
 FString UUpgradePurchaceLocation::GetPerkDescriptionString() const
 {
+	AActor* owner = GetOwner();
 	FString upgradeName = _modifierUpgrade.GetTagName().ToString();
-	upgradeName = upgradeName.Replace(TEXT("PerkModifierType."), TEXT(""));
+	upgradeName = upgradeName.Replace(TEXT("PerkModifier."), TEXT(""));
 
 	FString perkValueString = _perkUpgradeAmount.GetDescriptionText();
+
+	FNumberFormattingOptions Opts;
+	Opts.SetMinimumFractionalDigits(0);
+	Opts.SetMaximumFractionalDigits(2);
 
 	UPerkManager* perkManager = UFarmFPSUtilities::GetPlayerPerkManager(this);
 	float beforeValue = 0;
@@ -26,10 +31,10 @@ FString UUpgradePurchaceLocation::GetPerkDescriptionString() const
 		FPerkData currentPerkData = perkManager->GetPerkData(_modifierUpgrade);
 		beforeValue = currentPerkData.GetModifiedValue(_baseValueRowData.GetValue().GetBaseValue());
 		
-		FPerkData modifiedPerkData = FPerkData(currentPerkData.AdditiveValue + _perkUpgradeAmount.AdditiveValue, currentPerkData.MultiplicativeValue + _perkUpgradeAmount.MultiplicativeValue);
+		FPerkData modifiedPerkData = FPerkData(currentPerkData.AdditiveValue + _perkUpgradeAmount.AdditiveValue, currentPerkData.MultiplicativeValue * _perkUpgradeAmount.MultiplicativeValue);
 		afterValue = modifiedPerkData.GetModifiedValue(_baseValueRowData.GetValue().GetBaseValue());
 	}
-	FString change = FString::Printf(TEXT("\n%f -> %f"), beforeValue, afterValue);
+	FString change = FString::Printf(TEXT("\n%s -> %s"), *FText::AsNumber(beforeValue, &Opts).ToString(), *FText::AsNumber(afterValue, &Opts).ToString());
 	FString finalString = upgradeName.Append(perkValueString).Append(change);
 
 	return finalString;

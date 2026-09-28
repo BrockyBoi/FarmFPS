@@ -4,6 +4,7 @@
 
 // Brock
 #include "Managers/ModifiedValueData.h"
+#include "Misc/CachedModifiableValueDataTableRowHandle.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -35,11 +36,11 @@ struct FCropData
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float FinalScaleSize;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FModifiedIntValue NumberOfPickupsToDrop;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tunables")
+	FCachedModifiableValueDataTableRowHandle NumberOfPickupsToDrop;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FModifiedIntValue NumberOfLoveSeedsToDrop;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tunables")
+	FCachedModifiableValueDataTableRowHandle NumberOfLoveSeedsToDrop;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Categories = "ResourceType."))
 	FGameplayTag ResourceType;
