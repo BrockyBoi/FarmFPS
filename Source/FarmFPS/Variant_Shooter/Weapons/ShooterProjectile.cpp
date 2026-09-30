@@ -59,6 +59,8 @@ void AShooterProjectile::AddActorToPool()
 
 	SetActorScale3D(FVector::OneVector);
 	GetWorld()->GetTimerManager().ClearTimer(LifeTimeTimer);
+
+	Cosmetic_OnAddedToPool();
 }
 
 void AShooterProjectile::RemoveFromPool()
@@ -71,6 +73,7 @@ void AShooterProjectile::RemoveFromPool()
 	}
 
 	GetWorld()->GetTimerManager().SetTimer(LifeTimeTimer, this, &AShooterProjectile::OnLifeTimeExpired, LifeTime, false);
+	Cosmetic_OnRemovedFromPool();
 }
 
 void AShooterProjectile::Shoot()
@@ -133,11 +136,12 @@ void AShooterProjectile::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Ot
 	// pass control to BP for any extra effects
 	BP_OnProjectileHit(Hit);
 
+	Cosmetic_OnHitObject();
+
 	// check if we should schedule deferred destruction of the projectile
 	if (DeferredDestructionTime > 0.0f)
 	{
 		GetWorld()->GetTimerManager().SetTimer(DestructionTimer, this, &AShooterProjectile::OnDeferredDestruction, DeferredDestructionTime, false);
-
 	} 
 	else 
 	{

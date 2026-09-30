@@ -174,9 +174,18 @@ void ACropResourceProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Oth
 		return;
 	}
 
-	UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
-	if (ensure(IsValid(actorPool)))
+	Cosmetic_OnHitObject();
+
+	if (DeferredDestructionTime > 0.0f)
 	{
-		actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
+		GetWorld()->GetTimerManager().SetTimer(DestructionTimer, this, &ACropResourceProjectile::OnDeferredDestruction, DeferredDestructionTime, false);
+	}
+	else
+	{
+		UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
+		if (ensure(IsValid(actorPool)))
+		{
+			actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
+		}
 	}
 }

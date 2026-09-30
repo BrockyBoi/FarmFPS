@@ -33,6 +33,12 @@ protected:
 
 	bool CanSpawnCropAtLocation(class ACrop* crop, const FVector& spawnLocation, const FVector& hitNormal) const;
 
+	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
+	void Cosmetic_OnSpawnedSeedSucceed();
+
+	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
+	void Cosmetic_OnSpawnSeedFail();
+
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _onSeedPlantedSound;
 

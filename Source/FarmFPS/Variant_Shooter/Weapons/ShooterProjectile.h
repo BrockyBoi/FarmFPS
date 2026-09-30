@@ -40,6 +40,14 @@ public:
 	const FGameplayTag& GetProjectileType() const { return ProjectileType; }
 
 protected:
+	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
+	void Cosmetic_OnAddedToPool();
+
+	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
+	void Cosmetic_OnRemovedFromPool();
+
+	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
+	void Cosmetic_OnHitObject();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "CropResourceType,ResourceType"))
 	FGameplayTag ProjectileType;
@@ -130,5 +138,4 @@ protected:
 
 	/** Called from the destruction timer to destroy this projectile */
 	void OnDeferredDestruction();
-
 };

@@ -85,6 +85,7 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 					crop->SetActorRotation(Other->GetActorRotation());
 
 					crop->SetWasPlantedSuccessfully(true);
+					Cosmetic_OnSpawnedSeedSucceed();
 				}
 				else
 				{
@@ -95,6 +96,7 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 					}
 
 					crop->SetWasPlantedSuccessfully(false);
+					Cosmetic_OnSpawnSeedFail();
 					return;
 				}
 			}
@@ -103,6 +105,10 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 			{
 				UAudioManager::SpawnSoundAtLocation(this, _onSeedPlantedSound, GetActorLocation());
 			}
+		}
+		else
+		{
+			Cosmetic_OnSpawnSeedFail();
 		}
 	}
 }

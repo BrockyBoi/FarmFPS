@@ -213,12 +213,15 @@ void ACustomer::FindSpotInQueue()
 void ACustomer::MoveToBreadStand()
 {
 	_currentState = ECustomerState::MovingToBreadStand;
-	_nextDestination = _breadStand->GetNextCustomerQueuePosition();
-	if (ensure(IsValid(_aiController)))
+	if (ensure(_breadStand.IsValid()))
 	{
-		_aiController->ReceiveMoveCompleted.RemoveAll(this);
-		_aiController->ReceiveMoveCompleted.AddDynamic(this, &ACustomer::OnMoveFinishedMovingToBreadStand);
-		_aiController->MoveToLocation(_nextDestination, _moveAcceptanceRadius * 10);
+		_nextDestination = _breadStand->GetNextCustomerQueuePosition();
+		if (ensure(IsValid(_aiController)))
+		{
+			_aiController->ReceiveMoveCompleted.RemoveAll(this);
+			_aiController->ReceiveMoveCompleted.AddDynamic(this, &ACustomer::OnMoveFinishedMovingToBreadStand);
+			_aiController->MoveToLocation(_nextDestination, _moveAcceptanceRadius * 10);
+		}
 	}
 }
 

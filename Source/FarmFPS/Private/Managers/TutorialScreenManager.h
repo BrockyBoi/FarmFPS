@@ -90,6 +90,8 @@ protected:
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 private:
+	void ListenToAllEvents(bool shouldListen);
+
 	UFUNCTION()
 	void OnWeaponCollected(AShooterWeapon* weapon);
 

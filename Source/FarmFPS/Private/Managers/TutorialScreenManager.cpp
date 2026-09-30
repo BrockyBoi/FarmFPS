@@ -40,33 +40,13 @@ void UTutorialScreenManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APlant::OnFullyGrown.AddUObject(this, &UTutorialScreenManager::OnPlantFullyGrown);
-	AResourcePickupActor::OnCollected.AddUObject(this, &UTutorialScreenManager::OnResourceCollected);
-	AResourcePickupActor::OnResourceSpawned.AddUObject(this, &UTutorialScreenManager::OnResourceSpawned);
-	ABreadOven::OnStartConvertingResources.AddUObject(this, &UTutorialScreenManager::OnStartBakingBread);
-	ABreadOven::OnBreadSpawned.AddUObject(this, &UTutorialScreenManager::OnFirstBreadSpawned);
-	ABreadStand::OnBreadAddedToStand.AddUObject(this, &UTutorialScreenManager::OnBreadAddedToStand);
-	UDayNightCycleManager::OnDayStateChange.AddUObject(this, &UTutorialScreenManager::OnDayNightCycleStateChanged);
-	ACrop::OnCropPlanted.AddUObject(this, &UTutorialScreenManager::OnCropPlanted);
-	UPurchaseLocation::StaticOnPurchaseSuccess.AddUObject(this, &UTutorialScreenManager::OnFirstUpgradePurchased);
-
 	if (ensure(IsValid(_tutorialShineObjectClass)))
 	{
 		_tutorialShineObject = GetWorld()->SpawnActor<ATutorialShineActor>(_tutorialShineObjectClass, FTransform::Identity);
 		HideTutorialShineObject();
 	}
 
-	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
-	if (ensure(IsValid(saveGameManager)))
-	{
-		saveGameManager->OnLoadGameData.AddUObject(this, &UTutorialScreenManager::OnGameLoaded);
-	}
-
-	AShooterCharacter* player = Cast<AShooterCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));
-	if (ensure(IsValid(player)))
-	{
-		player->OnNewWeaponAdded.AddUObject(this, &UTutorialScreenManager::OnWeaponCollected);
-	}
+	ListenToAllEvents(true);
 
 	FTimerHandle handle;
 	GetWorld()->GetTimerManager().SetTimer(handle, FTimerDelegate::CreateUObject(this, &UTutorialScreenManager::OnLevelReady), .5f, false);
@@ -74,22 +54,7 @@ void UTutorialScreenManager::BeginPlay()
 
 void UTutorialScreenManager::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
-	APlant::OnFullyGrown.RemoveAll(this);
-	AShooterWeapon::OnWeaponCollected.RemoveAll(this);
-	AResourcePickupActor::OnCollected.RemoveAll(this);
-	AResourcePickupActor::OnResourceSpawned.RemoveAll(this);
-	ABreadOven::OnStartConvertingResources.RemoveAll(this);
-	ABreadOven::OnBreadSpawned.RemoveAll(this);
-	ABreadStand::OnBreadAddedToStand.RemoveAll(this);
-	UDayNightCycleManager::OnDayStateChange.RemoveAll(this);
-	ACrop::OnCropPlanted.RemoveAll(this);
-	UPurchaseLocation::StaticOnPurchaseSuccess.RemoveAll(this);
-
-	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
-	if (IsValid(saveGameManager))
-	{
-		saveGameManager->OnLoadGameData.RemoveAll(this);
-	}
+	ListenToAllEvents(false);
 
 	Super::EndPlay(EndPlayReason);
 }
@@ -107,23 +72,26 @@ void UTutorialScreenManager::PressStopShowingTutorials()
 	_shouldShowTutorials = false;
 	HideTutorialShineObject();
 
-	if (ensure(_waterPistol.IsValid()))
-	{
-		_waterPistol->SetActorEnableCollision(true);
-		_waterPistol->SetActorHiddenInGame(false);
-	}
-
-	if (ensure(_wheatPistol.IsValid()))
-	{
-		_wheatPistol->SetActorEnableCollision(true);
-		_wheatPistol->SetActorHiddenInGame(false);
-	}
 
 	AShooterCharacter* player = Cast<AShooterCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));
 	if (ensure(IsValid(player)))
 	{
+		if (ensure(_waterPistol.IsValid()) && !IsValid(player->FindWeaponOfType(WeaponTypeTag::WaterPistol)))
+		{
+			_waterPistol->SetActorEnableCollision(true);
+			_waterPistol->SetActorHiddenInGame(false);
+		}
+
+		if (ensure(_wheatPistol.IsValid()) && !IsValid(player->FindWeaponOfType(WeaponTypeTag::WheatSeedPistol)))
+		{
+			_wheatPistol->SetActorEnableCollision(true);
+			_wheatPistol->SetActorHiddenInGame(false);
+		}
+
 		player->StopForcingWeaponEquip();
 	}
+
+	ListenToAllEvents(false);
 }
 
 FTutorialSaveGameData UTutorialScreenManager::GetTutorialSaveGameData() const
@@ -164,6 +132,59 @@ bool UTutorialScreenManager::HasPlayerCompletedBasicTutorial() const
 {
 	// Tutorial is over when either the first loaf of bread has been given, or if the player simply opts out of tutorials
 	return HasShownTutorialScreen(ETutorialScreenType::GiveBreadToStand) || !_shouldShowTutorials;
+}
+
+void UTutorialScreenManager::ListenToAllEvents(bool shouldListen)
+{
+	if (shouldListen)
+	{
+		APlant::OnFullyGrown.AddUObject(this, &UTutorialScreenManager::OnPlantFullyGrown);
+		AResourcePickupActor::OnCollected.AddUObject(this, &UTutorialScreenManager::OnResourceCollected);
+		AResourcePickupActor::OnResourceSpawned.AddUObject(this, &UTutorialScreenManager::OnResourceSpawned);
+		ABreadOven::OnStartConvertingResources.AddUObject(this, &UTutorialScreenManager::OnStartBakingBread);
+		ABreadOven::OnBreadSpawned.AddUObject(this, &UTutorialScreenManager::OnFirstBreadSpawned);
+		ABreadStand::OnBreadAddedToStand.AddUObject(this, &UTutorialScreenManager::OnBreadAddedToStand);
+		UDayNightCycleManager::OnDayStateChange.AddUObject(this, &UTutorialScreenManager::OnDayNightCycleStateChanged);
+		ACrop::OnCropPlanted.AddUObject(this, &UTutorialScreenManager::OnCropPlanted);
+		UPurchaseLocation::StaticOnPurchaseSuccess.AddUObject(this, &UTutorialScreenManager::OnFirstUpgradePurchased);
+
+		USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
+		if (ensure(IsValid(saveGameManager)))
+		{
+			saveGameManager->OnLoadGameData.AddUObject(this, &UTutorialScreenManager::OnGameLoaded);
+		}
+
+		AShooterCharacter* player = Cast<AShooterCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));
+		if (ensure(IsValid(player)))
+		{
+			player->OnNewWeaponAdded.AddUObject(this, &UTutorialScreenManager::OnWeaponCollected);
+		}
+	}
+	else
+	{
+		APlant::OnFullyGrown.RemoveAll(this);
+		AShooterWeapon::OnWeaponCollected.RemoveAll(this);
+		AResourcePickupActor::OnCollected.RemoveAll(this);
+		AResourcePickupActor::OnResourceSpawned.RemoveAll(this);
+		ABreadOven::OnStartConvertingResources.RemoveAll(this);
+		ABreadOven::OnBreadSpawned.RemoveAll(this);
+		ABreadStand::OnBreadAddedToStand.RemoveAll(this);
+		UDayNightCycleManager::OnDayStateChange.RemoveAll(this);
+		ACrop::OnCropPlanted.RemoveAll(this);
+		UPurchaseLocation::StaticOnPurchaseSuccess.RemoveAll(this);
+
+		USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
+		if (IsValid(saveGameManager))
+		{
+			saveGameManager->OnLoadGameData.RemoveAll(this);
+		}
+
+		AShooterCharacter* player = Cast<AShooterCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));
+		if (IsValid(player))
+		{
+			player->OnNewWeaponAdded.RemoveAll(this);
+		}
+	}
 }
 
 void UTutorialScreenManager::OnWeaponCollected(AShooterWeapon* weapon)
