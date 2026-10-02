@@ -568,6 +568,7 @@ void AFarmFPSCharacter::DoJumpEnd()
 
 void AFarmFPSCharacter::OnPressSpawnWaterAffector()
 {
+	return;
 	if (ensure(IsValid(_waterAffectorClass)))
 	{
 		FActorSpawnParameters SpawnParams;
@@ -577,6 +578,7 @@ void AFarmFPSCharacter::OnPressSpawnWaterAffector()
 
 void AFarmFPSCharacter::OnPressSpawnLightAffector()
 {
+	return;
 	if (ensure(IsValid(_lightAffectorClass)))
 	{
 		FActorSpawnParameters SpawnParams;

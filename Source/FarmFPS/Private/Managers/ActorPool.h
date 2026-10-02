@@ -35,8 +35,8 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	void SpawnNewActor(const FGameplayTag& actorTag, const FTransform& spawnTransform, EPooledActorType actorType);
-	void SpawnNewActor(const FGameplayTag& actorTag, const FVector& spawnLocation, EPooledActorType actorType);
+	AActor* SpawnNewActor(const FGameplayTag& actorTag, const FTransform& spawnTransform, EPooledActorType actorType);
+	AActor* SpawnNewActor(const FGameplayTag& actorTag, const FVector& spawnLocation, EPooledActorType actorType);
 
 	TMap<FGameplayTag, TArray<AActor*>>& GetPoolMap(EPooledActorType actorType);
 

@@ -33,6 +33,7 @@ void UActorPool::InitializeActors(const FGameplayTag& actorTag, int actorCount, 
 
 AActor* UActorPool::GetActorFromPool(const FGameplayTag& actorTag, const FTransform& spawnTransform, EPooledActorType actorType)
 {
+	AActor* pooledActor = nullptr;
 	TMap<FGameplayTag, TArray<AActor*>>& mapReference = GetPoolMap(actorType);
 
 	if (!mapReference.Contains(actorTag))
@@ -42,15 +43,14 @@ AActor* UActorPool::GetActorFromPool(const FGameplayTag& actorTag, const FTransf
 
 	if (mapReference[actorTag].IsEmpty())
 	{
-		SpawnNewActor(actorTag, spawnTransform, actorType);
+		pooledActor = SpawnNewActor(actorTag, spawnTransform, actorType);
 	}
 
-	if (!ensure(!mapReference[actorTag].IsEmpty()))
+	if (!IsValid(pooledActor))
 	{
-		return nullptr;
+		pooledActor = mapReference[actorTag].Pop();
 	}
 
-	AActor* pooledActor = mapReference[actorTag].Pop();
 	if (ensure(IsValid(pooledActor)))
 	{
 		pooledActor->SetActorHiddenInGame(false);
@@ -70,6 +70,7 @@ AActor* UActorPool::GetActorFromPool(const FGameplayTag& actorTag, const FTransf
 
 AActor* UActorPool::GetActorFromPool(const FGameplayTag& actorTag, const FVector& spawnLocation, EPooledActorType actorType)
 {
+	AActor* pooledActor = nullptr;
 	TMap<FGameplayTag, TArray<AActor*>>& mapReference = GetPoolMap(actorType);
 	if (!mapReference.Contains(actorTag))
 	{
@@ -78,15 +79,14 @@ AActor* UActorPool::GetActorFromPool(const FGameplayTag& actorTag, const FVector
 
 	if (mapReference[actorTag].IsEmpty())
 	{
-		SpawnNewActor(actorTag, spawnLocation, actorType);
+		pooledActor = SpawnNewActor(actorTag, spawnLocation, actorType);
 	}
 
-	if (!ensure(!mapReference[actorTag].IsEmpty()))
+	if (!IsValid(pooledActor))
 	{
-		return nullptr;
+		pooledActor = mapReference[actorTag].Pop();
 	}
 
-	AActor* pooledActor = mapReference[actorTag].Pop();
 	if (ensure(IsValid(pooledActor)))
 	{
 		pooledActor->SetActorHiddenInGame(false);
@@ -127,7 +127,7 @@ void UActorPool::AddActorToPool(const FGameplayTag& actorTag, AActor* actor, EPo
 	}
 }
 
-void UActorPool::SpawnNewActor(const FGameplayTag& actorTag, const FTransform& spawnTransform, EPooledActorType actorType)
+AActor* UActorPool::SpawnNewActor(const FGameplayTag& actorTag, const FTransform& spawnTransform, EPooledActorType actorType)
 {
 	UActorLookupComponent* lookupComponent = UFarmFPSUtilities::GetResourceActorLookupComponent(this);
 	if (ensure(IsValid(lookupComponent)))
@@ -141,13 +141,15 @@ void UActorPool::SpawnNewActor(const FGameplayTag& actorTag, const FTransform& s
 
 			if (ensure(IsValid(actor)))
 			{
-				AddActorToPool(actorTag, actor, actorType);
+				return actor;
 			}
 		}
 	}
+
+	return nullptr;
 }
 
-void UActorPool::SpawnNewActor(const FGameplayTag& actorTag, const FVector& spawnLocation, EPooledActorType actorType)
+AActor* UActorPool::SpawnNewActor(const FGameplayTag& actorTag, const FVector& spawnLocation, EPooledActorType actorType)
 {
 	UActorLookupComponent* lookupComponent = UFarmFPSUtilities::GetResourceActorLookupComponent(this);
 	if (ensure(IsValid(lookupComponent)))
@@ -161,10 +163,12 @@ void UActorPool::SpawnNewActor(const FGameplayTag& actorTag, const FVector& spaw
 
 			if (ensure(IsValid(actor)))
 			{
-				AddActorToPool(actorTag, actor, actorType);
+				return actor;
 			}
 		}
 	}
+
+	return nullptr;
 }
 
 TMap<FGameplayTag, TArray<AActor*>>& UActorPool::GetPoolMap(EPooledActorType actorType)

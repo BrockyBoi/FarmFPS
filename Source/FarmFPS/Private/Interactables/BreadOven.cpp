@@ -55,7 +55,7 @@ void ABreadOven::BeginPlay()
 void ABreadOven::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 	SetHeatLevel(_ovenHeat - (_heatLostPerSecond * DeltaTime));
 }
 

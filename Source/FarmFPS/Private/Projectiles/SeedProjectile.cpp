@@ -126,7 +126,7 @@ bool ASeedProjectile::CanSpawnCropAtLocation(ACrop* crop, const FVector& spawnLo
 		FRotator slopeRotator = UKismetMathLibrary::MakeRotFromZ(hitNormal);
 
 		auto shape = crop->GetCapsuleComponent()->GetCollisionShape();
-		GetWorld()->SweepMultiByChannel(outHits, spawnLocation, spawnLocation, FQuat(slopeRotator), _collisionChannelToCheck, crop->GetCapsuleComponent()->GetCollisionShape(), params);
+		GetWorld()->SweepMultiByChannel(outHits, spawnLocation, spawnLocation, FQuat(slopeRotator), _collisionChannelToCheck, FCollisionShape::MakeCapsule(shape.GetCapsuleRadius() / 2.f, shape.GetCapsuleHalfHeight()), params);
 		for (FHitResult& result : outHits)
 		{
 			AActor* actor = result.GetActor();
