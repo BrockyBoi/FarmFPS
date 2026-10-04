@@ -4,6 +4,7 @@
 
 // Brock
 #include "Managers/ModifiedValueData.h"
+#include "Misc/CachedModifiableValueDataTableRowHandle.h"
 #include "SaveSystem/Saveable.h"
 
 // UE
@@ -252,8 +253,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	UPlayerInventoryItemSelector* _itemSelector = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Pickup Collider")
-	FModifiedFloatValue _defaultPickupColliderRadius = 150.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tunables|Pickup Collider", meta = (AllowPrivateAccess = true))
+	FCachedModifiableValueDataTableRowHandle _defaultPickupColliderRadius = 1;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Ground Slam")
 	FModifiedFloatValue _groundSlamDistanceThreshold;
@@ -302,8 +303,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Melee")
 	FVector _meleeColliderBounds = FVector(1.0f, 1.0f, 1.0f);
 
-	UPROPERTY(EditDefaultsOnly, Category = "Melee")
-	FModifiedFloatValue _meleeScale = 1;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tunables|Melee", meta = (AllowPrivateAccess = true))
+	FCachedModifiableValueDataTableRowHandle _meleeScale = 1;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Melee")
 	FModifiedFloatValue _meleeDuration = 1;
@@ -324,8 +325,8 @@ protected:
 
 	float _throwInterval = 0.5f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Throw")
-	FModifiedFloatValue _throwIntervalSpeedUpPerThrow = 0.01;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tunables|Throw", meta = (AllowPrivateAccess = true))
+	FCachedModifiableValueDataTableRowHandle _throwIntervalSpeedUpPerThrow = 1;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Throw")
 	float _maxThrowSpeedInterval = 0.5f;
@@ -341,10 +342,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Affectors")
 	TSubclassOf<AConstantCropAffectorArea> _lightAffectorClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Movement")
-	FModifiedFloatValue _movementSpeedMultiplier = 1.f;
-
-	float _startingMovementSpeed = 0;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tunables|Movement", meta = (AllowPrivateAccess = true))
+	FCachedModifiableValueDataTableRowHandle _moveSpeed = 750;
 
 	UPROPERTY(EditAnywhere)
 	USphereComponent* _groundSlamSphereCollider;

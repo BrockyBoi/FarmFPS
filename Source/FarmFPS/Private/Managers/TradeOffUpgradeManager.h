@@ -50,6 +50,9 @@ protected:
 
 	void OnTradeOffDayStateReached();
 
+	UFUNCTION(BlueprintPure)
+	FString GetDescriptionString() const;
+
 private:
 	void IntializeTradeOffs();
 
@@ -63,6 +66,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	UDataTable* _tradeOffPossiblitiesTable;
+
+	UPROPERTY(EditDefaultsOnly)
+	UDataTable* _baseValuesTable;
 
 	TMap<FGameplayTag, FTradeOffPossibility> _possibilities;
 };

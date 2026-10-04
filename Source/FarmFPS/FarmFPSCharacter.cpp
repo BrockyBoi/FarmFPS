@@ -210,7 +210,7 @@ void AFarmFPSCharacter::BeginPlay()
 		_startingJumpCount = JumpMaxCount;
 		_startingJumpHeight = GetCharacterMovement()->JumpZVelocity;
 
-		_startingMovementSpeed = GetCharacterMovement()->MaxWalkSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = _moveSpeed.GetValue().GetModifiedValue(this);
 	}
 
 	if (ensure(IsValid(_inventory)) && ensure(IsValid(_itemSelector)))
@@ -220,7 +220,7 @@ void AFarmFPSCharacter::BeginPlay()
 		_itemSelector->OnIndexChanged.AddUObject(this, &AFarmFPSCharacter::Cosmetic_OnItemSelectorIndexChanged);
 	}
 
-	_resourcePickupCollider->SetSphereRadius(_defaultPickupColliderRadius.GetModifiedValue(this));
+	_resourcePickupCollider->SetSphereRadius(_defaultPickupColliderRadius.GetValue().GetModifiedValue(this));
 	_resourcePickupCollider->OnComponentBeginOverlap.AddDynamic(this, &AFarmFPSCharacter::OnResourcePickupOverlap);
 
 	LandedDelegate.AddDynamic(this, &AFarmFPSCharacter::OnPlayerLanded);
@@ -307,7 +307,7 @@ void AFarmFPSCharacter::TriggerFallSlam(const float velocityAtFall)
 {
 	float lerpedValue = FMath::Lerp(_minFallSlamColliderMultipler, _maxFallSlamColliderMultipler, velocityAtFall / _maxFallSlamVelocity);
 
-	_resourcePickupCollider->SetSphereRadius(_defaultPickupColliderRadius.GetModifiedValue(this) * lerpedValue);
+	_resourcePickupCollider->SetSphereRadius(_defaultPickupColliderRadius.GetValue().GetModifiedValue(this) * lerpedValue);
 	FTimerHandle handle;
 	GetWorld()->GetTimerManager().SetTimer(handle, FTimerDelegate::CreateUObject(this, &AFarmFPSCharacter::OnResourcePickupBonusTimeEnd), _timeOfFallSlamColliderBonus, false);
 }
@@ -316,9 +316,9 @@ void AFarmFPSCharacter::OnPerkLevelDataChanged(const FGameplayTag& perkType, con
 {
 	JumpMaxCount = _startingJumpCount + _extraJumpCount.GetModifiedValue(this);
 	GetCharacterMovement()->JumpZVelocity = _startingJumpHeight + _extraJumpHeight.GetModifiedValue(this);
-	GetCharacterMovement()->MaxWalkSpeed =  _startingMovementSpeed * _movementSpeedMultiplier.GetModifiedValue(this);
-	_meleeCollider->SetBoxExtent(_meleeColliderBounds + FVector(_meleeScale.GetModifiedValue(this)));
-	_resourcePickupCollider->SetSphereRadius(_defaultPickupColliderRadius.GetModifiedValue(this));
+	GetCharacterMovement()->MaxWalkSpeed =  _moveSpeed.GetValue().GetModifiedValue(this);
+	_meleeCollider->SetBoxExtent(_meleeColliderBounds + FVector(_meleeScale.GetValue().GetModifiedValue(this)));
+	_resourcePickupCollider->SetSphereRadius(_defaultPickupColliderRadius.GetValue().GetModifiedValue(this));
 }
 
 void AFarmFPSCharacter::OnGroundSlamComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -523,7 +523,7 @@ void AFarmFPSCharacter::ThrowInventoryItem()
 
 			if (!depleteResources)
 			{
-				_throwInterval = FMath::Max(_throwInterval - _throwIntervalSpeedUpPerThrow.GetModifiedValue(this), _minThrowSpeedInterval);
+				_throwInterval = FMath::Max(_throwInterval - _throwIntervalSpeedUpPerThrow.GetValue().GetModifiedValue(this), _minThrowSpeedInterval);
 				GetWorld()->GetTimerManager().SetTimer(_throwTimerHandle, this, &AFarmFPSCharacter::ThrowInventoryItem, _throwInterval, false);
 			}
 			else
@@ -644,5 +644,5 @@ void AFarmFPSCharacter::DoGroundSlamEnd()
 
 void AFarmFPSCharacter::OnResourcePickupBonusTimeEnd()
 {
-	_resourcePickupCollider->SetSphereRadius(_defaultPickupColliderRadius.GetModifiedValue(this));
+	_resourcePickupCollider->SetSphereRadius(_defaultPickupColliderRadius.GetValue().GetModifiedValue(this));
 }
