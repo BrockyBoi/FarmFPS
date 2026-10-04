@@ -84,7 +84,7 @@ FString UTradeOffUpgradeManager::GetDescriptionString() const
 		afterValue = modifiedPerkData.GetModifiedValue(value.GetBaseValue());
 
 		FPerkData currentBreadData = perkManager->GetPerkData(PerkModifierTypeTag::DailyBreadIncreaseAmount);
-		beforeBreadValue = currentBreadData.GetModifiedValue(value.GetBaseValue());
+		beforeBreadValue = currentBreadData.GetModifiedValue(1);
 		afterBreadValue = beforeBreadValue + _currentTradeOff.BreadIncreaseAmount.AdditiveValue;
 	}
 	FString change = FString::Printf(TEXT("\n%s -> %s"), *FText::AsNumber(beforeValue, &Opts).ToString(), *FText::AsNumber(afterValue, &Opts).ToString());
