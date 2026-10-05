@@ -72,6 +72,8 @@ protected:
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 private:
+	bool IsValidTag(const FGameplayTag& tag) const;
+
 	UFUNCTION()
 	void OnDayBegin();
 

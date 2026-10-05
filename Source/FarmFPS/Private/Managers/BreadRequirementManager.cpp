@@ -4,7 +4,11 @@
 
 // Brock
 #include "DayNightCycleManager.h"
+#include "FarmFPSCharacter.h"
 #include "FarmFPSUtilities.h"
+#include "Managers/PerkManager.h"
+#include "Managers/PerkModifierTypeTag.h"
+#include "Resources/ResourceInventory.h"
 #include "SaveSystem/SaveGameManager.h"
 
 UBreadRequirementManager::UBreadRequirementManager()
@@ -66,7 +70,7 @@ void UBreadRequirementManager::SellBread(int breadAmount)
 FBreadRequirementManagerSaveGameData UBreadRequirementManager::GetBreadRequriementSaveGameData() const
 {
 	FBreadRequirementManagerSaveGameData saveData;
-	saveData.DailyRequiredBread = _breadRequiredForCurrentDay;
+	saveData.ConsecutiveDaysMetRequirement = _consecutiveDaysSoldBreadRequirement;
 
 	return saveData;
 }
@@ -75,23 +79,13 @@ void UBreadRequirementManager::OnGameLoaded(UFarmFPSSaveGame* saveGame)
 {
 	if (ensure(saveGame))
 	{
-		_breadRequiredForCurrentDay = saveGame->GetBreadRequirmentSaveData().DailyRequiredBread;
+		_consecutiveDaysSoldBreadRequirement = saveGame->GetBreadRequirmentSaveData().ConsecutiveDaysMetRequirement;
 	}
 }
 
 void UBreadRequirementManager::OnDayBegin()
 {
 	_currentBreadSold = 0;
-
-	if (_isFirstDay)
-	{
-		_breadRequiredForCurrentDay = _startingBreadRequired;
-		_isFirstDay = false;
-	}
-	else
-	{
-		_breadRequiredForCurrentDay += _dailyBreadIncreaseAmount.GetValue().GetModifiedValue(this);
-	}
 }
 
 void UBreadRequirementManager::OnDayEnd()
@@ -107,12 +101,23 @@ void UBreadRequirementManager::RequirementsMet()
 	_consecutiveDaysSoldBreadRequirement++;
 	OnRequirementsMet.Broadcast();
 	_metRequirementForDay = true;
+
+	UPerkManager* perkManager = UFarmFPSUtilities::GetPlayerPerkManager(this);
+	if (ensure(IsValid(perkManager)))
+	{
+		perkManager->SetPerkData(PerkModifierTypeTag::BonusDailyBreadRewardModifier, FPerkData(0, 1 + (_bonusMultiplierPerDaySold.GetValue().GetBaseValue() * _consecutiveDaysSoldBreadRequirement)));
+	}
 }
 
 void UBreadRequirementManager::DayFailed()
 {
 	_consecutiveDaysSoldBreadRequirement = 0;
 	OnDayFailed.Broadcast();
-	_breadRequiredForCurrentDay = 0;
 	_currentBreadSold = 0;
+
+	UPerkManager* perkManager = UFarmFPSUtilities::GetPlayerPerkManager(this);
+	if (ensure(IsValid(perkManager)))
+	{
+		perkManager->SetPerkData(PerkModifierTypeTag::BonusDailyBreadRewardModifier, FPerkData(0, 0));
+	}
 }

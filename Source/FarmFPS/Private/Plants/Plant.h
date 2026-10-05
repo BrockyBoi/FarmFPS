@@ -28,7 +28,7 @@ public:
 	APlant();
 
 	UFUNCTION(BlueprintCallable)
-	void AddResource(const FGameplayTag& resourceType, float amount);
+	virtual void AddResource(const FGameplayTag& resourceType, float amount);
 	void AddResource(const FGameplayTagContainer& resourceTypes, float amount);
 	const FCropData& GetCropData() const { return _cropData; }
 
@@ -126,6 +126,7 @@ protected:
 	void Cosmetic_OnResourceFull(const FGameplayTag& resourceType);
 
 	UResourceInventory* _resourcesInventory = nullptr;
+	UStaticMeshComponent* _staticMesh = nullptr;
 
 	int _currentPlantHealth = 0;
 

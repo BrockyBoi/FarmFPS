@@ -34,14 +34,17 @@ public:
 	float ModifyValueByPerks(const FGameplayTag& perkTag, float valueToModify) const;
 	float ModifyValueByPerks(const FGameplayTagContainer& perkTags, float valueToModify) const;
 
+	void SetPerkData(const FGameplayTag& perkTag, const FPerkData& newPerkData);
+
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPerkLevelChange, const FGameplayTag&, resourceType, const FPerkData&, perkData);
 
 	UPROPERTY(BlueprintAssignable)
 	FOnPerkLevelChange OnPerkLevelChange;
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	bool IsValidTag(const FGameplayTag& tag) const;
 		
 	TMap<FGameplayTag, FPerkData> _activePerks;
 };

@@ -4,6 +4,9 @@
 
 namespace PerkModifierTypeTag
 {
+	UE_DEFINE_GAMEPLAY_TAG(PerkModifierBaseTag, "PerkModifier");
+
+
 	// Base Player Movement
 	UE_DEFINE_GAMEPLAY_TAG(JumpCount, "PerkModifier.JumpCount");
 	UE_DEFINE_GAMEPLAY_TAG(JumpHeight, "PerkModifier.JumpHeight");
@@ -17,6 +20,7 @@ namespace PerkModifierTypeTag
 
 	// Resource Modifiers
 	UE_DEFINE_GAMEPLAY_TAG(BreadPrice, "PerkModifier.BreadPrice");
+	UE_DEFINE_GAMEPLAY_TAG(BonusDailyBreadRewardModifier, "PerkModifier.BonusDailyBreadRewardModifier");
 	UE_DEFINE_GAMEPLAY_TAG(LightEfficacy, "PerkModifier.LightEfficacy");
 	UE_DEFINE_GAMEPLAY_TAG(MoreCropYield, "PerkModifier.MoreCropYield");
 	UE_DEFINE_GAMEPLAY_TAG(WaterEfficacy, "PerkModifier.WaterEfficacy");

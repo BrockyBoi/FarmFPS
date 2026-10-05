@@ -16,5 +16,5 @@ struct FBreadRequirementManagerSaveGameData
 
 public:
 	UPROPERTY()
-	int DailyRequiredBread;
+	int ConsecutiveDaysMetRequirement;
 };

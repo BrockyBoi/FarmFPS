@@ -35,6 +35,8 @@ public:
 
 	void SetWasPlantedSuccessfully(bool wasSuccessful);
 
+	virtual void AddResource(const FGameplayTag& resourceType, float amount) override;
+
 	UFUNCTION(BlueprintPure)
 	bool GetIsInPerfectTiming() const { return _isInPerfectTiming; }
 
@@ -46,6 +48,8 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason);
+
+	void SetMeshForCurrentProgress();
 
 	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
 	void Cosmetic_OnAddedToPool();
@@ -89,6 +93,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _onBreakCropSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
+	TArray<UStaticMesh*> _meshesOverProgress;
 
 	float _sinAngleInPerfectTiming = 270.f;
 

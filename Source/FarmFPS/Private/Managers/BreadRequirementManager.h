@@ -26,20 +26,18 @@ public:
 	UBreadRequirementManager();
 
 	void SellBread(int breadAmount = 1);
-	
-	float GetBonusMultiplierForBreadSold() const { return 1 + (_bonusMultiplierPerDaySold.GetValue().GetModifiedValue(this) * _consecutiveDaysSoldBreadRequirement); }
 
 	UFUNCTION(BlueprintPure)
 	int GetCurrentBreadSold() const { return _currentBreadSold; }
 
 	UFUNCTION(BlueprintPure)
-	bool HasSoldBreadNeeded() const { return _currentBreadSold >= _breadRequiredForCurrentDay; }
+	bool HasSoldBreadNeeded() const { return _currentBreadSold >= GetBreadRequiredForDay(); }
 
 	UFUNCTION(BlueprintPure)
-	int GetBreadRequiredForDay() const { return _breadRequiredForCurrentDay; }
+	int GetBreadRequiredForDay() const { return _dailyBreadNeeded.GetValue().GetModifiedValue(this); }
 
 	UFUNCTION(BlueprintPure)
-	bool GetHasSoldBreadRequiredForDay() const { return _currentBreadSold >= _breadRequiredForCurrentDay; }
+	bool GetHasSoldBreadRequiredForDay() const { return _currentBreadSold >= GetBreadRequiredForDay(); }
 
 	FBreadRequirementManagerSaveGameData GetBreadRequriementSaveGameData() const;
 	virtual void OnGameLoaded(UFarmFPSSaveGame* saveGame) override;
@@ -61,11 +59,8 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BreadRequirement", meta = (AllowPrivateAccess = true))
-	int _startingBreadRequired = 1;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tunables|BreadRequirement", meta = (AllowPrivateAccess = true))
-	FCachedModifiableValueDataTableRowHandle _dailyBreadIncreaseAmount = 1;
+	FCachedModifiableValueDataTableRowHandle _dailyBreadNeeded = 1;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tunables|BreadRequirement", meta = (AllowPrivateAccess = true))
 	FCachedModifiableValueDataTableRowHandle _bonusMultiplierPerDaySold = .1f;
@@ -82,8 +77,6 @@ private:
 
 	int _currentBreadSold = 0;
 	int _consecutiveDaysSoldBreadRequirement = 0;
-	int _breadRequiredForCurrentDay = 0;
 
-	bool _isFirstDay = true;
 	bool _metRequirementForDay = false;
 };

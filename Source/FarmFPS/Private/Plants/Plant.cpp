@@ -39,6 +39,9 @@ void APlant::BeginPlay()
 	{
 		saveGame->OnLoadGameData.AddUObject(this, &APlant::OnGameLoaded);
 	}
+
+	_staticMesh = FindComponentByClass<UStaticMeshComponent>();
+	ensure(IsValid(_staticMesh));
 }
 
 void APlant::Tick(float DeltaTime)
@@ -269,8 +272,6 @@ void APlant::OnDayEnd()
 		Cosmetic_OnResourceAdded();
 	}
 }
-
-
 
 float APlant::GetCurrentWaterLevel() const
 {

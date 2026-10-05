@@ -28,6 +28,11 @@ void UResourceInventory::EndPlay(EEndPlayReason::Type EndPlayReason)
 
 void UResourceInventory::AddResource(const FGameplayTag& resourceType, float amount)
 {
+	if (!ensure(IsValidTag(resourceType)))
+	{
+		return;
+	}
+
 	if (_canAddResources && amount > 0)
 	{
 		SetResourceAmount(resourceType, GetResourceCount(resourceType) + amount);
@@ -36,6 +41,11 @@ void UResourceInventory::AddResource(const FGameplayTag& resourceType, float amo
 
 void UResourceInventory::MultiplyResource(const FGameplayTag& resourceType, float amount)
 {
+	if (!ensure(IsValidTag(resourceType)))
+	{
+		return;
+	}
+
 	if (_canAddResources && amount > 0)
 	{
 		SetResourceAmount(resourceType, GetResourceCount(resourceType) * amount);
@@ -44,6 +54,11 @@ void UResourceInventory::MultiplyResource(const FGameplayTag& resourceType, floa
 
 void UResourceInventory::SetResourceCap(const FGameplayTag& resourceType, float cap)
 {
+	if (!ensure(IsValidTag(resourceType)))
+	{
+		return;
+	}
+
 	if (cap > 0)
 	{
 		_resourceCaps.FindOrAdd(resourceType, cap) = cap;
@@ -52,6 +67,11 @@ void UResourceInventory::SetResourceCap(const FGameplayTag& resourceType, float 
 
 void UResourceInventory::RemoveResource(const FGameplayTag& resourceType, float amount)
 {
+	if (!ensure(IsValidTag(resourceType)))
+	{
+		return;
+	}
+
 	if (amount > 0 && ensure(HasResourceAmount(resourceType, amount)))
 	{
 		SetResourceAmount(resourceType, GetResourceCount(resourceType) - amount);
@@ -60,6 +80,11 @@ void UResourceInventory::RemoveResource(const FGameplayTag& resourceType, float 
 
 void UResourceInventory::SetResourceAmount(const FGameplayTag& resourceType, float newAmount)
 {
+	if (!ensure(IsValidTag(resourceType)))
+	{
+		return;
+	}
+
 	if (FMath::IsNearlyEqual(GetResourceCount(resourceType), newAmount))
 	{
 		return;
@@ -130,6 +155,11 @@ float UResourceInventory::GetResourceCount(const FGameplayTag& resourceType) con
 
 bool UResourceInventory::HasResourceAmount(const FGameplayTag& resourceType, float amount) const
 {
+	if (!ensure(IsValidTag(resourceType)))
+	{
+		return false;
+	}
+
 	float currentAmount = GetResourceCount(resourceType);
 	return FMath::IsNearlyEqual(currentAmount, amount) || currentAmount > amount;
 }
@@ -146,6 +176,11 @@ bool UResourceInventory::IsResourceFull(const FGameplayTag& resourceType) const
 	const float cap = GetResourceCap(resourceType);
 
 	return FMath::IsNearlyEqual(resourceCount, cap) || resourceCount > cap;
+}
+
+bool UResourceInventory::IsValidTag(const FGameplayTag& tag) const
+{
+	return tag.GetTagName().ToString().Contains(ResourceTypeTag::BaseResourceTypeTag.GetTag().ToString());
 }
 
 void UResourceInventory::OnDayBegin()

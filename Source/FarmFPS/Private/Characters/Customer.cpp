@@ -3,15 +3,18 @@
 #include "Customer.h"
 
 // Brock
+#include "CustomerSpawnerManager.h"
+#include "FarmFPSCharacter.h"
+#include "Interactables/BreadStand.h"
 #include "Managers/AudioManager.h"
 #include "Managers/BreadRequirementManager.h"
-#include "Interactables/BreadStand.h"
 #include "Managers/CustomerQueue.h"
-#include "CustomerSpawnerManager.h"
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/ObjectiveManager.h"
 #include "Managers/ObjectiveTypeTag.h"
+#include "Managers/PerkManager.h"
+#include "Managers/PerkModifierTypeTag.h"
 #include "Managers/TutorialScreenManager.h"
 #include "Resources/ResourceInventory.h"
 #include "Resources/ResourceTypeTag.h"
@@ -174,21 +177,24 @@ void ACustomer::AttemptBuyBreadAtFrontOfQueue()
 			breadInventory->RemoveResource(breadDesired, breadAmount);
 			_breadStand->SetIsCurrentlySellingBreadToCustomer(false);
 
-			const FModifiedResourceValue priceData = _breadStand->GetPriceForResource(breadDesired);
-			const int price = priceData.ModifiedIntValue.GetModifiedValue(this) * _bonusMoneyValue.GetModifiedValue(this);
+			UBreadRequirementManager* breadRequirementManager = UFarmFPSUtilities::GetBreadRequirementManager(this);
+			AFarmFPSCharacter* player = Cast<AFarmFPSCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));
+			UPerkManager* perkManager = UFarmFPSUtilities::GetPlayerPerkManager(this);
+			if (ensure(IsValid(breadRequirementManager)) && ensure(IsValid(player)) && ensure(IsValid(player->GetResourceInventory())) && ensure(IsValid(perkManager)))
+			{
+				breadRequirementManager->SellBread(breadAmount);
 
-			_breadStand->GetOutputInventory()->AddResource(ResourceTypeTag::Money, breadAmount * price);
+				const FModifiedResourceValue priceData = _breadStand->GetPriceForResource(breadDesired);
+				int price = priceData.ModifiedIntValue.GetModifiedValue(this) * _bonusMoneyValue.GetModifiedValue(this);
+				price = UFarmFPSUtilities::GetModifiedValueByPlayerPerk(this, PerkModifierTypeTag::BonusDailyBreadRewardModifier, price);
+
+				player->GetResourceInventory()->AddResource(ResourceTypeTag::Money, breadAmount * price);
+			}
 
 			UObjectiveManager* objectiveManager = UFarmFPSUtilities::GetObjectiveManager(this);
 			if (ensure(IsValid(objectiveManager)))
 			{
 				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTag::SellBread, breadDesired, breadAmount);
-			}
-
-			UBreadRequirementManager* breadRequirementManager = UFarmFPSUtilities::GetBreadRequirementManager(this);
-			if (ensure(IsValid(breadRequirementManager)))
-			{
-				breadRequirementManager->SellBread(breadAmount);
 			}
 
 			_customerQueue->RemoveCustomerFromFrontOfQueue();

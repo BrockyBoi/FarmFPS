@@ -48,6 +48,19 @@ void ACrop::EndPlay(EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
+void ACrop::SetMeshForCurrentProgress()
+{
+	if (_meshesOverProgress.Num() > 1)
+	{
+		int staticMeshIndex = FMath::RoundToInt(_meshesOverProgress.Num() * GetCompletionPercentage());
+
+		if (ensure(IsValid(_staticMesh)) && _meshesOverProgress.IsValidIndex(staticMeshIndex) && ensure(IsValid(_meshesOverProgress[staticMeshIndex])))
+		{
+			_staticMesh->SetStaticMesh(_meshesOverProgress[staticMeshIndex]);
+		}
+	}
+}
+
 void ACrop::OnLightAndWaterFilled()
 {
 	Super::OnLightAndWaterFilled();
@@ -82,6 +95,8 @@ void ACrop::AddActorToPool()
 	ListenToWeatherManager(false);
 
 	Cosmetic_OnAddedToPool();
+
+	CheckShouldTick();
 }
 
 void ACrop::RemoveFromPool()
@@ -122,10 +137,9 @@ void ACrop::RemoveFromPool()
 	ListenToWeatherManager(true);
 
 	AffectGrowth();
+	SetMeshForCurrentProgress();
 
 	CheckShouldTick();
-
-
 }
 
 void ACrop::SetWasPlantedSuccessfully(bool wasSuccessful)
@@ -138,6 +152,13 @@ void ACrop::SetWasPlantedSuccessfully(bool wasSuccessful)
 	{
 
 	}
+}
+
+void ACrop::AddResource(const FGameplayTag& resourceType, float amount)
+{
+	Super::AddResource(resourceType, amount);
+
+	SetMeshForCurrentProgress();
 }
 
 void ACrop::OnPlayerDestroyPlant()
@@ -273,6 +294,6 @@ void ACrop::DestroyPlant()
 
 bool ACrop::ShouldTick() const
 {
-	return true;
+	return _isInPerfectTiming && !_hasPerfectTimingPeriodEnded;
 }
 

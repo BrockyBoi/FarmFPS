@@ -6,6 +6,9 @@
 
 namespace PerkModifierTypeTag
 {
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(PerkModifierBaseTag);
+
+
 	 // Base Player Movement
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(JumpCount);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(JumpHeight);
@@ -19,6 +22,7 @@ namespace PerkModifierTypeTag
 
 	// Resource Modifiers
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(BreadPrice);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(BonusDailyBreadRewardModifier);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(LightEfficacy);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(MoreCropYield);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(WaterEfficacy);

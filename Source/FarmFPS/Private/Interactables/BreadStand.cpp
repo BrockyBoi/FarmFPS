@@ -126,15 +126,5 @@ void ABreadStand::OnDayBegin()
 
 void ABreadStand::OnDayEnd()
 {
-	UBreadRequirementManager* breadRequirementManager = UFarmFPSUtilities::GetBreadRequirementManager(this);
-	if (ensure(IsValid(breadRequirementManager)) && breadRequirementManager->GetHasSoldBreadRequiredForDay())
-	{
-		GetOutputInventory()->MultiplyResource(ResourceTypeTag::Money, breadRequirementManager->GetBonusMultiplierForBreadSold());
-	}
 
-	AFarmFPSCharacter* player = Cast<AFarmFPSCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));
-	if (ensure(IsValid(player)) && ensure(IsValid(player->GetResourceInventory())))
-	{
-		player->GetResourceInventory()->AddAllResourcesInInventory(GetOutputInventory());
-	}
 }

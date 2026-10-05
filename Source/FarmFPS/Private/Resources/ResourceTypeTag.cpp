@@ -5,6 +5,7 @@
 namespace ResourceTypeTag
 {
 	UE_DEFINE_GAMEPLAY_TAG(None, "None");
+	UE_DEFINE_GAMEPLAY_TAG(BaseResourceTypeTag, "ResourceType");
 
 	UE_DEFINE_GAMEPLAY_TAG(Bread, "ResourceType.Bread");
 	UE_DEFINE_GAMEPLAY_TAG(Wheat, "ResourceType.Wheat");
