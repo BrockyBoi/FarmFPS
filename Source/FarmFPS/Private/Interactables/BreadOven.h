@@ -105,4 +105,16 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _onFireBurnSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Heat Colors")
+	FLinearColor _coldColor = FLinearColor::Blue;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Heat Colors")
+	FLinearColor _goodColor = FLinearColor::Green;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Heat Colors")
+	FLinearColor _almostBurningColor = FLinearColor::Yellow;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Heat Colors")
+	FLinearColor _burningColor = FLinearColor::Red;
 };

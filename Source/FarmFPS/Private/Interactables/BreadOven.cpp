@@ -114,19 +114,21 @@ FLinearColor ABreadOven::GetHeatColorText() const
 {
 	if (_ovenHeat < _idealHeatMin)
 	{
-		return FMath::Lerp(FLinearColor::Blue, FLinearColor::Green, _ovenHeat / _idealHeatMin);
+		return _coldColor;
+		//return FMath::Lerp(FLinearColor::Blue, FLinearColor::Green, _ovenHeat / _idealHeatMin);
 	}
 	else if (_ovenHeat >= _idealHeatMin && _ovenHeat <= _idealHeatMax)
 	{
-		return FLinearColor::Green;
+		return _goodColor;
 	}
 	else if (_ovenHeat > _idealHeatMax && _ovenHeat < _heatToDestroyBread)
 	{
-		return FMath::Lerp(FLinearColor::Green, FLinearColor::Yellow, (_ovenHeat - _idealHeatMax) / (_heatToDestroyBread - _idealHeatMax));
+		return _almostBurningColor;
+		//return FMath::Lerp(FLinearColor::Green, FLinearColor::Yellow, (_ovenHeat - _idealHeatMax) / (_heatToDestroyBread - _idealHeatMax));
 	}
 	else if (_ovenHeat >= _heatToDestroyBread)
 	{
-		return FLinearColor::Red;
+		return _burningColor;
 	}
 	return FLinearColor();
 }

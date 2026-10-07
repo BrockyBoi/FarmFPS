@@ -406,6 +406,12 @@ bool UTutorialScreenManager::AttemptShowScreen(ETutorialScreenType screenToShow)
 		_allowTutorialScreenClose = false;
 
 		SetComponentTickEnabled(true);
+
+		AShooterCharacter* player = Cast<AShooterCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));
+		if (ensure(IsValid(player)))
+		{
+			player->ConsumeMovementInputVector();
+		}
 		return true;
 	}
 

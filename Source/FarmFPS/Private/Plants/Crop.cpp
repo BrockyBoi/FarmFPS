@@ -34,13 +34,15 @@ UCapsuleComponent* ACrop::GetCapsuleComponent() const
 void ACrop::BeginPlay()
 {
 	Super::BeginPlay();
+
+	_randomPerfectTimingModifierOffset = FMath::RandRange(-_changeInPerfectTimingSizePerFrame, _changeInPerfectTimingSizePerFrame) * .5f;
 }
 
 void ACrop::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	ShowPerfectTimingVisuals();
+	ShowCropCompletionVisuals();
 }
 
 void ACrop::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -68,6 +70,11 @@ void ACrop::OnLightAndWaterFilled()
 	_isInPerfectTiming = true;
 	GetWorld()->GetTimerManager().SetTimer(_perfectTimingTimerHandle, this, &ACrop::OnPerfectTimingEnd, _perfectTimingDuration.GetModifiedValue(this), false);
 	CheckShouldTick();
+
+	if (IsValid(_finalMaterial))
+	{
+		_staticMesh->SetMaterial(0, _finalMaterial);
+	}
 }
 
 void ACrop::OnPerfectTimingEnd()
@@ -101,6 +108,11 @@ void ACrop::AddActorToPool()
 
 void ACrop::RemoveFromPool()
 {
+	if (IsValid(_standardMaterial))
+	{
+		_staticMesh->SetMaterial(0, _standardMaterial);
+	}
+
 	_resourcesInventory->ListenToDayCycleEvents(true);
 	_isBroken = _isInPerfectTiming = _hasPerfectTimingPeriodEnded = _isLightAndWaterFull = false;
 	_sinAngleInPerfectTiming = 270.f;
@@ -235,9 +247,9 @@ void ACrop::SpawnResourceActors()
 	}
 }
 
-void ACrop::ShowPerfectTimingVisuals()
+void ACrop::ShowCropCompletionVisuals()
 {
-	if (!_isInPerfectTiming && !_hasPerfectTimingPeriodEnded)
+	if (!IsLightAndWaterFull())
 	{
 		return;
 	}
@@ -245,32 +257,29 @@ void ACrop::ShowPerfectTimingVisuals()
 	UStaticMeshComponent* cropMesh = FindComponentByClass<UStaticMeshComponent>();
 	if (ensure(IsValid(cropMesh)))
 	{
-		if (_isInPerfectTiming)
-		{
-			float scale = FMath::Lerp(_cropData.FinalScaleSize, _cropData.FinalScaleSize * _maxSizeModifierForPerfectTiming, FMath::Sin(FMath::DegreesToRadians(_sinAngleInPerfectTiming)) + 1);
-			cropMesh->SetWorldScale3D(FVector::One() * scale);
-		}
-		else if (_hasPerfectTimingPeriodEnded)
-		{
-			FVector currentScale = cropMesh->GetRelativeScale3D();
-			if (currentScale.X > _cropData.FinalScaleSize)
-			{
-				cropMesh->SetWorldScale3D(currentScale * .995f);
-			}
-			else if (currentScale.X < _cropData.FinalScaleSize)
-			{
-				cropMesh->SetWorldScale3D(currentScale * 1.015f);
-			}
+		float scale = FMath::Lerp(_cropData.FinalScaleSize, _cropData.FinalScaleSize * _maxSizeModifierForPerfectTiming, FMath::Sin(FMath::DegreesToRadians(_sinAngleInPerfectTiming)) + 1);
+		cropMesh->SetWorldScale3D(FVector::One() * scale);
+		_sinAngleInPerfectTiming += (_changeInPerfectTimingSizePerFrame + _randomPerfectTimingModifierOffset);
 
-			if ((currentScale - _cropData.FinalScaleSize).IsNearlyZero(.01))
-			{
-				cropMesh->SetWorldScale3D(FVector::One() * _cropData.FinalScaleSize);
-				CheckShouldTick();
-			}
-		}
+		//if (_hasPerfectTimingPeriodEnded)
+		//{
+		//	FVector currentScale = cropMesh->GetRelativeScale3D();
+		//	if (currentScale.X > _cropData.FinalScaleSize)
+		//	{
+		//		cropMesh->SetWorldScale3D(currentScale * .995f);
+		//	}
+		//	else if (currentScale.X < _cropData.FinalScaleSize)
+		//	{
+		//		cropMesh->SetWorldScale3D(currentScale * 1.015f);
+		//	}
+
+		//	if ((currentScale - _cropData.FinalScaleSize).IsNearlyZero(.01))
+		//	{
+		//		cropMesh->SetWorldScale3D(FVector::One() * _cropData.FinalScaleSize);
+		//		CheckShouldTick();
+		//	}
+		//}
 	}
-
-	_sinAngleInPerfectTiming -= .75f;
 }
 
 void ACrop::OnBreakCropTimerEnd()
@@ -294,6 +303,6 @@ void ACrop::DestroyPlant()
 
 bool ACrop::ShouldTick() const
 {
-	return _isInPerfectTiming && !_hasPerfectTimingPeriodEnded;
+	return IsLightAndWaterFull();
 }
 

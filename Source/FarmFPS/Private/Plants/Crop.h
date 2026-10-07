@@ -59,7 +59,7 @@ protected:
 
 	void OnPerfectTimingEnd();
 
-	void ShowPerfectTimingVisuals();
+	void ShowCropCompletionVisuals();
 
 	virtual void OnLightAndWaterFilled() override;
 
@@ -81,14 +81,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Crop Yield")
 	FModifiedFloatValue _perfectTimingDuration = 5.f;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Crop Yield")
 	float _yieldPickupSpawnHeight = 100.f;
 
 	bool _hasStartedPerfectTiming = false;
 	bool _isInPerfectTiming = false;
 	bool _hasPerfectTimingPeriodEnded = false;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Perfect Timing")
 	float _maxSizeModifierForPerfectTiming = 1.15f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
@@ -97,7 +97,19 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
 	TArray<UStaticMesh*> _meshesOverProgress;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Material")
+	TObjectPtr<UMaterialInstance> _standardMaterial;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Material")
+	TObjectPtr<UMaterialInstance> _finalMaterial;
+
+	UPROPERTY(EditAnywhere, Category = "Perfect Timing")
 	float _sinAngleInPerfectTiming = 270.f;
+
+	UPROPERTY(EditAnywhere, Category = "Perfect Timing")
+	float _changeInPerfectTimingSizePerFrame = -.75f;
+
+	float _randomPerfectTimingModifierOffset = 0.f;
 
 	int _currentCropHealth = 0;
 

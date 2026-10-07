@@ -375,8 +375,8 @@ void AFarmFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Started, this, &AFarmFPSCharacter::DoMeleeStart);
 
-		EnhancedInputComponent->BindAction(GroundSlamAction, ETriggerEvent::Started, this, &AFarmFPSCharacter::DoGroundSlamStart);
-		EnhancedInputComponent->BindAction(GroundSlamAction, ETriggerEvent::Completed, this, &AFarmFPSCharacter::DoGroundSlamEnd);
+		//EnhancedInputComponent->BindAction(GroundSlamAction, ETriggerEvent::Started, this, &AFarmFPSCharacter::DoGroundSlamStart);
+		//EnhancedInputComponent->BindAction(GroundSlamAction, ETriggerEvent::Completed, this, &AFarmFPSCharacter::DoGroundSlamEnd);
 
 		EnhancedInputComponent->BindAction(SelectInventoryItemAction, ETriggerEvent::Triggered, this, &AFarmFPSCharacter::DoSelectInventoryItem);
 
