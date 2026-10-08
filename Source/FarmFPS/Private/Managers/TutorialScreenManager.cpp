@@ -76,13 +76,13 @@ void UTutorialScreenManager::PressStopShowingTutorials()
 	AShooterCharacter* player = Cast<AShooterCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));
 	if (ensure(IsValid(player)))
 	{
-		if (ensure(_waterPistol.IsValid()) && !IsValid(player->FindWeaponOfType(WeaponTypeTag::WaterPistol)))
+		if (_waterPistol.IsValid() && !IsValid(player->FindWeaponOfType(WeaponTypeTag::WaterPistol)))
 		{
 			_waterPistol->SetActorEnableCollision(true);
 			_waterPistol->SetActorHiddenInGame(false);
 		}
 
-		if (ensure(_wheatPistol.IsValid()) && !IsValid(player->FindWeaponOfType(WeaponTypeTag::WheatSeedPistol)))
+		if (_wheatPistol.IsValid() && !IsValid(player->FindWeaponOfType(WeaponTypeTag::WheatSeedPistol)))
 		{
 			_wheatPistol->SetActorEnableCollision(true);
 			_wheatPistol->SetActorHiddenInGame(false);
@@ -192,7 +192,7 @@ void UTutorialScreenManager::OnWeaponCollected(AShooterWeapon* weapon)
 	const FGameplayTag& resourceType = weapon->GetWeaponResourceType();
 	if (resourceType == ResourceTypeTag::Light && AttemptShowScreen(ETutorialScreenType::PickUpLightGun))
 	{
-		if (ensure(_waterPistol.IsValid()))
+		if (_waterPistol.IsValid())
 		{
 			_waterPistol->SetActorEnableCollision(true);
 			_waterPistol->SetActorHiddenInGame(false);
@@ -201,7 +201,7 @@ void UTutorialScreenManager::OnWeaponCollected(AShooterWeapon* weapon)
 	}
 	else if (resourceType == ResourceTypeTag::Water && AttemptShowScreen(ETutorialScreenType::PickUpWaterGun))
 	{
-		if (ensure(_wheatPistol.IsValid()))
+		if (_wheatPistol.IsValid())
 		{
 			_wheatPistol->SetActorEnableCollision(true);
 			_wheatPistol->SetActorHiddenInGame(false);

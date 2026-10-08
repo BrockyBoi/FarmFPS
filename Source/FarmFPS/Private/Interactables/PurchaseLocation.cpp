@@ -40,6 +40,23 @@ void UPurchaseLocation::BeginPlay()
 	if (ensure(IsValid(saveGameManager)))
 	{
 		saveGameManager->OnLoadGameData.AddUObject(this, &ThisClass::OnGameLoaded);
+		if (!saveGameManager->HasSaveGame())
+		{
+			bool hasAllPrerequisites = HasAllPrequisites();
+			HidePurchaseLocation(hasAllPrerequisites);
+			if (!hasAllPrerequisites)
+			{
+				for (const FPrerequisiteUnlocks& prereq : _prerequisitesNeeded)
+				{
+					UPurchaseLocation* purchaseLocation = ensure(IsValid(prereq.PurchaseLocationActor)) ? prereq.PurchaseLocationActor->FindComponentByClass<UPurchaseLocation>() : nullptr;
+
+					if (ensure(IsValid(purchaseLocation)))
+					{
+						purchaseLocation->OnUpgradePurchased.AddUObject(this, &UPurchaseLocation::OnPrequisitePurchaseSuccess);
+					}
+				}
+			}
+		}
 	}
 
 	StaticOnPurchaseSuccess.AddUObject(this, &UPurchaseLocation::OnAnyPurchaseSuccess);
@@ -67,6 +84,18 @@ void UPurchaseLocation::EndPlay(const EEndPlayReason::Type endPlayReason)
 
 	StaticOnPurchaseSuccess.RemoveAll(this);
 
+	for (const FPrerequisiteUnlocks& prerequisite : _prerequisitesNeeded)
+	{
+		if (ensure(IsValid(prerequisite.PurchaseLocationActor)))
+		{
+			UPurchaseLocation* purchaseLocation = prerequisite.PurchaseLocationActor->FindComponentByClass<UPurchaseLocation>();
+			if (ensure(IsValid(purchaseLocation)))
+			{
+				purchaseLocation->OnUpgradePurchased.RemoveAll(this);
+			}
+		}
+	}
+
 	Super::EndPlay(endPlayReason);
 }
 
@@ -77,7 +106,7 @@ void UPurchaseLocation::OnDayBegin()
 
 void UPurchaseLocation::OnDayEnd()
 {
-	if (_canPurchase)
+	if (_canPurchase && HasAllPrequisites())
 	{
 		HidePurchaseLocation(false);
 	}
@@ -87,6 +116,31 @@ void UPurchaseLocation::HidePurchaseLocation(bool shouldHide)
 {
 	GetOwner()->SetActorHiddenInGame(shouldHide);
 	GetOwner()->SetActorEnableCollision(!shouldHide);
+}
+
+void UPurchaseLocation::OnPrequisitePurchaseSuccess()
+{
+	if (!_hasAllPrerequisites && HasAllPrequisites())
+	{
+		_hasAllPrerequisites = true;
+		HidePurchaseLocation(false);
+	}
+}
+
+bool UPurchaseLocation::HasAllPrequisites() const
+{
+	bool hasAllPrerequisitesNeeded = true;
+	for (const FPrerequisiteUnlocks& prereq : _prerequisitesNeeded)
+	{
+		UPurchaseLocation* purchaseLocation = ensure(IsValid(prereq.PurchaseLocationActor)) ? prereq.PurchaseLocationActor->FindComponentByClass<UPurchaseLocation>() : nullptr;
+		if (!ensure(IsValid(purchaseLocation)) || purchaseLocation->GetCurrentPurchaseCount() < prereq.NeededLevel)
+		{
+			hasAllPrerequisitesNeeded = false;
+			break;
+		}
+	}
+
+	return hasAllPrerequisitesNeeded;
 }
 
 void UPurchaseLocation::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -137,6 +191,7 @@ void UPurchaseLocation::OnPurchaseSuccess(UPerkManager* perkManager, UResourceIn
 	_currentPurchaseCount++;
 
 	Cosmetic_OnPurchaseSuccess.Broadcast();
+	OnUpgradePurchased.Broadcast();
 
 	if (_currentPurchaseCount >= _maxPurchaseCount)
 	{
@@ -162,6 +217,21 @@ void UPurchaseLocation::OnGameLoaded(UFarmFPSSaveGame* saveGame)
 		if (ensure(upgradeLocationSaveData))
 		{
 			SetCurrentPurchaseCountFromLoad(upgradeLocationSaveData->NumberOfPurchases);
+		}
+	}
+
+	bool hasAllPrerequisites = HasAllPrequisites();
+	HidePurchaseLocation(hasAllPrerequisites);
+	if (!hasAllPrerequisites)
+	{
+		for (const FPrerequisiteUnlocks& prereq : _prerequisitesNeeded)
+		{
+			UPurchaseLocation* purchaseLocation = ensure(IsValid(prereq.PurchaseLocationActor)) ? prereq.PurchaseLocationActor->FindComponentByClass<UPurchaseLocation>() : nullptr;
+
+			if (ensure(IsValid(purchaseLocation)))
+			{
+				purchaseLocation->OnUpgradePurchased.AddUObject(this, &UPurchaseLocation::OnPrequisitePurchaseSuccess);
+			}
 		}
 	}
 }

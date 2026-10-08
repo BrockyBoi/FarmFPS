@@ -29,6 +29,18 @@ struct FUnlockActorLocationData
 	TArray<AActor*> ActorsInSceneToDisable;
 };
 
+USTRUCT(BlueprintType)
+struct FPrerequisiteUnlocks
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	AActor* PurchaseLocationActor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int NeededLevel;
+};
+
 UCLASS()
 class UPurchaseLocation : public UActorComponent, public ISaveable
 {
@@ -48,7 +60,12 @@ public:
 
 	virtual void OnGameLoaded(UFarmFPSSaveGame* saveGame) override;
 
+	virtual bool HasAllPrequisites() const;
+
 	FUpgradeLocationSaveData GetUpgradeLocationSaveData() const;
+
+	DECLARE_MULTICAST_DELEGATE(FOnUpgradePurchased)
+	FOnUpgradePurchased OnUpgradePurchased;
 
 	DECLARE_MULTICAST_DELEGATE(FStaticOnPurchaseSuccess);
 	static FStaticOnPurchaseSuccess StaticOnPurchaseSuccess;
@@ -61,6 +78,8 @@ protected:
 	virtual void OnDayEnd();
 
 	virtual void HidePurchaseLocation(bool shouldHide);
+
+	void OnPrequisitePurchaseSuccess();
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPurchaseSuccess);
 
@@ -89,7 +108,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Purchase")
 	int _maxPurchaseCount = 5;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prerequisites")
+	TArray<FPrerequisiteUnlocks> _prerequisitesNeeded;
+
 	int _currentPurchaseCount = 0;
 
 	bool _canPurchase = true;
+
+	bool _hasAllPrerequisites = false;
 };
