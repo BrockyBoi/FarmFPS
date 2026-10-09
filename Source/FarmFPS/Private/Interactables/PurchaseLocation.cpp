@@ -52,7 +52,7 @@ void UPurchaseLocation::BeginPlay()
 
 					if (ensure(IsValid(purchaseLocation)))
 					{
-						purchaseLocation->OnUpgradePurchased.AddUObject(this, &UPurchaseLocation::OnPrequisitePurchaseSuccess);
+						purchaseLocation->OnUpgradePurchased.AddUObject(this, &UPurchaseLocation::OnPrerequisitePurchaseSuccess);
 					}
 				}
 			}
@@ -118,12 +118,33 @@ void UPurchaseLocation::HidePurchaseLocation(bool shouldHide)
 	GetOwner()->SetActorEnableCollision(!shouldHide);
 }
 
-void UPurchaseLocation::OnPrequisitePurchaseSuccess()
+void UPurchaseLocation::OnPrerequisitePurchaseSuccess()
 {
 	if (!_hasAllPrerequisites && HasAllPrequisites())
 	{
 		_hasAllPrerequisites = true;
 		HidePurchaseLocation(false);
+	}
+}
+
+void UPurchaseLocation::CheckPrerequisites()
+{
+	if (_currentPurchaseCount < _maxPurchaseCount)
+	{
+		bool hasAllPrerequisites = HasAllPrequisites();
+		HidePurchaseLocation(!hasAllPrerequisites);
+		if (!hasAllPrerequisites)
+		{
+			for (const FPrerequisiteUnlocks& prereq : _prerequisitesNeeded)
+			{
+				UPurchaseLocation* purchaseLocation = ensure(IsValid(prereq.PurchaseLocationActor)) ? prereq.PurchaseLocationActor->FindComponentByClass<UPurchaseLocation>() : nullptr;
+
+				if (ensure(IsValid(purchaseLocation)))
+				{
+					purchaseLocation->OnUpgradePurchased.AddUObject(this, &UPurchaseLocation::OnPrerequisitePurchaseSuccess);
+				}
+			}
+		}
 	}
 }
 
@@ -220,20 +241,7 @@ void UPurchaseLocation::OnGameLoaded(UFarmFPSSaveGame* saveGame)
 		}
 	}
 
-	bool hasAllPrerequisites = HasAllPrequisites();
-	HidePurchaseLocation(hasAllPrerequisites);
-	if (!hasAllPrerequisites)
-	{
-		for (const FPrerequisiteUnlocks& prereq : _prerequisitesNeeded)
-		{
-			UPurchaseLocation* purchaseLocation = ensure(IsValid(prereq.PurchaseLocationActor)) ? prereq.PurchaseLocationActor->FindComponentByClass<UPurchaseLocation>() : nullptr;
-
-			if (ensure(IsValid(purchaseLocation)))
-			{
-				purchaseLocation->OnUpgradePurchased.AddUObject(this, &UPurchaseLocation::OnPrequisitePurchaseSuccess);
-			}
-		}
-	}
+	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UPurchaseLocation::CheckPrerequisites);
 }
 
 void UPurchaseLocation::SetCurrentPurchaseCountFromLoad(int count)

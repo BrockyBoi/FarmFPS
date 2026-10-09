@@ -185,7 +185,7 @@ void ACustomer::AttemptBuyBreadAtFrontOfQueue()
 				breadRequirementManager->SellBread(breadAmount);
 
 				const FModifiedResourceValue priceData = _breadStand->GetPriceForResource(breadDesired);
-				int price = priceData.ModifiedIntValue.GetModifiedValue(this) * _bonusMoneyValue.GetModifiedValue(this);
+				float price = priceData.ModifiedIntValue.GetModifiedValue(this) * _bonusMoneyValue.GetModifiedValue(this);
 				price = UFarmFPSUtilities::GetModifiedValueByPlayerPerk(this, PerkModifierTypeTag::BonusDailyBreadRewardModifier, price);
 
 				player->GetResourceInventory()->AddResource(ResourceTypeTag::Money, breadAmount * price);

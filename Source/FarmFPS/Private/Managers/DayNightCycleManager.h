@@ -26,6 +26,7 @@ class ADirectionalLight;
 class UAudioManager;
 class UFarmFPSSaveGame;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBPOnDayStateChange);
 DECLARE_MULTICAST_DELEGATE_OneParam(FStaticOnDayStateChange, EDayState);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -40,8 +41,13 @@ public:
 	void ForceEndDay();
 	void ForceSetTimeLeft(float secondsLeftInDay);
 
+	UFUNCTION(BlueprintPure)
 	bool IsDay() const { return _currentDayState == EDayState::Day; }
+
+	UFUNCTION(BlueprintPure)
 	bool IsNight() const { return _currentDayState == EDayState::MidNight || _currentDayState == EDayState::NightTransitionToDay; }
+
+	UFUNCTION(BlueprintPure)
 	EDayState GetCurrentDayState() const { return _currentDayState; }
 
 	void TransitionToNextDay();
@@ -57,6 +63,15 @@ public:
 	FOnDayStateChange OnDayBegin;
 	FOnDayStateChange OnDayEnd;
 	FOnDayStateChange OnWaitingForTradeOff;
+
+	UPROPERTY(BlueprintAssignable)
+	FBPOnDayStateChange BPOnDayBegin;
+
+	UPROPERTY(BlueprintAssignable)
+	FBPOnDayStateChange BPOnDayEnd;
+
+	UPROPERTY(BlueprintAssignable)
+	FBPOnDayStateChange BPOnWaitingForTradeOff;
 
 	static FStaticOnDayStateChange OnDayStateChange;
 

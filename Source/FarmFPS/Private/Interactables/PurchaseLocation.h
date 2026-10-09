@@ -79,7 +79,9 @@ protected:
 
 	virtual void HidePurchaseLocation(bool shouldHide);
 
-	void OnPrequisitePurchaseSuccess();
+	void OnPrerequisitePurchaseSuccess();
+
+	void CheckPrerequisites();
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPurchaseSuccess);
 

@@ -151,7 +151,7 @@ void APlant::OnGameLoaded(UFarmFPSSaveGame* saveGame)
 				return data.PlantName == GetName();
 			});
 
-		if (ensure(plantSaveData) && !plantSaveData->IsEnabled)
+		if (ensure(plantSaveData) && plantSaveData->IsBroken)
 		{
 			OnPlayerDestroyPlant();
 		}
@@ -164,7 +164,7 @@ FPlantSaveData APlant::GetPlantSaveData() const
 	if (!_destroyAtEndOfDay)
 	{
 		saveData.PlantName = GetName();
-		saveData.IsEnabled = _isBroken;
+		saveData.IsBroken = _isBroken;
 	}
 
 	return saveData;

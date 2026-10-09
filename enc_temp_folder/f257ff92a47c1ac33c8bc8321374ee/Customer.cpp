@@ -1,0 +1,255 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#include "Customer.h"
+
+// Brock
+#include "CustomerSpawnerManager.h"
+#include "FarmFPSCharacter.h"
+#include "Interactables/BreadStand.h"
+#include "Managers/AudioManager.h"
+#include "Managers/BreadRequirementManager.h"
+#include "Managers/CustomerQueue.h"
+#include "Managers/DayNightCycleManager.h"
+#include "Managers/FarmFPSUtilities.h"
+#include "Managers/ObjectiveManager.h"
+#include "Managers/ObjectiveTypeTag.h"
+#include "Managers/PerkManager.h"
+#include "Managers/PerkModifierTypeTag.h"
+#include "Managers/TutorialScreenManager.h"
+#include "Resources/ResourceInventory.h"
+#include "Resources/ResourceTypeTag.h"
+
+// UE
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Navigation/PathFollowingComponent.h"
+
+ACustomer::ACustomer()
+{
+	PrimaryActorTick.bCanEverTick = false;
+}
+
+void ACustomer::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	//int modifiedMin = _minCanDesire.GetModifiedValue(this);
+	//int modifiedMax = _maxCanDesire.GetModifiedValue(this);
+
+	// If tutorial has not been completed then ensure that customer can only ever desire one bread
+	//UTutorialScreenManager* tutorialManager = UFarmFPSUtilities::GetTutorialScreenManager(this);
+	//if (ensure(IsValid(tutorialManager)) && !tutorialManager->HasShownTutorialScreen(ETutorialScreenType::GiveBreadToStand))
+	//{
+	//	modifiedMax = modifiedMin;
+	//}
+	//_amountDesired = FMath::RandRange(modifiedMin, modifiedMax);
+
+	_startLocation = GetActorLocation();
+
+	UCharacterMovementComponent* movement = FindComponentByClass<UCharacterMovementComponent>();
+	if (ensure(IsValid(movement)))
+	{
+		movement->MaxWalkSpeed = _customerMoveSpeed.GetModifiedValue(this);
+	}
+
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightCycle)))
+	{
+		dayNightCycle->OnDayEnd.AddUObject(this, &ACustomer::OnDayEnd);
+	}
+}
+
+void ACustomer::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
+	if (IsValid(dayNightCycle))
+	{
+		dayNightCycle->OnDayEnd.RemoveAll(this);
+	}
+
+	if (IsValid(_aiController))
+	{
+		_aiController->ReceiveMoveCompleted.RemoveAll(this);
+	}
+
+	Super::EndPlay(EndPlayReason);
+}
+
+void ACustomer::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	AAIController* aiController = Cast<AAIController>(NewController);
+	if (ensure(IsValid(aiController)))
+	{
+		_aiController = aiController;
+
+		_breadStand = UFarmFPSUtilities::GetBreadStand(this);
+		if (ensure(_breadStand.IsValid()) && ensure(IsValid(_breadStand->GetCustomerQueue())))
+		{
+			_customerQueue = _breadStand->GetCustomerQueue();
+		}
+
+		MoveToBreadStand();
+	}
+}
+
+void ACustomer::OnMoveFinishedMovingToBreadStand(FAIRequestID RequestID, EPathFollowingResult::Type Result)
+{
+	if (Result == EPathFollowingResult::Success)
+	{
+		if (ensure(_customerQueue.IsValid()) && ensure(IsValid(_aiController)))
+		{
+			_currentState = ECustomerState::InQueue;
+			_customerQueue->AddCustomerToQueue(this);
+
+			MoveToNextSpotInQueue(_customerQueue->GetCustomerQueuePosition(this));
+		}
+	}
+	else
+	{
+		FTimerHandle timerDel;
+		GetWorld()->GetTimerManager().SetTimer(timerDel, this, &ACustomer::MoveToBreadStand, 1.f, false);
+	}
+}
+
+void ACustomer::OnMoveFinishedOutOfMap(FAIRequestID RequestID, EPathFollowingResult::Type Result)
+{
+	if (Result == EPathFollowingResult::Success)
+	{
+		UCustomerSpawnerManager* spawnerManager = UFarmFPSUtilities::GetCustomerSpawnerManager(this);
+		if (ensure(IsValid(spawnerManager)))
+		{
+			spawnerManager->OnCustomerLeaveMap();
+		}
+
+		Destroy();
+	}
+}
+
+void ACustomer::OnMoveFinishedInQueue(FAIRequestID RequestID, EPathFollowingResult::Type Result)
+{
+	if (Result == EPathFollowingResult::Success)
+	{
+		_currentState = ECustomerState::InQueue;
+		AttemptBuyBreadAtFrontOfQueue();
+	}
+	else if (Result == EPathFollowingResult::Blocked)
+	{
+		FTimerHandle timerDel;
+		GetWorld()->GetTimerManager().SetTimer(timerDel, this, &ACustomer::FindSpotInQueue, 1.f, false);
+	}
+}
+
+void ACustomer::OnDayEnd()
+{
+	if (ensure(_customerQueue.IsValid()))
+	{
+		_customerQueue->RemoveCustomerFromQueue(this);
+	}
+
+	MoveOutOfMap();
+}
+
+void ACustomer::AttemptBuyBreadAtFrontOfQueue()
+{
+	if (_currentState != ECustomerState::InQueue)
+	{
+		return;
+	}
+
+	if (!ensure(_breadStand.IsValid()) || !ensure(_customerQueue.IsValid()) || !_customerQueue->IsAtFrontOfQueue(this) || _breadStand->GetIsCurrentlySellingBreadToCustomer())
+	{
+		return;
+	}
+
+	UResourceInventory* breadInventory = _breadStand->GetInputInventory();
+	if (ensure(IsValid(breadInventory)))
+	{
+		for (const FGameplayTag& breadDesired : GetResourcesDesired())
+		{
+			int breadAmount = FMath::RoundToInt(_amountBreadDesired.GetValue().GetModifiedValue(this));
+			if (!breadInventory->HasResourceAmount(breadDesired, breadAmount))
+			{
+				continue;
+			}
+
+			_breadStand->SetIsCurrentlySellingBreadToCustomer(true);
+			breadInventory->RemoveResource(breadDesired, breadAmount);
+			_breadStand->SetIsCurrentlySellingBreadToCustomer(false);
+
+			UBreadRequirementManager* breadRequirementManager = UFarmFPSUtilities::GetBreadRequirementManager(this);
+			AFarmFPSCharacter* player = Cast<AFarmFPSCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));
+			UPerkManager* perkManager = UFarmFPSUtilities::GetPlayerPerkManager(this);
+			if (ensure(IsValid(breadRequirementManager)) && ensure(IsValid(player)) && ensure(IsValid(player->GetResourceInventory())) && ensure(IsValid(perkManager)))
+			{
+				breadRequirementManager->SellBread(breadAmount);
+
+				const FModifiedResourceValue priceData = _breadStand->GetPriceForResource(breadDesired);
+				int price = priceData.ModifiedIntValue.GetModifiedValue(this) * _bonusMoneyValue.GetModifiedValue(this);
+				price = UFarmFPSUtilities::GetModifiedValueByPlayerPerk(this, PerkModifierTypeTag::BonusDailyBreadRewardModifier, price);
+
+				player->GetResourceInventory()->AddResource(ResourceTypeTag::Money, breadAmount * price);
+			}
+
+			UObjectiveManager* objectiveManager = UFarmFPSUtilities::GetObjectiveManager(this);
+			if (ensure(IsValid(objectiveManager)))
+			{
+				objectiveManager->IncrementObjectiveProgress(ObjectiveTypeTag::SellBread, breadDesired, breadAmount);
+			}
+
+			_customerQueue->RemoveCustomerFromFrontOfQueue();
+
+			_aiController->ReceiveMoveCompleted.RemoveAll(this);
+
+			if (IsValid(_onBoughtBreadSound))
+			{
+				UAudioManager::SpawnSoundAtLocation(this, _onBoughtBreadSound, GetActorLocation());
+			}
+
+			MoveOutOfMap();
+		}
+	}
+}
+
+void ACustomer::FindSpotInQueue()
+{
+	MoveToNextSpotInQueue(_customerQueue->GetEndQueuePosition());
+}
+
+void ACustomer::MoveToBreadStand()
+{
+	_currentState = ECustomerState::MovingToBreadStand;
+	if (ensure(_breadStand.IsValid()))
+	{
+		_nextDestination = _breadStand->GetNextCustomerQueuePosition();
+		if (ensure(IsValid(_aiController)))
+		{
+			_aiController->ReceiveMoveCompleted.RemoveAll(this);
+			_aiController->ReceiveMoveCompleted.AddDynamic(this, &ACustomer::OnMoveFinishedMovingToBreadStand);
+			_aiController->MoveToLocation(_nextDestination, _moveAcceptanceRadius * 10);
+		}
+	}
+}
+
+void ACustomer::MoveToNextSpotInQueue(const FVector& nextSpot)
+{
+	_currentState = ECustomerState::MovingToSpotInQueue;
+	_nextDestination = nextSpot;
+	if (ensure(IsValid(_aiController)))
+	{
+		_aiController->ReceiveMoveCompleted.RemoveAll(this);
+		_aiController->ReceiveMoveCompleted.AddDynamic(this, &ACustomer::OnMoveFinishedInQueue);
+		_aiController->MoveToLocation(_nextDestination, _moveAcceptanceRadius);
+	}
+}
+
+void ACustomer::MoveOutOfMap()
+{
+	_currentState = ECustomerState::MovingOutOfMap;
+	if (ensure(IsValid(_aiController)))
+	{
+		_aiController->ReceiveMoveCompleted.RemoveAll(this);
+		_aiController->ReceiveMoveCompleted.AddDynamic(this, &ACustomer::OnMoveFinishedOutOfMap);
+		_aiController->MoveToLocation(_startLocation, _moveAcceptanceRadius);
+	}
+}

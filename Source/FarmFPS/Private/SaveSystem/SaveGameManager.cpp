@@ -32,14 +32,6 @@ void USaveGameManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UPurchaseLocation::StaticOnPurchaseSuccess.AddUObject(this, &USaveGameManager::SaveGame);
-
-	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
-	if (IsValid(dayNightCycle))
-	{
-		dayNightCycle->OnDayEnd.AddUObject(this, &USaveGameManager::SaveGame);
-	}
-
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &USaveGameManager::OnPostLoadMap);
 }
 
@@ -68,6 +60,14 @@ void USaveGameManager::OnPostLoadMap(UWorld*)
 	if (HasSaveGameSettings())
 	{
 		LoadGameSettings();
+	}
+
+	UPurchaseLocation::StaticOnPurchaseSuccess.AddUObject(this, &USaveGameManager::SaveGame);
+
+	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
+	if (IsValid(dayNightCycle))
+	{
+		dayNightCycle->OnDayEnd.AddUObject(this, &USaveGameManager::SaveGame);
 	}
 }
 

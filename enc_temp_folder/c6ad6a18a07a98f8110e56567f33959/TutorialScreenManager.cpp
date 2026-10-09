@@ -421,13 +421,7 @@ bool UTutorialScreenManager::AttemptShowScreen(ETutorialScreenType screenToShow)
 		AShooterCharacter* player = Cast<AShooterCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));
 		if (ensure(IsValid(player)))
 		{
-			player->DoStopFiring();
 			player->ConsumeMovementInputVector();
-			APlayerController* controller = Cast<APlayerController>(player->GetController());
-			if (ensure(IsValid(controller)))
-			{
-				controller->FlushPressedKeys();
-			}
 		}
 		return true;
 	}

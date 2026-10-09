@@ -164,4 +164,5 @@ private:
 
 	bool _hasFirstWheatSpawned = false;
 	bool _hasFirstBreadSpawned = false;
+	bool _hasGameLoaded = false;
 };

@@ -17,5 +17,5 @@ struct FPlantSaveData
 	FString PlantName;
 
 	UPROPERTY()
-	bool IsEnabled;
+	bool IsBroken;
 };

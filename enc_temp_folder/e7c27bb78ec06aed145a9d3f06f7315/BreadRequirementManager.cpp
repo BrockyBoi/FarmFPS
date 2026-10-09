@@ -86,7 +86,6 @@ void UBreadRequirementManager::OnGameLoaded(UFarmFPSSaveGame* saveGame)
 void UBreadRequirementManager::OnDayBegin()
 {
 	_currentBreadSold = 0;
-	_metRequirementForDay = false;
 }
 
 void UBreadRequirementManager::OnDayEnd()
@@ -119,6 +118,6 @@ void UBreadRequirementManager::DayFailed()
 	UPerkManager* perkManager = UFarmFPSUtilities::GetPlayerPerkManager(this);
 	if (ensure(IsValid(perkManager)))
 	{
-		perkManager->SetPerkData(PerkModifierTypeTag::BonusDailyBreadRewardModifier, FPerkData(0, 1));
+		perkManager->SetPerkData(PerkModifierTypeTag::BonusDailyBreadRewardModifier, FPerkData(0, 0));
 	}
 }

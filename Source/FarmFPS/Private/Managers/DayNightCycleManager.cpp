@@ -193,6 +193,8 @@ void UDayNightCycleManager::StartDay()
 		OnDayBegin.Broadcast();
 	}
 
+	BPOnDayBegin.Broadcast();
+
 	if (ensure(_sunLight.IsValid()) && ensure(_moonLight.IsValid()))
 	{
 		_sunLight->SetActorHiddenInGame(false);
@@ -224,6 +226,8 @@ void UDayNightCycleManager::EndDay()
 	{
 		OnDayEnd.Broadcast();
 	}
+
+	BPOnDayEnd.Broadcast();
 
 	_timeElapsed = 0.f;
 
@@ -284,5 +288,7 @@ void UDayNightCycleManager::GenerateDailyTradeOff()
 	{
 		OnWaitingForTradeOff.Broadcast();
 	}
+
+	BPOnWaitingForTradeOff.Broadcast();
 }
 
