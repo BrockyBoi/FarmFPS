@@ -60,6 +60,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USphereComponent* CollisionComponent;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> _onHitSound;
+
 	/** Loudness of the AI perception noise done by this projectile on hit */
 	UPROPERTY(EditAnywhere, Category="Projectile|Noise", meta = (ClampMin = 0, ClampMax = 100))
 	float NoiseLoudness = 3.0f;

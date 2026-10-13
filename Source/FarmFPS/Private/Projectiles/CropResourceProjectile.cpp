@@ -4,16 +4,13 @@
 
 // Brock
 #include "Managers/ActorPool.h"
+#include "Managers/AudioManager.h"
 #include "Managers/FarmFPSUtilities.h"
-
 #include "Misc/MoonHitBox.h"
-
 #include "Plants/Crop.h"
 #include "Plants/Plant.h"
-
 #include "StatusEffects/ArcResourceToOtherCropOnHit.h"
 #include "StatusEffects/LingeringStatusEffectOnHit.h"
-
 #include "Resources/ResourceTypeTag.h"
 
 ACropResourceProjectile::ACropResourceProjectile() : Super()
@@ -172,6 +169,11 @@ void ACropResourceProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Oth
 	if (IsValid(Other) && (Other->IsA<AResourcePickupActor>() || Other->IsA<ACropResourceProjectile>()))
 	{
 		return;
+	}
+
+	if (IsValid(_onHitSound))
+	{
+		UAudioManager::SpawnSoundAtLocation(this, _onHitSound, GetActorLocation());
 	}
 
 	Cosmetic_OnHitObject();

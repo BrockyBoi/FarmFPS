@@ -172,6 +172,19 @@ void AShooterWeapon::StopFiring(bool clearTimer)
 	bIsFiring = false;
 }
 
+void AShooterWeapon::SetIsShotgun(bool isShotgun)
+{
+	if (IsShotgunSpread != isShotgun)
+	{
+		IsShotgunSpread = isShotgun;
+
+		if (!_hasPhysicalRecoil && IsShotgunSpread)
+		{
+			_hasPhysicalRecoil = true;
+		}
+	}
+}
+
 void AShooterWeapon::Fire()
 {
 	if (bFullAuto)
@@ -226,7 +239,9 @@ void AShooterWeapon::StartReload()
 		CurrentBullets = 0;
 		WeaponOwner->UpdateWeaponHUD(CurrentBullets, GetMagazineSize());
 
-		GetWorld()->GetTimerManager().SetTimer(ReloadTimer, this, &AShooterWeapon::OnReloadFinish, ReloadTime.GetValue().GetModifiedValue(this), false);
+		float reloadTime = ReloadTime.GetValue().GetModifiedValue(this);
+
+		GetWorld()->GetTimerManager().SetTimer(ReloadTimer, this, &AShooterWeapon::OnReloadFinish, reloadTime, false);
 	}
 }
 
@@ -250,50 +265,45 @@ void AShooterWeapon::FireCooldownExpired()
 
 void AShooterWeapon::FireProjectile(const FVector& TargetLocation)
 {
-	// get the projectile transform
-	FTransform ProjectileTransform = CalculateProjectileSpawnTransform(TargetLocation);
-	
-	// spawn the projectile
-	//FActorSpawnParameters SpawnParams;
-	//SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	//SpawnParams.TransformScaleMethod = ESpawnActorScaleMethod::OverrideRootScale;
-	//SpawnParams.Owner = GetOwner();
-	//SpawnParams.Instigator = PawnOwner;
-
-	//AShooterProjectile* Projectile = GetWorld()->SpawnActor<AShooterProjectile>(ProjectileClass, ProjectileTransform, SpawnParams);
-
-	UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
-	if (ensure(IsValid(actorPool)))
+	int bulletCount = IsShotgunSpread ? _shotgunCount : 1;
+	for (int i = 0; i < bulletCount; i++)
 	{
-		AShooterProjectile* Projectile = Cast<AShooterProjectile>(actorPool->GetActorFromPool(WeaponResourceType, ProjectileTransform, EPooledActorType::Projectile));
-		if (ensure(IsValid(Projectile)))
+		// get the projectile transform
+		FTransform ProjectileTransform = CalculateProjectileSpawnTransform(TargetLocation);
+
+		UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
+		if (ensure(IsValid(actorPool)))
 		{
-			if (bIsChargeableWeapon)
+			AShooterProjectile* Projectile = Cast<AShooterProjectile>(actorPool->GetActorFromPool(WeaponResourceType, ProjectileTransform, EPooledActorType::Projectile));
+			if (ensure(IsValid(Projectile)))
 			{
-				Projectile->ModifyThroughChargingWeapon(GetPercentCharged());
+				if (bIsChargeableWeapon)
+				{
+					Projectile->ModifyThroughChargingWeapon(GetPercentCharged());
+				}
+
+				Projectile->Shoot();
 			}
-
-			Projectile->Shoot();
-
-			// play the firing montage
-			WeaponOwner->PlayFiringMontage(FiringMontage);
-
-			// add recoil
-			WeaponOwner->AddWeaponRecoil(FiringRecoil);
-
-			// consume bullets
-			--CurrentBullets;
-
-			// if the clip is depleted, reload it
-			if (CurrentBullets <= 0)
-			{
-				StartReload();
-			}
-
-			// update the weapon HUD
-			WeaponOwner->UpdateWeaponHUD(CurrentBullets, GetMagazineSize());
 		}
 	}
+
+	// play the firing montage
+	WeaponOwner->PlayFiringMontage(FiringMontage);
+
+	// add recoil
+	WeaponOwner->AddWeaponRecoil(FiringRecoil);
+
+	// consume bullets
+	--CurrentBullets;
+
+	// if the clip is depleted, reload it
+	if (CurrentBullets <= 0)
+	{
+		StartReload();
+	}
+
+	// update the weapon HUD
+	WeaponOwner->UpdateWeaponHUD(CurrentBullets, GetMagazineSize());
 
 	if (_hasPhysicalRecoil)
 	{
@@ -302,7 +312,8 @@ void AShooterWeapon::FireProjectile(const FVector& TargetLocation)
 		{
 			float chargeMultiplier = 1 + (PhysicalRecoilMultiplierBasedOnCharge * GetPercentCharged());
 			FVector forwardVec = CharacterOwner->GetFirstPersonCameraComponent()->GetForwardVector();
-			CharacterOwner->LaunchCharacter(-forwardVec * PhysicalRecoilMultiplier.GetModifiedValue(this) * chargeMultiplier, false, false);
+			float recoilMultiplier = IsShotgunSpread ? ShotgunPhysicalRecoilMultiplier.GetModifiedValue(this) : PhysicalRecoilMultiplier.GetModifiedValue(this);
+			CharacterOwner->LaunchCharacter(-forwardVec * PhysicalRecoilMultiplier.GetModifiedValue(this) * chargeMultiplier * bulletCount, false, false);
 		}
 	}
 }
@@ -325,7 +336,7 @@ FTransform AShooterWeapon::CalculateProjectileSpawnTransform(const FVector& Targ
 	const FVector SpawnLoc = MuzzleLoc + ((TargetLocation - MuzzleLoc).GetSafeNormal() * MuzzleOffset);
 
 	// find the aim rotation vector while applying some variance to the target 
-	const FRotator AimRot = UKismetMathLibrary::FindLookAtRotation(SpawnLoc, TargetLocation + (UKismetMathLibrary::RandomUnitVector() * AimVariance));
+	const FRotator AimRot = UKismetMathLibrary::FindLookAtRotation(SpawnLoc, TargetLocation + (UKismetMathLibrary::RandomUnitVector() * AimVariance * (IsShotgunSpread ? _shotgunAimVarianceMultiplier : 1.f)));
 
 	// return the built transform
 	return FTransform(AimRot, SpawnLoc, FVector::OneVector);

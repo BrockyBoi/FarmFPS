@@ -303,6 +303,6 @@ void ACrop::DestroyPlant()
 
 bool ACrop::ShouldTick() const
 {
-	return IsLightAndWaterFull();
+	return IsLightAndWaterFull() || Super::ShouldTick();
 }
 

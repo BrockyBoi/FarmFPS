@@ -101,9 +101,9 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 				}
 			}
 
-			if (IsValid(_onSeedPlantedSound))
+			if (IsValid(_onHitSound))
 			{
-				UAudioManager::SpawnSoundAtLocation(this, _onSeedPlantedSound, GetActorLocation());
+				UAudioManager::SpawnSoundAtLocation(this, _onHitSound, GetActorLocation());
 			}
 		}
 		else

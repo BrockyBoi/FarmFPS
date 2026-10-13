@@ -57,6 +57,9 @@ public:
 	/** Stop firing this weapon */
 	void StopFiring(bool clearTimer = true);
 
+	UFUNCTION(BlueprintCallable)
+	void SetIsShotgun(bool isShotgun);
+
 	virtual void StartReload();
 
 	float GetFireRate() const { return RefireRate.GetValue().GetModifiedValue(this); }
@@ -195,7 +198,19 @@ protected:
 	FModifiedFloatValue PhysicalRecoilMultiplier = 150.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
+	FModifiedFloatValue ShotgunPhysicalRecoilMultiplier = 150.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
 	float PhysicalRecoilMultiplierBasedOnCharge = 10.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Shotgun")
+	bool IsShotgunSpread = false;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Shotgun")
+	int _shotgunCount = 6;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Shotgun")
+	float _shotgunAimVarianceMultiplier = 3;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _onShootSound;

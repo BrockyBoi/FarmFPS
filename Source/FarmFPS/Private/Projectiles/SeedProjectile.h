@@ -40,9 +40,6 @@ protected:
 	void Cosmetic_OnSpawnSeedFail();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
-	TObjectPtr<USoundBase> _onSeedPlantedSound;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _unableToPlantSound;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tunables")
