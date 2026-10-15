@@ -100,7 +100,7 @@ void AResourcePickupActor::AddActorToPool()
 	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycle))
 	{
-		dayNightCycle->OnDayEnd.RemoveAll(this);
+		dayNightCycle->OnDayStateChange.RemoveAll(this);
 	}
 
 	SetActorTickEnabled(false);
@@ -131,7 +131,8 @@ void AResourcePickupActor::RemoveFromPool()
 	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycle)))
 	{
-		dayNightCycle->OnDayEnd.AddUObject(this, &AResourcePickupActor::OnDayEnd);
+		dayNightCycle->OnDayStateChange.RemoveAll(this);
+		dayNightCycle->OnDayStateChange.AddUObject(this, &AResourcePickupActor::OnDayStateChange);
 	}
 
 	SetActorTickEnabled(true);
@@ -211,12 +212,16 @@ void AResourcePickupActor::StartMovingTowardsActor()
 	EnableAllCollision(false);
 }
 
-void AResourcePickupActor::OnDayEnd()
+void AResourcePickupActor::OnDayStateChange(EDayState dayState)
 {
-	UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
-	if (ensure(IsValid(actorPool)))
+	UDayNightCycleManager* dayNightManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightManager)) && dayNightManager->GetResetDayState() == dayState)
 	{
-		actorPool->AddActorToPool(_resourceType, this, EPooledActorType::ResourcePickup);
+		UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
+		if (ensure(IsValid(actorPool)))
+		{
+			actorPool->AddActorToPool(_resourceType, this, EPooledActorType::ResourcePickup);
+		}
 	}
 }
 

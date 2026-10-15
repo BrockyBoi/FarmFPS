@@ -45,7 +45,7 @@ void AInputOutputStationActor::BeginPlay()
 	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycleManager)))
 	{
-		dayNightCycleManager->OnDayEnd.AddUObject(this, &AInputOutputStationActor::OnDayEnd);
+		dayNightCycleManager->OnDayStateChange.AddUObject(this, &AInputOutputStationActor::OnDayStateChange);
 	}
 }
 
@@ -97,9 +97,13 @@ void AInputOutputStationActor::EndPlay(EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-void AInputOutputStationActor::OnDayEnd()
+void AInputOutputStationActor::OnDayStateChange(EDayState dayState)
 {
-	_resourcesToSpawnFromInputInventory.Empty();
+	UDayNightCycleManager* dayNightManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightManager)) && dayNightManager->GetResetDayState() == dayState)
+	{
+		_resourcesToSpawnFromInputInventory.Empty();
+	}
 }
 
 float AInputOutputStationActor::GetTimeBetweenSpawns() const

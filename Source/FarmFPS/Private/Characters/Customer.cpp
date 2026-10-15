@@ -54,7 +54,7 @@ void ACustomer::BeginPlay()
 	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycle)))
 	{
-		dayNightCycle->OnDayEnd.AddUObject(this, &ACustomer::OnDayEnd);
+		dayNightCycle->OnDayStateChange.AddUObject(this, &ACustomer::OnDayStateChange);
 	}
 }
 
@@ -140,14 +140,18 @@ void ACustomer::OnMoveFinishedInQueue(FAIRequestID RequestID, EPathFollowingResu
 	}
 }
 
-void ACustomer::OnDayEnd()
+void ACustomer::OnDayStateChange(EDayState state)
 {
-	if (ensure(_customerQueue.IsValid()))
+	UDayNightCycleManager* dayNightManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightManager)) && state == dayNightManager->GetResetDayState())
 	{
-		_customerQueue->RemoveCustomerFromQueue(this);
-	}
+		if (ensure(_customerQueue.IsValid()))
+		{
+			_customerQueue->RemoveCustomerFromQueue(this);
+		}
 
-	MoveOutOfMap();
+		MoveOutOfMap();
+	}
 }
 
 void ACustomer::AttemptBuyBreadAtFrontOfQueue()

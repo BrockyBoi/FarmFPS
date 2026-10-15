@@ -169,6 +169,27 @@ float UDayNightCycleManager::GetPercentageDayElapsed() const
 	return 0.0f;
 }
 
+FLinearColor UDayNightCycleManager::GetDayProgressBarColor() const
+{
+	FLinearColor color = FLinearColor::Gray;
+
+	float percentage = GetPercentageDayElapsed();
+	if (percentage <= .5f)
+	{
+		color = FLinearColor::LerpUsingHSV(_startOfDayColor, _midDayColor, percentage / .5f);
+	}
+	else if (percentage <= _percentageToShowWarningColors)
+	{
+		color = FLinearColor::LerpUsingHSV(_midDayColor, _endOfDayColor, (percentage - .5f) / .4f);
+	}
+	else
+	{
+		color = FLinearColor::LerpUsingHSV(_endOfDayColor, _warningColor, FMath::Clamp(FMath::Sin(GetWorld()->GetTimeSeconds() * _sinWaveMultiplier), 0, 1));
+	}
+
+	return color;
+}
+
 void UDayNightCycleManager::CHEAT_StartDay()
 {
 	if (GetCurrentDayState() == EDayState::MidNight)
@@ -219,7 +240,10 @@ void UDayNightCycleManager::StartDay()
 
 void UDayNightCycleManager::EndDay()
 {
-	GetMusicAudioComponent(_daytimeMusic)->FadeOut(2.f, 0.f);
+	if (IsValid(GetMusicAudioComponent(_daytimeMusic)))
+	{
+		GetMusicAudioComponent(_daytimeMusic)->FadeOut(2.f, 0.f);
+	}
 
 	SetDayState(EDayState::MidNight);
 	if (OnDayEnd.IsBound())

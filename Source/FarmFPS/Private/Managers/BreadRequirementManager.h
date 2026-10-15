@@ -17,6 +17,8 @@
 // Generated
 #include "BreadRequirementManager.generated.h"
 
+enum class EDayState : uint8;
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class FARMFPS_API UBreadRequirementManager : public UActorComponent, public ISaveable
 {
@@ -66,11 +68,7 @@ protected:
 	FCachedModifiableValueDataTableRowHandle _bonusMultiplierPerDaySold = .1f;
 
 private:
-	UFUNCTION()
-	void OnDayBegin();
-
-	UFUNCTION()
-	void OnDayEnd();
+	void OnDayStateChange(EDayState dayState);
 
 	void RequirementsMet();
 	void DayFailed();

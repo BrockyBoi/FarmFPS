@@ -17,6 +17,7 @@
 
 class ABreadStand;
 class UCustomerQueue;
+enum class EDayState : uint8;
 
 enum class ECustomerState
 {
@@ -63,8 +64,7 @@ protected:
 	UFUNCTION()
 	void OnMoveFinishedInQueue(FAIRequestID RequestID, EPathFollowingResult::Type Result);
 
-	UFUNCTION()
-	void OnDayEnd();
+	void OnDayStateChange(EDayState state);
 
 	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
 	void Cosmetic_SetBreadDesiredUI();

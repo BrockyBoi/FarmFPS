@@ -3,6 +3,7 @@
 #include "ResourceInventory.h"
 
 // Brock
+#include "CustomerSpawnerManager.h"
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Resources/ResourceTypeTag.h"
@@ -137,13 +138,11 @@ void UResourceInventory::ListenToDayCycleEvents(bool listen)
 	{
 		if (listen)
 		{
-			dayNightCycle->OnDayBegin.AddUObject(this, &UResourceInventory::OnDayBegin);
-			dayNightCycle->OnDayEnd.AddUObject(this, &UResourceInventory::OnDayEnd);
+			dayNightCycle->OnDayStateChange.AddUObject(this, &UResourceInventory::OnDayStateChange);
 		}
 		else
 		{
-			dayNightCycle->OnDayBegin.RemoveAll(this);
-			dayNightCycle->OnDayEnd.RemoveAll(this);
+			dayNightCycle->OnDayStateChange.RemoveAll(this);
 		}
 	}
 }
@@ -183,21 +182,25 @@ bool UResourceInventory::IsValidTag(const FGameplayTag& tag) const
 	return tag.GetTagName().ToString().Contains(ResourceTypeTag::BaseResourceTypeTag.GetTag().ToString());
 }
 
-void UResourceInventory::OnDayBegin()
+void UResourceInventory::OnDayStateChange(EDayState newState)
 {
-	_canAddResources = true;
-}
-
-void UResourceInventory::OnDayEnd()
-{
-	if (_clearResourcesAtEndOfDay)
+	UDayNightCycleManager* dayNightManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightManager)) && newState == dayNightManager->GetResetDayState())
 	{
-		ClearAllExceptMoney();
+		if (_clearResourcesAtEndOfDay)
+		{
+			ClearAllExceptMoney();
+		}
+
+		if (!_canAlwaysAddResources)
+		{
+			_canAddResources = false;
+		}
 	}
 
-	if (!_canAlwaysAddResources)
+	if (newState == EDayState::Day)
 	{
-		_canAddResources = false;
+		_canAddResources = true;
 	}
 }
 

@@ -25,11 +25,11 @@ void UBreadRequirementManager::BeginPlay()
 	{
 		if (dayNightCycleManager->IsDay())
 		{
-			OnDayBegin();
+			_currentBreadSold = 0;
+			_metRequirementForDay = false;
 		}
 
-		dayNightCycleManager->OnDayBegin.AddUObject(this, &UBreadRequirementManager::OnDayBegin);
-		dayNightCycleManager->OnDayEnd.AddUObject(this, &UBreadRequirementManager::OnDayEnd);
+		dayNightCycleManager->OnDayStateChange.AddUObject(this, &UBreadRequirementManager::OnDayStateChange);
 	}
 
 	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
@@ -46,6 +46,7 @@ void UBreadRequirementManager::EndPlay(EEndPlayReason::Type EndPlayReason)
 	{
 		dayNightCycleManager->OnDayBegin.RemoveAll(this);
 		dayNightCycleManager->OnDayEnd.RemoveAll(this);
+		dayNightCycleManager->OnDayStateChange.RemoveAll(this);
 	}
 
 	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
@@ -83,17 +84,23 @@ void UBreadRequirementManager::OnGameLoaded(UFarmFPSSaveGame* saveGame)
 	}
 }
 
-void UBreadRequirementManager::OnDayBegin()
+void UBreadRequirementManager::OnDayStateChange(EDayState dayState)
 {
-	_currentBreadSold = 0;
-	_metRequirementForDay = false;
-}
-
-void UBreadRequirementManager::OnDayEnd()
-{
-	if (!HasSoldBreadNeeded())
+	UDayNightCycleManager* dayNightManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightManager)))
 	{
-		DayFailed();
+		if (dayState == EDayState::Day)
+		{
+			_currentBreadSold = 0;
+			_metRequirementForDay = false;
+		}
+		else if (dayState == dayNightManager->GetResetDayState())
+		{
+			if (!HasSoldBreadNeeded())
+			{
+				DayFailed();
+			}
+		}
 	}
 }
 

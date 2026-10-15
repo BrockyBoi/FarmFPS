@@ -25,7 +25,7 @@
 AActor* UFarmFPSUtilities::GetPlayerCharacter(const UObject* WorldContextObject)
 {
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(WorldContextObject, 0);
-	if (ensure(IsValid(playerController)) && ensure(IsValid(playerController->GetPawn())))
+	if (IsValid(playerController) && ensure(IsValid(playerController->GetPawn())))
 	{
 		return playerController->GetPawn();
 	}

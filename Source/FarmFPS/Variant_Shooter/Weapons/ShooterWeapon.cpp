@@ -65,6 +65,11 @@ void AShooterWeapon::BeginPlay()
 	WeaponOwner->AttachWeaponMeshes(this);
 
 	OnWeaponCollected.Broadcast(WeaponResourceType);
+
+	if (!_hasPhysicalRecoil && IsShotgunSpread)
+	{
+		_hasPhysicalRecoil = true;
+	}
 }
 
 void AShooterWeapon::Tick(float DeltaTime)

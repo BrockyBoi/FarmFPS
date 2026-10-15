@@ -20,6 +20,7 @@ class APawn;
 class UCapsuleComponent;
 class UResourceInventory;
 class USphereComponent;
+enum class EDayState : uint8;
 
 UCLASS()
 class AResourcePickupActor : public AActor, public IPoolableActor
@@ -62,8 +63,7 @@ protected:
 
 	void StartMovingTowardsActor();
 
-	UFUNCTION()
-	void OnDayEnd();
+	void OnDayStateChange(EDayState dayState);
 
 	void AddResourcesToInventory(UResourceInventory* inventory);
 

@@ -10,6 +10,8 @@
 // Generated
 #include "ResourceInventory.generated.h"
 
+enum class EDayState : uint8;
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UResourceInventory : public UActorComponent
 {
@@ -74,11 +76,7 @@ protected:
 private:
 	bool IsValidTag(const FGameplayTag& tag) const;
 
-	UFUNCTION()
-	void OnDayBegin();
-
-	UFUNCTION()
-	void OnDayEnd();
+	void OnDayStateChange(EDayState newState);
 
 	bool _canAddResources = true;
 

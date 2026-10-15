@@ -14,6 +14,8 @@
 // Generated
 #include "InputOutputStationActor.generated.h"
 
+enum class EDayState : uint8;
+
 UCLASS()
 class AInputOutputStationActor : public AActor
 {
@@ -31,7 +33,7 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
-	void OnDayEnd();
+	void OnDayStateChange(EDayState dayState);
 
 	virtual float GetTimeBetweenSpawns() const;
 

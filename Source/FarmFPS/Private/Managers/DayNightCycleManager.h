@@ -50,10 +50,15 @@ public:
 	UFUNCTION(BlueprintPure)
 	EDayState GetCurrentDayState() const { return _currentDayState; }
 
+	EDayState GetResetDayState() const { return _dayStateOnDayReset; }
+
 	void TransitionToNextDay();
 
 	UFUNCTION(BlueprintPure)
 	float GetPercentageDayElapsed() const;
+
+	UFUNCTION(BlueprintPure)
+	FLinearColor GetDayProgressBarColor() const;
 
 	void CHEAT_StartDay();
 	void CHEAT_StartNight();
@@ -127,7 +132,28 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _onNightEndSound = nullptr;
 
+	UPROPERTY(EditAnywhere)
+	FLinearColor _startOfDayColor = FLinearColor::Green;
+
+	UPROPERTY(EditAnywhere)
+	FLinearColor _midDayColor = FLinearColor::Yellow;
+
+	UPROPERTY(EditAnywhere)
+	FLinearColor _warningColor = FLinearColor::Red;
+
+	UPROPERTY(EditAnywhere)
+	FLinearColor _endOfDayColor = FLinearColor::Black;
+
+	UPROPERTY(EditAnywhere)
+	float _percentageToShowWarningColors = .85f;
+
+	UPROPERTY(EditAnywhere)
+	float _sinWaveMultiplier = 5;
+
 	float _timeElapsed = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	EDayState _dayStateOnDayReset = EDayState::MidNight;
 
 	EDayState _currentDayState;
 };
