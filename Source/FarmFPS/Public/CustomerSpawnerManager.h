@@ -14,6 +14,7 @@
 #include "CustomerSpawnerManager.generated.h"
 
 class ACustomer;
+enum class EDayState : uint8;
 
 USTRUCT(BlueprintType)
 struct FCustomerSpawnData
@@ -52,11 +53,7 @@ protected:
 	const FGameplayTag GetNextCustomerTypeToSpawn() const;
 	const TSubclassOf<ACustomer> GetNextCustomerSpawnClass(const FGameplayTag& customerType);
 
-	UFUNCTION()
-	void OnDayBegin();
-	
-	UFUNCTION()
-	void OnDayEnd();
+	void OnDayStateChange(EDayState dayState);
 
 	UFUNCTION()
 	void AttemptSpawnCustomer();

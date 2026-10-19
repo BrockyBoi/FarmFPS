@@ -66,7 +66,7 @@ void AShooterWeapon::BeginPlay()
 
 	OnWeaponCollected.Broadcast(WeaponResourceType);
 
-	if (!_hasPhysicalRecoil && IsShotgunSpread)
+	if (!_hasPhysicalRecoil && IsShotGunFireType())
 	{
 		_hasPhysicalRecoil = true;
 	}
@@ -89,10 +89,10 @@ void AShooterWeapon::Tick(float DeltaTime)
 
 void AShooterWeapon::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
-	Super::EndPlay(EndPlayReason);
-
 	// clear the refire timer
 	GetWorld()->GetTimerManager().ClearTimer(RefireTimer);
+
+	Super::EndPlay(EndPlayReason);
 }
 
 void AShooterWeapon::OnOwnerDestroyed(AActor* DestroyedActor)
@@ -177,17 +177,27 @@ void AShooterWeapon::StopFiring(bool clearTimer)
 	bIsFiring = false;
 }
 
-void AShooterWeapon::SetIsShotgun(bool isShotgun)
+void AShooterWeapon::SetWeaponFireType(EWeaponFireType fireType)
 {
-	if (IsShotgunSpread != isShotgun)
+	switch (fireType)
 	{
-		IsShotgunSpread = isShotgun;
-
-		if (!_hasPhysicalRecoil && IsShotgunSpread)
+		case EWeaponFireType::Shotgun:
 		{
-			_hasPhysicalRecoil = true;
+			if (!_hasPhysicalRecoil)
+			{
+				_hasPhysicalRecoil = true;
+			}
+		}
+		case EWeaponFireType::Automatic:
+		{
+			if (!bFullAuto)
+			{
+				bFullAuto = true;
+			}
 		}
 	}
+
+	WeaponFireType = fireType;
 }
 
 void AShooterWeapon::Fire()
@@ -270,7 +280,7 @@ void AShooterWeapon::FireCooldownExpired()
 
 void AShooterWeapon::FireProjectile(const FVector& TargetLocation)
 {
-	int bulletCount = IsShotgunSpread ? _shotgunCount : 1;
+	int bulletCount = IsShotGunFireType() ? _shotgunCount : 1;
 	for (int i = 0; i < bulletCount; i++)
 	{
 		// get the projectile transform
@@ -317,7 +327,7 @@ void AShooterWeapon::FireProjectile(const FVector& TargetLocation)
 		{
 			float chargeMultiplier = 1 + (PhysicalRecoilMultiplierBasedOnCharge * GetPercentCharged());
 			FVector forwardVec = CharacterOwner->GetFirstPersonCameraComponent()->GetForwardVector();
-			float recoilMultiplier = IsShotgunSpread ? ShotgunPhysicalRecoilMultiplier.GetModifiedValue(this) : PhysicalRecoilMultiplier.GetModifiedValue(this);
+			float recoilMultiplier = IsShotGunFireType() ? ShotgunPhysicalRecoilMultiplier.GetModifiedValue(this) : PhysicalRecoilMultiplier.GetModifiedValue(this);
 			CharacterOwner->LaunchCharacter(-forwardVec * PhysicalRecoilMultiplier.GetModifiedValue(this) * chargeMultiplier * bulletCount, false, false);
 		}
 	}
@@ -341,7 +351,7 @@ FTransform AShooterWeapon::CalculateProjectileSpawnTransform(const FVector& Targ
 	const FVector SpawnLoc = MuzzleLoc + ((TargetLocation - MuzzleLoc).GetSafeNormal() * MuzzleOffset);
 
 	// find the aim rotation vector while applying some variance to the target 
-	const FRotator AimRot = UKismetMathLibrary::FindLookAtRotation(SpawnLoc, TargetLocation + (UKismetMathLibrary::RandomUnitVector() * AimVariance * (IsShotgunSpread ? _shotgunAimVarianceMultiplier : 1.f)));
+	const FRotator AimRot = UKismetMathLibrary::FindLookAtRotation(SpawnLoc, TargetLocation + (UKismetMathLibrary::RandomUnitVector() * AimVariance * (IsShotGunFireType() ? _shotgunAimVarianceMultiplier : 1.f)));
 
 	// return the built transform
 	return FTransform(AimRot, SpawnLoc, FVector::OneVector);

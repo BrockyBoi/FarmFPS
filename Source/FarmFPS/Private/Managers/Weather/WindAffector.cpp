@@ -42,7 +42,7 @@ void UWindAffector::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 
 	for (TWeakObjectPtr<UPrimitiveComponent> primitiveComponent : _primitiveComponents)
 	{
-		if (ensure(primitiveComponent.IsValid()))
+		if (ensure(primitiveComponent.IsValid()) && primitiveComponent->IsSimulatingPhysics())
 		{
 			primitiveComponent->AddForce(finalVec3D * _resourceActorStrengthBonus);
 		}

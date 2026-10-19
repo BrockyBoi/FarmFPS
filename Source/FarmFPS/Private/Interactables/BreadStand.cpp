@@ -28,29 +28,6 @@ void ABreadStand::SetBreadPropDataSpawnLocation(const FGameplayTag& breadType, U
 	GetBreadPropData(breadType).BreadSpawnLocationComponent = sceneComponent;
 }
 
-void ABreadStand::BeginPlay()
-{
-	Super::BeginPlay();
-
-	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
-	if (ensure(IsValid(dayNightCycle)))
-	{
-		dayNightCycle->OnDayBegin.AddUObject(this, &ABreadStand::OnDayBegin);
-		dayNightCycle->OnDayEnd.AddUObject(this, &ABreadStand::OnDayEnd);
-	}
-}
-
-void ABreadStand::EndPlay(EEndPlayReason::Type EndPlayReason)
-{
-	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
-	if (IsValid(dayNightCycle))
-	{
-		dayNightCycle->OnDayBegin.RemoveAll(this);
-		dayNightCycle->OnDayEnd.RemoveAll(this);
-	}
-	Super::EndPlay(EndPlayReason);
-}
-
 const FVector ABreadStand::GetNextCustomerQueuePosition()
 {
 	return ensure(IsValid(_customerQueue)) ? _customerQueue->GetEndQueuePosition() : FVector::ZeroVector;
@@ -118,13 +95,4 @@ void ABreadStand::OnInputInventoryResourceCountChanged(const FGameplayTag& resou
 			customer->AttemptBuyBreadAtFrontOfQueue();
 		}
 	}
-}
-
-void ABreadStand::OnDayBegin()
-{
-}
-
-void ABreadStand::OnDayEnd()
-{
-
 }

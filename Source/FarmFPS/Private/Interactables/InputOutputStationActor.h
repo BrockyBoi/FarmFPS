@@ -33,7 +33,7 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
-	void OnDayStateChange(EDayState dayState);
+	virtual void OnDayStateChange(EDayState dayState);
 
 	virtual float GetTimeBetweenSpawns() const;
 

@@ -17,6 +17,8 @@ class UFarmFPSSaveGame;
 
 struct FUpgradeLocationSaveData;
 
+class AShooterCharacter;
+
 USTRUCT(BlueprintType)
 struct FUnlockActorLocationData
 {
@@ -118,4 +120,6 @@ protected:
 	bool _canPurchase = true;
 
 	bool _hasAllPrerequisites = false;
+
+	TWeakObjectPtr<AShooterCharacter> _shooterCharacter = nullptr;
 };

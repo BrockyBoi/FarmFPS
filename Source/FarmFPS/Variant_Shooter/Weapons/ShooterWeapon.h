@@ -21,6 +21,14 @@ class UAnimInstance;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnWeaponCollected, const FGameplayTag&)
 
+UENUM(BlueprintType)
+enum class EWeaponFireType : uint8
+{
+	SemiAuto,
+	Shotgun,
+	Automatic
+};
+
 /**
  *  Base class for a simple first person shooter weapon
  *  Provides both first person and third person perspective meshes
@@ -41,7 +49,6 @@ class FARMFPS_API AShooterWeapon : public AActor
 	USkeletalMeshComponent* ThirdPersonMesh;
 
 public:	
-
 	/** Constructor */
 	AShooterWeapon();
 
@@ -57,8 +64,8 @@ public:
 	/** Stop firing this weapon */
 	void StopFiring(bool clearTimer = true);
 
-	UFUNCTION(BlueprintCallable)
-	void SetIsShotgun(bool isShotgun);
+	void SetWeaponFireType(EWeaponFireType fireType);
+	EWeaponFireType GetWeaponFireType() const { return WeaponFireType; }
 
 	virtual void StartReload();
 
@@ -95,7 +102,6 @@ public:
 	static FOnWeaponCollected OnWeaponCollected;
 
 protected:
-	
 	/** Gameplay initialization */
 	virtual void BeginPlay() override;
 
@@ -130,6 +136,11 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, meta = (Categories = "WeaponType"))
 	FGameplayTag WeaponTypeTag;
+
+	UPROPERTY(EditAnywhere, meta = (Categories = "WeaponType"))
+	EWeaponFireType WeaponFireType = EWeaponFireType::SemiAuto;
+
+	bool IsShotGunFireType() const { return WeaponFireType == EWeaponFireType::Shotgun; }
 
 	/** Type of projectiles this weapon will shoot */
 	UPROPERTY(EditAnywhere, Category = "Ammo")
@@ -202,9 +213,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
 	float PhysicalRecoilMultiplierBasedOnCharge = 10.f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Shotgun")
-	bool IsShotgunSpread = false;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Shotgun")
 	int _shotgunCount = 6;

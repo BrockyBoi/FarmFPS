@@ -8,7 +8,6 @@
 // FarmFPS
 #include "FarmFPSCharacter.h"
 #include "ShooterCharacter.h"
-#include "ShooterWeapon.h"
 
 void UWeaponUpgradeLocation::BeginPlay()
 {
@@ -17,21 +16,48 @@ void UWeaponUpgradeLocation::BeginPlay()
 
 FString UWeaponUpgradeLocation::GetPerkDescriptionString() const
 {
-	return FString();
+	AActor* owner = GetOwner();
+	AShooterWeapon* weapon = GetWeapon();
+	if (!ensure(IsValid(owner)) || !ensure(IsValid(weapon)))
+	{
+		return TEXT("Invalid");
+	}
+
+	FString weaponName = _weaponUpgradeData.WeaponToUpgrade.ToString();
+	weaponName = weaponName.Replace(TEXT("WeaponType."), TEXT(""));
+
+	FString currentFireRateType = UEnum::GetValueAsString(weapon->GetWeaponFireType());
+
+	FNumberFormattingOptions Opts;
+	Opts.SetMinimumFractionalDigits(0);
+	Opts.SetMaximumFractionalDigits(2);
+
+	FString change = FString::Printf(TEXT("\n%s -> %s"), *currentFireRateType, *UEnum::GetValueAsString(_weaponUpgradeData.FireType));
+	FString finalString = weaponName.Append(change);
+
+	return finalString;
 }
 
 void UWeaponUpgradeLocation::OnPurchaseSuccess(UPerkManager* perkManager, UResourceInventory* inventory)
 {
-	AShooterCharacter* shooterCharacter = Cast<AShooterCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));
-	if (ensure(IsValid(shooterCharacter)))
+	Super::OnPurchaseSuccess(perkManager, inventory);
+
+	if (ensure(_shooterCharacter.IsValid()))
 	{
-		AShooterWeapon* weapon = shooterCharacter->FindWeaponOfType(_weaponUpgradeData.WeaponToUpgrade);
+		AShooterWeapon* weapon = GetWeapon();
 		if (ensure(IsValid(weapon)))
 		{
-			if (_weaponUpgradeData.MakeShotgun)
-			{
-				weapon->SetIsShotgun(true);
-			}
+			weapon->SetWeaponFireType(_weaponUpgradeData.FireType);
 		}
 	}
+}
+
+AShooterWeapon* UWeaponUpgradeLocation::GetWeapon() const
+{
+	if (ensure(_shooterCharacter.IsValid()))
+	{
+		return _shooterCharacter->FindWeaponOfType(_weaponUpgradeData.WeaponToUpgrade);
+	}
+
+	return nullptr;
 }

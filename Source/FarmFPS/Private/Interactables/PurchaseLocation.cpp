@@ -13,6 +13,8 @@
 #include "SaveSystem/SaveGameManager.h"
 #include "SaveSystem/UpgradeLocationSaveData.h"
 
+#include "ShooterCharacter.h"
+
 UPurchaseLocation::FStaticOnPurchaseSuccess UPurchaseLocation::StaticOnPurchaseSuccess;
 
 UPurchaseLocation::UPurchaseLocation()
@@ -57,6 +59,12 @@ void UPurchaseLocation::BeginPlay()
 				}
 			}
 		}
+	}
+
+	AShooterCharacter* shooterCharacter = Cast<AShooterCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));
+	if (ensure(IsValid(shooterCharacter)))
+	{
+		_shooterCharacter = shooterCharacter;
 	}
 
 	StaticOnPurchaseSuccess.AddUObject(this, &UPurchaseLocation::OnAnyPurchaseSuccess);

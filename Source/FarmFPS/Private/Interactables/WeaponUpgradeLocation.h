@@ -3,7 +3,10 @@
 #pragma once
 
 // Brock
-#include "Interactables/PurchaseLocation.h"
+#include "PurchaseLocation.h"
+
+// Shooter
+#include "ShooterWeapon.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -12,6 +15,10 @@
 // Generated
 #include "WeaponUpgradeLocation.generated.h"
 
+class AShooterWeapon;
+enum class EWaponFireType : uint8;
+
+// Don't know why I made a separate struct just for this.  Maybe there's a reason?  Keeping it for now I guess.
 USTRUCT(BlueprintType)
 struct FWeaponUpgradeData
 {
@@ -20,7 +27,8 @@ struct FWeaponUpgradeData
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (Categories = "WeaponType."))
 	FGameplayTag WeaponToUpgrade;
 
-	bool MakeShotgun;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
+	EWeaponFireType FireType;
 };
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
@@ -34,8 +42,12 @@ public:
 	UFUNCTION(BlueprintPure)
 	FString GetPerkDescriptionString() const;
 
+protected:
 	virtual void OnPurchaseSuccess(class UPerkManager* perkManager, class UResourceInventory* inventory) override;
 
-	UPROPERTY(EditAnywhere)
+	AShooterWeapon* GetWeapon() const;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon", meta = (Categories = "WeaponType."))
 	FWeaponUpgradeData _weaponUpgradeData;
+
 };

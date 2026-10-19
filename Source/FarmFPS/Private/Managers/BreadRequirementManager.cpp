@@ -127,5 +127,6 @@ void UBreadRequirementManager::DayFailed()
 	if (ensure(IsValid(perkManager)))
 	{
 		perkManager->SetPerkData(PerkModifierTypeTag::BonusDailyBreadRewardModifier, FPerkData(0, 1));
+		perkManager->SetPerkData(PerkModifierTypeTag::DailyBreadIncreaseAmount, FPerkData(0, 1));
 	}
 }

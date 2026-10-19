@@ -71,8 +71,7 @@ void UCustomerSpawnerManager::BeginPlay()
 	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycle)))
 	{
-		dayNightCycle->OnDayBegin.AddUObject(this, &UCustomerSpawnerManager::OnDayBegin);
-		dayNightCycle->OnDayEnd.AddUObject(this, &UCustomerSpawnerManager::OnDayEnd);
+		dayNightCycle->OnDayStateChange.AddUObject(this, &UCustomerSpawnerManager::OnDayStateChange);
 	}
 }
 
@@ -81,8 +80,7 @@ void UCustomerSpawnerManager::EndPlay(EEndPlayReason::Type EndPlayReason)
 	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycle))
 	{
-		dayNightCycle->OnDayBegin.RemoveAll(this);
-		dayNightCycle->OnDayEnd.RemoveAll(this);
+		dayNightCycle->OnDayStateChange.RemoveAll(this);
 	}
 
 	Super::EndPlay(EndPlayReason);
@@ -115,19 +113,21 @@ const TSubclassOf<ACustomer> UCustomerSpawnerManager::GetNextCustomerSpawnClass(
 	return TSubclassOf<ACustomer>();
 }
 
-void UCustomerSpawnerManager::OnDayBegin()
+void UCustomerSpawnerManager::OnDayStateChange(EDayState dayState)
 {
-	if (ensure(IsValid(GetWorld())) && !IsSpawnTimerActive())
+	if (dayState == EDayState::Day)
 	{
-		GetWorld()->GetTimerManager().SetTimer(_spawnTimer, this, &UCustomerSpawnerManager::AttemptSpawnCustomer, _spawnRate.GetModifiedValue(this), true);
+		if (ensure(IsValid(GetWorld())) && !IsSpawnTimerActive())
+		{
+			GetWorld()->GetTimerManager().SetTimer(_spawnTimer, this, &UCustomerSpawnerManager::AttemptSpawnCustomer, _spawnRate.GetModifiedValue(this), true);
+		}
 	}
-}
-
-void UCustomerSpawnerManager::OnDayEnd()
-{
-	if (ensure(IsValid(GetWorld())))
+	else if (dayState == EDayState::MidNight)
 	{
-		GetWorld()->GetTimerManager().ClearTimer(_spawnTimer);
+		if (ensure(IsValid(GetWorld())))
+		{
+			GetWorld()->GetTimerManager().ClearTimer(_spawnTimer);
+		}
 	}
 }
 
