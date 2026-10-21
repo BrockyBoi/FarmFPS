@@ -70,6 +70,10 @@ private:
 	TArray<TObjectPtr<UAudioComponent>> _currentlyPlayingFXAudioComponents;
 	TMap<TObjectPtr<USoundBase>, TObjectPtr<UAudioComponent>> _currentlyPlayingMusicAudioComponents;
 
+
+	UPROPERTY(EditAnywhere)
+	USoundAttenuation* _defaultSoundAttenuationSettings = nullptr;
+
 	float _fxAudioMultiplier = 1.f;
 	float _musicAudioMultiplier = 1.f;
 	float _masterAudioMultiplier = 1.f;

@@ -26,8 +26,11 @@ class AResourceConverterStationActor : public AInputOutputStationActor
 	
 public:	
 	AResourceConverterStationActor();
-	void TryConvertAllResources();
-	void TryConvertLimitedAmount(int amountToCraft);
+	virtual void TryConvertAllResources();
+	virtual void TryConvertLimitedAmount(int amountToCraft);
+
+	UFUNCTION(BlueprintPure)
+	const FCraftingData& GetCurrentCraftingRecipe() const;
 
 	static FOnStartConvertingResources OnStartConvertingResources;
 
@@ -36,11 +39,16 @@ protected:
 
 	virtual void OnInputInventoryResourceCountChanged(const FGameplayTag& resourceType, float amount) override;
 
+	void SetCurrentRecipeIndex(int index);
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UResourceConverterComponent* _resourceConverter = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FCraftingData> _craftingRecipes;
+
+	UPROPERTY(BlueprintReadOnly)
+	int _currentRecipeIndex = 0;
 
 	UPROPERTY(EditDefaultsOnly)
 	bool _automaticallyConvertResources = true;

@@ -4,6 +4,7 @@
 
 // Brock
 #include "CustomerSpawnerManager.h"
+#include "Interactables/MeleeableInterface.h"
 #include "Managers/ActorPool.h"
 #include "Managers/AudioManager.h"
 #include "Managers/DayNightCycleManager.h"
@@ -337,10 +338,10 @@ void AFarmFPSCharacter::OnMeleeComponentOverlap(UPrimitiveComponent* OverlappedC
 {
 	if (IsValid(OtherActor))
 	{
-		APlant* plant = Cast<APlant>(OtherActor);
-		if (IsValid(plant))
+		IMeleeableInterface* meleeInterface = Cast<IMeleeableInterface>(OtherActor);
+		if (meleeInterface != nullptr)
 		{
-			plant->DoDamage(_meleeDamage.GetModifiedValue(this));
+			meleeInterface->MeleeObject(_meleeDamage.GetModifiedValue(this));
 		}
 	}
 }

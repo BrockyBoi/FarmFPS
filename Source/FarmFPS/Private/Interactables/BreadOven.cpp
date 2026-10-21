@@ -5,6 +5,8 @@
 // Brock
 #include "Managers/AudioManager.h"
 #include "Projectiles/CropResourceProjectile.h"
+#include "Resources/ResourceConverterComponent.h"
+#include "Resources/ResourceInventory.h"
 #include "Resources/ResourceTypeTag.h"
 
 // UE
@@ -17,29 +19,6 @@ ABreadOven::ABreadOven() : Super()
 	PrimaryActorTick.bCanEverTick = true;
 	_fireTargetCollider = CreateDefaultSubobject<USphereComponent>("Fire Target Collider");
 	_fireTargetCollider->SetupAttachment(RootComponent);
-}
-
-float ABreadOven::GetHeatMultipler() const
-{
-	if (ShouldGainHeatMultiplier())
-	{
-		return _idealHeatSpeedModifier.GetModifiedValue(this);
-	}
-	else if (_ovenHeat < _idealHeatMin)
-	{
-		return _coldHeatSpeedPenalty.GetModifiedValue(this);
-	}
-	return 1.0f;
-}
-
-bool ABreadOven::ShouldGainHeatMultiplier() const
-{
-	return _ovenHeat >= _idealHeatMin && _ovenHeat <= _idealHeatMax;
-}
-
-bool ABreadOven::IsHeatTooHigh() const
-{
-	return _ovenHeat >= _heatToDestroyBread;
 }
 
 void ABreadOven::BeginPlay()
@@ -84,6 +63,46 @@ void ABreadOven::OnFireTargetOverlap(UPrimitiveComponent* OverlappedComponent, A
 			SetHeatLevel(_ovenHeat - _heatLossOnWater);
 		}
 	}
+}
+
+float ABreadOven::GetHeatMultipler() const
+{
+	if (ShouldGainHeatMultiplier())
+	{
+		return _idealHeatSpeedModifier.GetModifiedValue(this);
+	}
+	else if (_ovenHeat < _idealHeatMin)
+	{
+		return _coldHeatSpeedPenalty.GetModifiedValue(this);
+	}
+	return 1.0f;
+}
+
+bool ABreadOven::ShouldGainHeatMultiplier() const
+{
+	return _ovenHeat >= _idealHeatMin && _ovenHeat <= _idealHeatMax;
+}
+
+bool ABreadOven::IsHeatTooHigh() const
+{
+	return _ovenHeat >= _heatToDestroyBread;
+}
+
+void ABreadOven::TryConvertLimitedAmount(int amountToCraft)
+{
+	if (ensure(IsValid(_resourceConverter)))
+	{
+		const FCraftingData& craftingData = GetCurrentCraftingRecipe();
+		if (_resourceConverter->TryConvertResources(_inputInventory, _outputInventory, craftingData, amountToCraft))
+		{
+			OnStartConvertingResources.Broadcast();
+		}
+	}
+}
+
+void ABreadOven::MeleeObject(int damage)
+{
+	SetCurrentRecipeIndex((_currentRecipeIndex + 1) % _craftingRecipes.Num());
 }
 
 float ABreadOven::GetTimeBetweenSpawns() const

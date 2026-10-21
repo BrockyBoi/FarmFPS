@@ -2,8 +2,9 @@
 
 #pragma once
 
-// Brock6
+// Brock
 #include "Resources/ResourceConverterStationActor.h"
+#include "MeleeableInterface.h"
 
 // UE 
 #include "Components/SphereComponent.h"
@@ -16,7 +17,7 @@
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnBreadSpawned, AActor*);
 
 UCLASS()
-class ABreadOven : public AResourceConverterStationActor
+class ABreadOven : public AResourceConverterStationActor, public IMeleeableInterface
 {
 	GENERATED_BODY()
 	
@@ -34,6 +35,10 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	bool IsHeatTooHigh() const;
+
+	virtual void TryConvertLimitedAmount(int amountToCraft) override;
+
+	virtual void MeleeObject(int damage) override;
 
 	DECLARE_MULTICAST_DELEGATE_OneParam(FOnOvenHeatChanged, float);
 	FOnOvenHeatChanged OnOvenHeatChanged;
@@ -53,6 +58,9 @@ protected:
 
 	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
 	void Cosmetic_OnOvenHeatChanged(float newHeat);
+
+	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
+	void Cosmetic_OnOvenKicked();
 
 	UFUNCTION(BlueprintPure)
 	FLinearColor GetHeatColorText() const;

@@ -31,7 +31,7 @@ void APlant::BeginPlay()
 	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (ensure(IsValid(dayNightCycle)))
 	{
-		dayNightCycle->OnDayEnd.AddUObject(this, &APlant::OnDayEnd);
+		dayNightCycle->OnDayStateChange.AddUObject(this, &APlant::OnDayStateChange);
 	}
 
 	USaveGameManager* saveGame = UFarmFPSUtilities::GetSaveGameManager(this);
@@ -61,7 +61,7 @@ void APlant::EndPlay(EEndPlayReason::Type EndPlayReason)
 	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycle))
 	{
-		dayNightCycle->OnDayEnd.RemoveAll(this);
+		dayNightCycle->OnDayStateChange.RemoveAll(this);
 	}
 
 	USaveGameManager* saveGame = UFarmFPSUtilities::GetSaveGameManager(this);
@@ -226,6 +226,25 @@ void APlant::OnStormEnd()
 	CheckShouldTick();
 }
 
+void APlant::OnDayStateChange(EDayState newState)
+{
+	if (newState == EDayState::MidNight)
+	{
+		if (_destroyAtEndOfDay)
+		{
+			DestroyPlant();
+		}
+
+		if (ensure(IsValid(_resourcesInventory)) && _resourcesInventory->ClearsResourcesAtEndOfDay())
+		{
+			_resourcesInventory->SetCanAddResources(false);
+			_resourcesInventory->ClearAllExceptMoney();
+			AffectGrowth();
+			Cosmetic_OnResourceAdded();
+		}
+	}
+}
+
 void APlant::DestroyPlant()
 {
 	if (OnPlantBreak.IsBound())
@@ -255,21 +274,6 @@ void APlant::AffectGrowth()
 	if (ensure(IsValid(mesh)))
 	{
 		mesh->SetWorldScale3D(FVector::One() * scaleAmount);
-	}
-}
-
-void APlant::OnDayEnd()
-{
-	if (_destroyAtEndOfDay)
-	{
-		DestroyPlant();
-	}
-
-	if (ensure(IsValid(_resourcesInventory)) && _resourcesInventory->ClearsResourcesAtEndOfDay())
-	{
-		_resourcesInventory->ClearAllExceptMoney();
-		AffectGrowth();
-		Cosmetic_OnResourceAdded();
 	}
 }
 

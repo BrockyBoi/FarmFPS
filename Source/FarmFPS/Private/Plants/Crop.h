@@ -3,10 +3,11 @@
 #pragma once
 
 // Brock
-#include "Plants/CropData.h"
+#include "Interactables/MeleeableInterface.h"
 #include "Managers/ModifiedValueData.h"
-#include "Plants/Plant.h"
 #include "Managers/PoolableActor.h"
+#include "Plants/CropData.h"
+#include "Plants/Plant.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -23,7 +24,7 @@ class UResourceInventory;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCropPlanted, ACrop*);
 
 UCLASS()
-class ACrop : public APlant, public IPoolableActor
+class ACrop : public APlant, public IPoolableActor, public IMeleeableInterface
 {
 	GENERATED_BODY()
 
@@ -36,6 +37,8 @@ public:
 	void SetWasPlantedSuccessfully(bool wasSuccessful);
 
 	virtual void AddResource(const FGameplayTag& resourceType, float amount) override;
+
+	virtual void MeleeObject(int damage) override;
 
 	UFUNCTION(BlueprintPure)
 	bool GetIsInPerfectTiming() const { return _isInPerfectTiming; }

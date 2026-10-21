@@ -69,7 +69,7 @@ public:
 
 	virtual void StartReload();
 
-	float GetFireRate() const { return RefireRate.GetValue().GetModifiedValue(this); }
+	float GetFireRate() const;
 	float GetCurrentTimeCharging() const { return _currentTimeCharging; }
 	float GetPercentCharged() const { return bIsChargeableWeapon ? _currentTimeCharging / MaxChargeTime : 0.f; }
 
@@ -219,6 +219,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Shotgun")
 	float _shotgunAimVarianceMultiplier = 3;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Shotgun")
+	float _shotgunFireRateMultiplier = 1.25f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Shotgun")
+	float _automaticFireRateMultiplier = .5f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _onShootSound;

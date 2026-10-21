@@ -173,7 +173,7 @@ UAudioComponent* UAudioManager::SpawnSoundAtLocation(UObject* worldContext, TObj
 	UAudioManager* audioManager = UFarmFPSUtilities::GetAudioManager(worldContext);
 	if (ensure(IsValid(audioManager)) && ensure(IsValid(soundClip)))
 	{
-		UAudioComponent* audioComponent = UGameplayStatics::SpawnSoundAtLocation(worldContext, soundClip, location, FRotator::ZeroRotator, audioManager->GetModifiedFXMultiplier());
+		UAudioComponent* audioComponent = UGameplayStatics::SpawnSoundAtLocation(worldContext, soundClip, location, FRotator::ZeroRotator, audioManager->GetModifiedFXMultiplier(), 1.f, 0.f, audioManager->_defaultSoundAttenuationSettings);
 		if (ensure(IsValid(audioComponent)))
 		{
 			audioComponent->bAutoDestroy = true;

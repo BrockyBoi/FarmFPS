@@ -60,10 +60,23 @@ void AResourceConverterStationActor::TryConvertLimitedAmount(int amountToCraft)
 	}
 }
 
+const FCraftingData& AResourceConverterStationActor::GetCurrentCraftingRecipe() const
+{
+	return _craftingRecipes[_currentRecipeIndex];
+}
+
 void AResourceConverterStationActor::OnInputInventoryResourceCountChanged(const FGameplayTag&, float)
 {
 	if (_automaticallyConvertResources)
 	{
 		TryConvertAllResources();
+	}
+}
+
+void AResourceConverterStationActor::SetCurrentRecipeIndex(int index)
+{
+	if (ensure(_craftingRecipes.Num() > 0))
+	{
+		_currentRecipeIndex = FMath::Clamp(index, 0, _craftingRecipes.Num() - 1);
 	}
 }

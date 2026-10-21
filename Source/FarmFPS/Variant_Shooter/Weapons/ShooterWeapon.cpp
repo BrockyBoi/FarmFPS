@@ -3,23 +3,27 @@
 #include "ShooterWeapon.h"
 
 // Brock
+#include "FarmFPSCharacter.h"
 #include "Managers/ActorPool.h"
 #include "Managers/AudioManager.h"
 #include "Managers/ModifiedValueData.h"
+#include "Managers/PerkManager.h"
 
-// UE
-#include "Camera/CameraComponent.h"
-#include "FarmFPSCharacter.h"
-#include "Kismet/KismetMathLibrary.h"
-#include "Kismet/GameplayStatics.h"
-#include "Engine/World.h"
+// Shooter
 #include "ShooterProjectile.h"
 #include "ShooterWeaponHolder.h"
-#include "Components/SceneComponent.h"
-#include "TimerManager.h"
+
+// UE
 #include "Animation/AnimInstance.h"
+#include "Camera/CameraComponent.h"
+#include "Components/SceneComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Engine/World.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "GameFramework/Pawn.h"
+#include "TimerManager.h"
+
 
 FOnWeaponCollected AShooterWeapon::OnWeaponCollected;
 
@@ -179,21 +183,18 @@ void AShooterWeapon::StopFiring(bool clearTimer)
 
 void AShooterWeapon::SetWeaponFireType(EWeaponFireType fireType)
 {
+	EWeaponFireType previousFireType = WeaponFireType;
+
 	switch (fireType)
 	{
 		case EWeaponFireType::Shotgun:
 		{
-			if (!_hasPhysicalRecoil)
-			{
-				_hasPhysicalRecoil = true;
-			}
+			_hasPhysicalRecoil = true;
+			bFullAuto = false;
 		}
 		case EWeaponFireType::Automatic:
 		{
-			if (!bFullAuto)
-			{
-				bFullAuto = true;
-			}
+			bFullAuto = true;
 		}
 	}
 
@@ -258,6 +259,21 @@ void AShooterWeapon::StartReload()
 
 		GetWorld()->GetTimerManager().SetTimer(ReloadTimer, this, &AShooterWeapon::OnReloadFinish, reloadTime, false);
 	}
+}
+
+float AShooterWeapon::GetFireRate() const
+{
+	float fireRate = RefireRate.GetValue().GetModifiedValue(this);
+	if (WeaponFireType == EWeaponFireType::Automatic)
+	{
+		fireRate *= _automaticFireRateMultiplier;
+	}
+	else if (WeaponFireType == EWeaponFireType::Shotgun)
+	{
+		fireRate *= _shotgunFireRateMultiplier;
+	}
+
+	return fireRate;
 }
 
 void AShooterWeapon::OnReloadFinish()

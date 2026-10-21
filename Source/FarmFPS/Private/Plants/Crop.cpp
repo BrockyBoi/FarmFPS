@@ -12,6 +12,7 @@
 #include "Managers/ObjectiveTypeTag.h"
 #include "Resources/ResourceInventory.h"
 #include "Resources/ResourcePickupActor.h"
+#include "Resources/ResourceTypeTag.h"
 
 // UE
 #include "FarmFPSCharacter.h"
@@ -135,8 +136,8 @@ void ACrop::RemoveFromPool()
 			_resourcesInventory->SetCanAddResources(true);
 		}
 
-		dayNightCycle->OnDayEnd.RemoveAll(this);
-		dayNightCycle->OnDayEnd.AddUObject(this, &ACrop::OnDayEnd);
+		dayNightCycle->OnDayStateChange.RemoveAll(this);
+		dayNightCycle->OnDayStateChange.AddUObject(this, &ACrop::OnDayStateChange);
 	}
 
 	AFarmFPSCharacter* farmFPSCharacter = Cast<AFarmFPSCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));
@@ -171,6 +172,11 @@ void ACrop::AddResource(const FGameplayTag& resourceType, float amount)
 	Super::AddResource(resourceType, amount);
 
 	SetMeshForCurrentProgress();
+}
+
+void ACrop::MeleeObject(int damage)
+{
+	DoDamage(damage);
 }
 
 void ACrop::OnPlayerDestroyPlant()

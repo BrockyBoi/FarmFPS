@@ -104,8 +104,7 @@ protected:
 	UFUNCTION()
 	virtual void OnStormEnd();
 
-	UFUNCTION()
-	virtual void OnDayEnd();
+	virtual void OnDayStateChange(EDayState newState);
 
 	bool _isBroken = false;
 	bool _isLightAndWaterFull = false;

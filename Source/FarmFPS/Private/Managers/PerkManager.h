@@ -4,6 +4,7 @@
 
 // Brock
 #include "PerkData.h"
+#include "PerkModifierTypeTag.h"
 
 // UE
 #include "CoreMinimal.h"
