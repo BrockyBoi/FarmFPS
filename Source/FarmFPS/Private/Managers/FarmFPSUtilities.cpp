@@ -15,6 +15,7 @@
 #include "Managers/TradeOffUpgradeManager.h"
 #include "Managers/Weather/WeatherManager.h"
 #include "Managers/TutorialScreenManager.h"
+#include "ModifiedValueData.h"
 #include "StatusEffects/EffectManager.h"
 #include "SaveSystem/SaveGameManager.h"
 

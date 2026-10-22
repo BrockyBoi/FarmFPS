@@ -27,6 +27,9 @@ class UTradeOffUpgradeManager;
 class UTutorialScreenManager;
 class UWeatherManager;
 
+struct FModifiedIntValue;
+struct FModifiedFloatValue;
+
 UCLASS()
 class UFarmFPSUtilities : public UBlueprintFunctionLibrary
 {

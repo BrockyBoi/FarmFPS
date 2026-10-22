@@ -336,13 +336,15 @@ void AFarmFPSCharacter::OnGroundSlamComponentOverlap(UPrimitiveComponent* Overla
 
 void AFarmFPSCharacter::OnMeleeComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (IsValid(OtherActor))
+	if (IsValid(OtherActor) && !_actorsMeleedFromPreviousAttack.Contains(OtherActor))
 	{
 		IMeleeableInterface* meleeInterface = Cast<IMeleeableInterface>(OtherActor);
 		if (meleeInterface != nullptr)
 		{
 			meleeInterface->MeleeObject(_meleeDamage.GetModifiedValue(this));
 		}
+
+		_actorsMeleedFromPreviousAttack.Add(OtherActor);
 	}
 }
 
@@ -599,6 +601,7 @@ void AFarmFPSCharacter::DoMeleeEnd()
 	_isMeleeing = false;
 	_meleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetWorld()->GetTimerManager().ClearTimer(_meleeTimerHandle);
+	_actorsMeleedFromPreviousAttack.Empty();
 }
 
 void AFarmFPSCharacter::DoGroundSlamStart()

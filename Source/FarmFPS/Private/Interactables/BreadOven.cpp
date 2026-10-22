@@ -103,6 +103,8 @@ void ABreadOven::TryConvertLimitedAmount(int amountToCraft)
 void ABreadOven::MeleeObject(int damage)
 {
 	SetCurrentRecipeIndex((_currentRecipeIndex + 1) % _craftingRecipes.Num());
+
+	Cosmetic_OnOvenKicked();
 }
 
 float ABreadOven::GetTimeBetweenSpawns() const

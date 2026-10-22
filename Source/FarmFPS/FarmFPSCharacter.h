@@ -354,7 +354,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* _meleeCollider;
 
-
+	TSet<AActor*> _actorsMeleedFromPreviousAttack;
 
 	bool _startedGroundSlam = false;
 	bool _isShowingCropHealth = false;
