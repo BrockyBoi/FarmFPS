@@ -18,7 +18,7 @@ FString UWeaponUpgradeLocation::GetPerkDescriptionString() const
 {
 	AActor* owner = GetOwner();
 	AShooterWeapon* weapon = GetWeapon();
-	if (!ensure(IsValid(owner)) || !ensure(IsValid(weapon)))
+	if (!ensure(IsValid(owner)) || !IsValid(weapon))
 	{
 		return TEXT("Invalid");
 	}
@@ -27,12 +27,16 @@ FString UWeaponUpgradeLocation::GetPerkDescriptionString() const
 	weaponName = weaponName.Replace(TEXT("WeaponType."), TEXT(""));
 
 	FString currentFireRateType = UEnum::GetValueAsString(weapon->GetWeaponFireType());
+	currentFireRateType = currentFireRateType.Replace(TEXT("EWeaponFireType::"), TEXT(""));
+
+	FString nextFireRateType = UEnum::GetValueAsString(_weaponUpgradeData.FireType);
+	nextFireRateType = nextFireRateType.Replace(TEXT("EWeaponFireType::"), TEXT(""));
 
 	FNumberFormattingOptions Opts;
 	Opts.SetMinimumFractionalDigits(0);
 	Opts.SetMaximumFractionalDigits(2);
 
-	FString change = FString::Printf(TEXT("\n%s -> %s"), *currentFireRateType, *UEnum::GetValueAsString(_weaponUpgradeData.FireType));
+	FString change = FString::Printf(TEXT("\n%s -> %s"), *currentFireRateType, *nextFireRateType);
 	FString finalString = weaponName.Append(change);
 
 	return finalString;

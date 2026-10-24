@@ -90,7 +90,7 @@ void ACrop::AddActorToPool()
 	UDayNightCycleManager* dayNightCycle = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycle))
 	{
-		dayNightCycle->OnDayEnd.RemoveAll(this);
+		dayNightCycle->OnDayStateChange.RemoveAll(this);
 	}
 
 	AFarmFPSCharacter* farmFPSCharacter = Cast<AFarmFPSCharacter>(UFarmFPSUtilities::GetPlayerCharacter(this));

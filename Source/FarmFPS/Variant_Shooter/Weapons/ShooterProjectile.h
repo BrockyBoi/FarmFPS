@@ -13,6 +13,7 @@
 // Generated
 #include "ShooterProjectile.generated.h"
 
+class AShooterWeapon;
 class USphereComponent;
 class UProjectileMovementComponent;
 class ACharacter;
@@ -39,6 +40,8 @@ public:
 
 	const FGameplayTag& GetProjectileType() const { return ProjectileType; }
 
+	void SetOwningWeapon(AShooterWeapon* weapon);
+
 protected:
 	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
 	void Cosmetic_OnAddedToPool();
@@ -62,6 +65,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _onHitSound;
+
+	TWeakObjectPtr<AShooterWeapon> _owningWeapon;
 
 	/** Loudness of the AI perception noise done by this projectile on hit */
 	UPROPERTY(EditAnywhere, Category="Projectile|Noise", meta = (ClampMin = 0, ClampMax = 100))

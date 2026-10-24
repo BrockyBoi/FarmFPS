@@ -199,6 +199,7 @@ void AShooterWeapon::SetWeaponFireType(EWeaponFireType fireType)
 	}
 
 	WeaponFireType = fireType;
+	OnReloadFinish();
 }
 
 void AShooterWeapon::Fire()
@@ -308,6 +309,8 @@ void AShooterWeapon::FireProjectile(const FVector& TargetLocation)
 			AShooterProjectile* Projectile = Cast<AShooterProjectile>(actorPool->GetActorFromPool(WeaponResourceType, ProjectileTransform, EPooledActorType::Projectile));
 			if (ensure(IsValid(Projectile)))
 			{
+				Projectile->SetOwningWeapon(this);
+
 				if (bIsChargeableWeapon)
 				{
 					Projectile->ModifyThroughChargingWeapon(GetPercentCharged());
@@ -381,4 +384,19 @@ const TSubclassOf<UAnimInstance>& AShooterWeapon::GetFirstPersonAnimInstanceClas
 const TSubclassOf<UAnimInstance>& AShooterWeapon::GetThirdPersonAnimInstanceClass() const
 {
 	return ThirdPersonAnimInstanceClass;
+}
+
+int32 AShooterWeapon::GetMagazineSize() const
+{
+	int magSize = FMath::RoundToInt(MagazineSize.GetValue().GetModifiedValue(this));
+	if (WeaponFireType == EWeaponFireType::Automatic)
+	{
+		magSize = FMath::RoundToInt(magSize * _automaticMagazineSizeMultiplier);
+	}
+	else if (WeaponFireType == EWeaponFireType::Shotgun)
+	{
+		magSize = FMath::RoundToInt(magSize * _shotgunMagazineSizeMultiplier);
+	}
+
+	return magSize;
 }

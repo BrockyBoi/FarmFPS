@@ -88,7 +88,7 @@ public:
 	const TSubclassOf<UAnimInstance>& GetThirdPersonAnimInstanceClass() const;
 
 	/** Returns the magazine size */
-	int32 GetMagazineSize() const { return FMath::RoundToInt(MagazineSize.GetValue().GetModifiedValue(this)); };
+	int32 GetMagazineSize() const;
 
 	/** Returns the current bullet count */
 	int32 GetBulletCount() const { return CurrentBullets; }
@@ -224,7 +224,13 @@ protected:
 	float _shotgunFireRateMultiplier = 1.25f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Shotgun")
+	float _shotgunMagazineSizeMultiplier = .75f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Auto")
 	float _automaticFireRateMultiplier = .5f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Auto")
+	float _automaticMagazineSizeMultiplier = 3.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	TObjectPtr<USoundBase> _onShootSound;

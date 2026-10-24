@@ -5,11 +5,12 @@
 // Brock
 #include "Managers/ActorPool.h"
 #include "Managers/AudioManager.h"
-#include "Plants/Crop.h"
 #include "Managers/DayNightCycleManager.h"
-#include "Plants/FarmingPlotComponent.h"
 #include "Managers/FarmFPSUtilities.h"
+#include "Plants/Crop.h"
+#include "Plants/FarmingPlotComponent.h"
 #include "Resources/ResourcePickupActor.h"
+#include "ShooterWeapon.h"
 
 // UE
 #include "Components/CapsuleComponent.h"
@@ -101,7 +102,7 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 				}
 			}
 
-			if (IsValid(_onHitSound))
+			if (IsValid(_onHitSound) && ensure(_owningWeapon.IsValid()) && _owningWeapon->GetWeaponFireType() == EWeaponFireType::SemiAuto)
 			{
 				UAudioManager::SpawnSoundAtLocation(this, _onHitSound, GetActorLocation());
 			}

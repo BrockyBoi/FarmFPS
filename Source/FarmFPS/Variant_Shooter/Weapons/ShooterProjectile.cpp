@@ -90,6 +90,11 @@ void AShooterProjectile::ModifyThroughChargingWeapon(float percentageCharged)
 	SetActorScale3D(FVector::OneVector * ScaleMultiplierAtMaxCharge * percentageCharged);
 }
 
+void AShooterProjectile::SetOwningWeapon(AShooterWeapon* weapon)
+{
+	_owningWeapon = weapon;
+}
+
 void AShooterProjectile::BeginPlay()
 {
 	Super::BeginPlay();
