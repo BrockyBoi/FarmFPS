@@ -97,10 +97,15 @@ private:
 
 	void GenerateDailyTradeOff();
 
+	void OnCustomerServed();
+
 	TWeakObjectPtr<UAudioManager> _audioManager;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tunables")
 	FCachedModifiableValueDataTableRowHandle _dayLength = 60.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Tunables")
+	FCachedModifiableValueDataTableRowHandle _timeToRemoveOnCustomerServed = 5.f;
 
 	UPROPERTY(EditDefaultsOnly)
 	float _timeToReachPeakMoon = 2.f;
@@ -151,6 +156,7 @@ private:
 	float _sinWaveMultiplier = 5;
 
 	float _timeElapsed = 0.f;
+	float _adjustedTimeElapsed = 0.f;
 
 	UPROPERTY(EditAnywhere)
 	EDayState _dayStateOnDayReset = EDayState::MidNight;

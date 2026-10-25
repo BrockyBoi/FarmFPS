@@ -269,10 +269,10 @@ void AFarmFPSCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-TArray<FGameplayTag> AFarmFPSCharacter::GetWeaponsUnlocked() const
+TArray<FWeaponData> AFarmFPSCharacter::GetWeaponsUnlocked() const
 {
 	// Purposely empty
-	return TArray<FGameplayTag>();
+	return TArray<FWeaponData>();
 }
 
 void AFarmFPSCharacter::OnGameLoaded(UFarmFPSSaveGame* saveGame)

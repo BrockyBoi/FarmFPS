@@ -82,5 +82,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Save Game")
 	TSubclassOf<AActor> _defaultUnlockActorPointBP;
 
+	UPROPERTY(EditAnywhere, Category = "Save Game")
+	TSubclassOf<AActor> _defaultWeaponUpgradeActorPointBP;
+
 	TArray<AActor*> _saveableActors;
 };

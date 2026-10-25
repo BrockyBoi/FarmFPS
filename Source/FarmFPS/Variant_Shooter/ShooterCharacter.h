@@ -66,6 +66,7 @@ public:
 
 	/** Gives a weapon of this class to the owner */
 	virtual void AddWeaponClass(const TSubclassOf<AShooterWeapon>& WeaponClass) override;
+	virtual void AddWeaponClass(const TSubclassOf<AShooterWeapon>& WeaponClass, EWeaponFireType fireType);
 
 	/** Activates the passed weapon */
 	virtual void OnWeaponActivated(AShooterWeapon* Weapon) override;
@@ -131,7 +132,7 @@ protected:
 	/** Set up input action bindings */
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 
-	virtual TArray<FGameplayTag> GetWeaponsUnlocked() const override;
+	virtual TArray<FWeaponData> GetWeaponsUnlocked() const override;
 
 	/** Called when this character's HP is depleted */
 	void Die();

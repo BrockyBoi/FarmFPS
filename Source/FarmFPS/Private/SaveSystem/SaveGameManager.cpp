@@ -75,11 +75,14 @@ void USaveGameManager::ResetSavableActors()
 {
 	TArray<AActor*> upgradeLocations;
 	TArray<AActor*> unlockActorLocations;
+	TArray<AActor*> upgradeWeaponsLocations;
 	UGameplayStatics::GetAllActorsWithInterface(this, USaveable::StaticClass(), _saveableActors);
 	UGameplayStatics::GetAllActorsOfClass(this, _defaultUpgradePointBP, upgradeLocations);
 	UGameplayStatics::GetAllActorsOfClass(this, _defaultUnlockActorPointBP, unlockActorLocations);
+	UGameplayStatics::GetAllActorsOfClass(this, _defaultWeaponUpgradeActorPointBP, upgradeWeaponsLocations);
 	_saveableActors.Append(upgradeLocations);
 	_saveableActors.Append(unlockActorLocations);
+	_saveableActors.Append(upgradeWeaponsLocations);
 	_saveableActors.Add(GetOwner());
 }
 

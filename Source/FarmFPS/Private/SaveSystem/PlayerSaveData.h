@@ -4,6 +4,7 @@
 
 // Brock
 #include "Managers/PerkData.h"
+#include "ShooterWeapon.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -11,6 +12,18 @@
 
 // Generated
 #include "PlayerSaveData.generated.h"
+
+USTRUCT(BlueprintType)
+struct FWeaponData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FGameplayTag WeaponType;
+
+	UPROPERTY()
+	EWeaponFireType FireType;
+};
 
 USTRUCT(BlueprintType)
 struct FPlayerSaveData
@@ -27,5 +40,5 @@ struct FPlayerSaveData
 	TArray<FPerkData> PlayerPerks;
 
 	UPROPERTY()
-	TArray<FGameplayTag> UnlockedWeapons;
+	TArray<FWeaponData> UnlockedWeapons;
 };

@@ -3,6 +3,7 @@
 #include "DayNightCycleManager.h"
 
 // Brock
+#include "Characters/Customer.h"
 #include "Managers/AudioManager.h"
 #include "Managers/TutorialScreenManager.h"
 #include "SaveSystem/SaveGameManager.h"
@@ -57,6 +58,8 @@ void UDayNightCycleManager::BeginPlay()
 	{
 		tradeOffUpgradeManager->OnTradeOffAnyInput.AddDynamic(this, &UDayNightCycleManager::StartDay);
 	}
+
+	ACustomer::OnCustomerServed.AddUObject(this, &UDayNightCycleManager::OnCustomerServed);
 }
 
 void UDayNightCycleManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -73,6 +76,8 @@ void UDayNightCycleManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		saveGameManager->OnLoadGameData.RemoveAll(this);
 	}
 
+	ACustomer::OnCustomerServed.RemoveAll(this);
+
 	Super::EndPlay(EndPlayReason);
 }
 
@@ -82,8 +87,22 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 	if (GetCurrentDayState() == EDayState::Day && ensure(_sunLight.IsValid()))
 	{
-		_timeElapsed += DeltaTime;
-		float dayLength = _dayLength.GetValue().GetModifiedValue(this);
+		if (!FMath::IsNearlyZero(_adjustedTimeElapsed))
+		{
+			_adjustedTimeElapsed += DeltaTime;
+
+			_timeElapsed = FMath::Lerp(_timeElapsed, _adjustedTimeElapsed, .1f);
+			if (FMath::IsNearlyEqual(_timeElapsed, _adjustedTimeElapsed, .01))
+			{
+				_adjustedTimeElapsed = 0.f;
+			}
+		}
+		else
+		{
+			_timeElapsed += DeltaTime;
+		}
+
+		float dayLength = _dayLength.GetModifiedValue(this);
 
 		// If player has not finished basic tutorial then simply keep the timer at mid day until it's completed
 		UTutorialScreenManager* tutorialManager = UFarmFPSUtilities::GetTutorialScreenManager(this);
@@ -146,7 +165,7 @@ void UDayNightCycleManager::ForceEndDay()
 
 void UDayNightCycleManager::ForceSetTimeLeft(float secondsLeftInDay)
 {
-	float dayLength = _dayLength.GetValue().GetModifiedValue(this);
+	float dayLength = _dayLength.GetModifiedValue(this);
 	_timeElapsed = FMath::Clamp(dayLength - secondsLeftInDay, 0, dayLength);
 }
 
@@ -163,7 +182,7 @@ float UDayNightCycleManager::GetPercentageDayElapsed() const
 {
 	if (_currentDayState == EDayState::Day)
 	{
-		return _timeElapsed / _dayLength.GetValue().GetModifiedValue(this);
+		return _timeElapsed / _dayLength.GetModifiedValue(this);
 	}
 
 	return 0.0f;
@@ -314,5 +333,20 @@ void UDayNightCycleManager::GenerateDailyTradeOff()
 	}
 
 	BPOnWaitingForTradeOff.Broadcast();
+}
+
+void UDayNightCycleManager::OnCustomerServed()
+{
+	if (IsDay())
+	{
+		if (FMath::IsNearlyZero(_adjustedTimeElapsed))
+		{
+			_adjustedTimeElapsed = FMath::Clamp(_timeElapsed - _timeToRemoveOnCustomerServed.GetModifiedValue(this), 0, _dayLength.GetModifiedValue(this));
+		}
+		else
+		{
+			_adjustedTimeElapsed = FMath::Clamp(_adjustedTimeElapsed - _timeToRemoveOnCustomerServed.GetModifiedValue(this), 0, _dayLength.GetModifiedValue(this));
+		}
+	}
 }
 

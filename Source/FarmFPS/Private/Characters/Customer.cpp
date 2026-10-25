@@ -23,6 +23,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Navigation/PathFollowingComponent.h"
 
+FOnCustomerServed ACustomer::OnCustomerServed;
+
 ACustomer::ACustomer()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -207,10 +209,12 @@ void ACustomer::AttemptBuyBreadAtFrontOfQueue()
 
 			if (IsValid(_onBoughtBreadSound))
 			{
-				UAudioManager::SpawnSoundAtLocation(this, _onBoughtBreadSound, GetActorLocation());
+				UAudioManager::SpawnSound2D(this, _onBoughtBreadSound);
 			}
 
 			MoveOutOfMap();
+
+			OnCustomerServed.Broadcast();
 		}
 	}
 }

@@ -110,7 +110,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
-	virtual TArray<FGameplayTag> GetWeaponsUnlocked() const;
+	virtual TArray<FWeaponData> GetWeaponsUnlocked() const;
 
 	UFUNCTION()
 	void OnPlayerLanded(const FHitResult& HitResult);

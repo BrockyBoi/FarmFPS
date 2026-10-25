@@ -27,6 +27,8 @@ enum class ECustomerState
 	MovingOutOfMap
 };
 
+DECLARE_MULTICAST_DELEGATE(FOnCustomerServed)
+
 UCLASS()
 class ACustomer : public ACharacter
 {
@@ -47,6 +49,8 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	const int GetAmountDesired() const { return _amountBreadDesired.GetValue().GetModifiedValue(this); }
+
+	static FOnCustomerServed OnCustomerServed;
 
 protected:
 	// Called when the game starts or when spawned

@@ -91,7 +91,7 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 				else
 				{
 					actorPool->AddActorToPool(ProjectileType, crop, EPooledActorType::Crop);
-					if (IsValid(_unableToPlantSound))
+					if (IsValid(_unableToPlantSound) && ensure(_owningWeapon.IsValid()) && _owningWeapon->GetWeaponFireType() == EWeaponFireType::SemiAuto)
 					{
 						UAudioManager::SpawnSoundAtLocation(this, _unableToPlantSound, GetActorLocation());
 					}
@@ -102,7 +102,7 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 				}
 			}
 
-			if (IsValid(_onHitSound) && ensure(_owningWeapon.IsValid()) && _owningWeapon->GetWeaponFireType() == EWeaponFireType::SemiAuto)
+			if (IsValid(_onHitSound))
 			{
 				UAudioManager::SpawnSoundAtLocation(this, _onHitSound, GetActorLocation());
 			}

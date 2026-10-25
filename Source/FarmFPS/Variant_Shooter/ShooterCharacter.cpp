@@ -27,8 +27,6 @@ AShooterCharacter::AShooterCharacter()
 	// create the noise emitter component
 	PawnNoiseEmitter = CreateDefaultSubobject<UPawnNoiseEmitterComponent>(TEXT("Pawn Noise Emitter"));
 
-
-
 	// configure movement
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 600.0f, 0.0f);
 }
@@ -72,12 +70,16 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	}
 }
 
-TArray<FGameplayTag> AShooterCharacter::GetWeaponsUnlocked() const
+TArray<FWeaponData> AShooterCharacter::GetWeaponsUnlocked() const
 {
-	TArray<FGameplayTag> unlockedWeapons;
+	TArray<FWeaponData> unlockedWeapons;
 	for (AShooterWeapon* weapon : OwnedWeapons)
 	{
-		unlockedWeapons.Add(weapon->GetWeaponTypeTag());
+		FWeaponData weaponData;
+		weaponData.FireType = weapon->GetWeaponFireType();
+		weaponData.WeaponType = weapon->GetWeaponTypeTag();
+
+		unlockedWeapons.Add(weaponData);
 	}
 
 	return unlockedWeapons;
@@ -300,6 +302,45 @@ void AShooterCharacter::AddWeaponClass(const TSubclassOf<AShooterWeapon>& Weapon
 	}
 }
 
+void AShooterCharacter::AddWeaponClass(const TSubclassOf<AShooterWeapon>& WeaponClass, EWeaponFireType fireType)
+{	
+	// do we already own this weapon?
+	AShooterWeapon* OwnedWeapon = FindWeaponOfType(WeaponClass);
+
+	if (!OwnedWeapon)
+	{
+		// spawn the new weapon
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = this;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.TransformScaleMethod = ESpawnActorScaleMethod::MultiplyWithRoot;
+
+		AShooterWeapon* AddedWeapon = GetWorld()->SpawnActor<AShooterWeapon>(WeaponClass, GetActorTransform(), SpawnParams);
+
+		if (AddedWeapon)
+		{
+			// add the weapon to the owned list
+			OwnedWeapons.Add(AddedWeapon);
+
+			// if we have an existing weapon, deactivate it
+			if (CurrentWeapon)
+			{
+				CurrentWeapon->DeactivateWeapon();
+			}
+
+			OnNewWeaponAdded.Broadcast(AddedWeapon);
+			OnDynamicNewWeaponAdded.Broadcast(AddedWeapon);
+
+			// switch to the new weapon
+			CurrentWeapon = AddedWeapon;
+			CurrentWeapon->ActivateWeapon();
+
+			AddedWeapon->SetWeaponFireType(fireType);
+		}
+	}
+}
+
 void AShooterCharacter::OnWeaponActivated(AShooterWeapon* Weapon)
 {
 	// update the bullet counter
@@ -418,15 +459,15 @@ void AShooterCharacter::OnGameLoaded(UFarmFPSSaveGame* saveGame)
 	Super::OnGameLoaded(saveGame);
 
 	FPlayerSaveData playerSaveData = saveGame->GetPlayerSaveData();
-	TArray<FGameplayTag>& unlockedWeaponsTags = playerSaveData.UnlockedWeapons;
+	TArray<FWeaponData>& unlockedWeapons = playerSaveData.UnlockedWeapons;
 	if (ensure(IsValid(_weaponsDataTable)))
 	{
-		for (FGameplayTag& weaponTag : unlockedWeaponsTags)
+		for (const FWeaponData& weapon : unlockedWeapons)
 		{
-			FWeaponTableRow* row = _weaponsDataTable->FindRow<FWeaponTableRow>(weaponTag.GetTagName(), TEXT("OnGameLoaded"));
+			FWeaponTableRow* row = _weaponsDataTable->FindRow<FWeaponTableRow>(weapon.WeaponType.GetTagName(), TEXT("OnGameLoaded"));
 			if (ensure(row))
 			{
-				AddWeaponClass(row->WeaponToSpawn);
+				AddWeaponClass(row->WeaponToSpawn, weapon.FireType);
 			}
 		}
 	}

@@ -54,6 +54,12 @@ struct FARMFPS_API FCachedModifiableValueDataTableRowHandle
 		return CachedValue;
 	}
 
+	float GetModifiedValue(const UObject* worldObject) const
+	{
+		FModifiedFloatValue& value = GetValue();
+		return value.GetModifiedValue(worldObject);
+	}
+
 private:
 	mutable FModifiedFloatValue CachedValue;
 
