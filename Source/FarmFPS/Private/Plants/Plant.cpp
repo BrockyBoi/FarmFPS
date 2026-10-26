@@ -52,6 +52,11 @@ void APlant::Tick(float DeltaTime)
 	{
 		AddResource(_weatherManager->GetCurrentStormTags(), _weatherManager->GetCurrentStormIntensity() * DeltaTime);
 	}
+
+	if (!FMath::IsNearlyZero(_adjustedGrowthPercentage))
+	{
+		AffectGrowth();
+	}
 }
 
 void APlant::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -95,7 +100,7 @@ void APlant::AddResource(const FGameplayTag& resourceType, float amount)
 
 			_resourcesInventory->AddResource(resourceType, amount);
 
-			AffectGrowth();
+			SetNewGrowthPercentage(GetLightPercentage(), false);
 
 			if (!_isLightAndWaterFull && IsLightAndWaterFull())
 			{
@@ -208,12 +213,33 @@ void APlant::ListenToWeatherManager(bool listen)
 
 bool APlant::ShouldTick() const
 {
-	return _weatherManager.IsValid() && _weatherManager->IsStorming();
+	return (_weatherManager.IsValid() && _weatherManager->IsStorming()) || !FMath::IsNearlyZero(_adjustedGrowthPercentage);
 }
 
 void APlant::CheckShouldTick()
 {
 	SetActorTickEnabled(ShouldTick());
+}
+
+void APlant::SetNewGrowthPercentage(float growthPercentage, bool instant)
+{
+	UStaticMeshComponent* mesh = FindComponentByClass<UStaticMeshComponent>();
+	if (ensure(IsValid(mesh)))
+	{
+		if (!instant)
+		{
+			_previousScalePercentage = FMath::GetRangePct(_cropData.StartingScaleSize, _cropData.FinalScaleSize, mesh->GetRelativeTransform().GetScale3D().X);
+			_adjustedGrowthPercentage = FMath::Clamp(growthPercentage, 0, 1.f);
+			CheckShouldTick();
+		}
+		else
+		{
+			mesh->SetRelativeScale3D(FVector::OneVector * growthPercentage);
+			_adjustedGrowthPercentage = 0.f;
+			_previousScalePercentage = FMath::GetRangePct(_cropData.StartingScaleSize, _cropData.FinalScaleSize, mesh->GetRelativeTransform().GetScale3D().X);
+		}
+	}
+
 }
 
 void APlant::OnStormBegin()
@@ -239,7 +265,7 @@ void APlant::OnDayStateChange(EDayState newState)
 		{
 			_resourcesInventory->SetCanAddResources(false);
 			_resourcesInventory->ClearAllExceptMoney();
-			AffectGrowth();
+			SetNewGrowthPercentage(_cropData.StartingScaleSize, true);
 			Cosmetic_OnResourceAdded();
 		}
 	}
@@ -268,13 +294,25 @@ void APlant::OnLightAndWaterFilled()
 
 void APlant::AffectGrowth()
 {
-	float scaleAmount = FMath::Lerp(_cropData.StartingScaleSize, _cropData.FinalScaleSize, GetCompletionPercentage());
-
+	float lerpedScale = 0.f;
 	UStaticMeshComponent* mesh = FindComponentByClass<UStaticMeshComponent>();
 	if (ensure(IsValid(mesh)))
 	{
-		mesh->SetWorldScale3D(FVector::One() * scaleAmount);
+		if (!FMath::IsNearlyZero(_adjustedGrowthPercentage))
+		{
+			_previousScalePercentage = FMath::Lerp(_previousScalePercentage, _adjustedGrowthPercentage, _lerpSpeedScale);
+			lerpedScale = FMath::Lerp(_cropData.StartingScaleSize, _cropData.FinalScaleSize, _previousScalePercentage);
+			if (FMath::IsNearlyEqual(_previousScalePercentage, _adjustedGrowthPercentage, .01f))
+			{
+				_adjustedGrowthPercentage = 0;
+				_previousScalePercentage = 0;
+			}
+		}
+
+		mesh->SetWorldScale3D(FVector::One() * lerpedScale);
 	}
+
+	CheckShouldTick();
 }
 
 float APlant::GetCurrentWaterLevel() const

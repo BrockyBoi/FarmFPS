@@ -98,6 +98,8 @@ protected:
 
 	virtual void CheckShouldTick();
 
+	void SetNewGrowthPercentage(float growthPercentage, bool instant);
+
 	UFUNCTION()
 	virtual void OnStormBegin();
 
@@ -117,6 +119,12 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	bool _isInvincible = false;
+
+	float _adjustedGrowthPercentage = 0.f;
+	float _previousScalePercentage = 0.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float _lerpSpeedScale = .01f;
 
 	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
 	void Cosmetic_OnResourceAdded();

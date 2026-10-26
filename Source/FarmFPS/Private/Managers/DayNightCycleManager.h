@@ -62,6 +62,7 @@ public:
 
 	void CHEAT_StartDay();
 	void CHEAT_StartNight();
+	void CHEAT_UnlimitedDay(bool isUnlimited);
 
 	DECLARE_MULTICAST_DELEGATE(FOnDayStateChange);
 
@@ -162,4 +163,6 @@ private:
 	EDayState _dayStateOnDayReset = EDayState::MidNight;
 
 	EDayState _currentDayState;
+
+	bool _CHEATIsUnlimitedDay = false;
 };

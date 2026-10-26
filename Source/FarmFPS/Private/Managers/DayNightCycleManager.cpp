@@ -87,6 +87,11 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 	if (GetCurrentDayState() == EDayState::Day && ensure(_sunLight.IsValid()))
 	{
+		if (_CHEATIsUnlimitedDay)
+		{
+			return;
+		}
+
 		if (!FMath::IsNearlyZero(_adjustedTimeElapsed))
 		{
 			_adjustedTimeElapsed += DeltaTime;
@@ -223,6 +228,11 @@ void UDayNightCycleManager::CHEAT_StartNight()
 	{
 		EndDay();
 	}
+}
+
+void UDayNightCycleManager::CHEAT_UnlimitedDay(bool isUnlimited)
+{
+	_CHEATIsUnlimitedDay = isUnlimited;
 }
 
 void UDayNightCycleManager::StartDay()

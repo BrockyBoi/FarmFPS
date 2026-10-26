@@ -55,7 +55,8 @@ void ACrop::SetMeshForCurrentProgress()
 {
 	if (_meshesOverProgress.Num() > 1)
 	{
-		int staticMeshIndex = FMath::RoundToInt(_meshesOverProgress.Num() * GetCompletionPercentage());
+		//int staticMeshIndex = FMath::RoundToInt(_meshesOverProgress.Num() * GetCompletionPercentage());
+		int staticMeshIndex = FMath::RoundToInt(_meshesOverProgress.Num() * _previousScalePercentage);
 
 		if (ensure(IsValid(_staticMesh)) && _meshesOverProgress.IsValidIndex(staticMeshIndex) && ensure(IsValid(_meshesOverProgress[staticMeshIndex])))
 		{
@@ -149,7 +150,7 @@ void ACrop::RemoveFromPool()
 
 	ListenToWeatherManager(true);
 
-	AffectGrowth();
+	SetNewGrowthPercentage(_cropData.StartingScaleSize, true);
 	SetMeshForCurrentProgress();
 
 	CheckShouldTick();

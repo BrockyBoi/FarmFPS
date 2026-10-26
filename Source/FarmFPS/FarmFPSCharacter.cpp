@@ -174,6 +174,15 @@ void AFarmFPSCharacter::DeleteSaveGameBrock()
 	}
 }
 
+void AFarmFPSCharacter::UnlimitedDayBrock(bool isUnlimited)
+{
+	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
+	if (ensure(IsValid(dayNightCycleManager)))
+	{
+		dayNightCycleManager->CHEAT_UnlimitedDay(isUnlimited);
+	}
+}
+
 bool AFarmFPSCharacter::IsPickupInRangeOfPlayer(AResourcePickupActor* pickup) const
 {
 	if (ensure(IsValid(pickup)))

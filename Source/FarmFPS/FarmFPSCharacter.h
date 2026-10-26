@@ -83,6 +83,9 @@ public:
 	UFUNCTION(Exec)
 	void DeleteSaveGameBrock();
 
+	UFUNCTION(Exec)
+	void UnlimitedDayBrock(bool isUnlimited);
+
 	bool IsPickupInRangeOfPlayer(AResourcePickupActor* pickup) const;
 
 	/** Returns the first person mesh **/
