@@ -25,6 +25,7 @@ class UPerkManager;
 class UObjectiveManager;
 class UTradeOffUpgradeManager;
 class UTutorialScreenManager;
+class UVisualSettingsManager;
 class UWeatherManager;
 
 struct FModifiedIntValue;
@@ -85,11 +86,11 @@ public:
 	static UAudioManager* GetAudioManager(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintPure, Category = "FarmFPS|Utilities", meta = (WorldContext = "WorldContextObject"))
+	static UVisualSettingsManager* GetVisualSettingsManager(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintPure, Category = "FarmFPS|Utilities", meta = (WorldContext = "WorldContextObject"))
 	static float GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, const FGameplayTagContainer& perkTags, float valueToModify);
 
 	UFUNCTION(BlueprintPure, Category = "FarmFPS|Utilities", meta = (WorldContext = "WorldContextObject"))
 	static float GetModifiedValueByPlayerPerk(const UObject* WorldContextObject, const FGameplayTag& perkTag, float valueToModify);
-
-	UFUNCTION(BlueprintPure, Category = "FarmFPS|Utilities", meta = (WorldContext = "WorldContextObject"))
-	static AActor* GetTickablePauseActor(const UObject* WorldContextObject);
 };

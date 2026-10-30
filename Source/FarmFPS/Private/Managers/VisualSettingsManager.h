@@ -16,6 +16,7 @@ enum class EVisualsValue : uint8
 	LessBad,
 	Fine,
 	FuckingPrimo,
+	PureCinema,
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -29,7 +30,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetVisualSettings(EVisualsValue visualsValue);
 
+	UFUNCTION(BlueprintCallable)
+	void CycleVisualsPreset();
+
 protected:
 	virtual void BeginPlay() override;
 	void SetResolution();
+	void SetAutoSettings();
+
+	EVisualsValue _currentVisualsPreset;
 };

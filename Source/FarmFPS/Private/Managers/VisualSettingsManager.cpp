@@ -22,7 +22,8 @@ void UVisualSettingsManager::BeginPlay()
     FString SteamDeckEnv = FPlatformMisc::GetEnvironmentVariable(TEXT("SteamDeck"));
     if (SteamDeckEnv.Equals(TEXT("1")))
     {
-        SetVisualSettings(EVisualsValue::Bad);
+        //SetVisualSettings(EVisualsValue::Bad);
+        SetAutoSettings();
     }
 }
 
@@ -43,6 +44,25 @@ void UVisualSettingsManager::SetResolution()
     UserSettings->ApplySettings(false);
 
     // GOT THIS SHIT OFF OF GOOOGLE LOOL
+}
+
+void UVisualSettingsManager::SetAutoSettings()
+{
+    // Get the user settings instance
+    UGameUserSettings* UserSettings = GEngine ? GEngine->GetGameUserSettings() : nullptr;
+
+    if (UserSettings)
+    {
+        // 1. Run the hardware benchmark to evaluate CPU and GPU capabilities
+        // The scale can range from 0.0 (low) to higher values depending on hardware
+        UserSettings->RunHardwareBenchmark();
+
+        // 2. Apply the recommended scalability settings based on the benchmark
+        UserSettings->ApplyHardwareBenchmarkResults();
+
+        // 3. Save the applied settings to disk (GameUserSettings.ini)
+        UserSettings->SaveSettings();
+    }
 }
 
 void UVisualSettingsManager::SetVisualSettings(EVisualsValue visualsValue)
@@ -69,9 +89,19 @@ void UVisualSettingsManager::SetVisualSettings(EVisualsValue visualsValue)
     Settings->SetVisualEffectQuality(visualSetting);
     Settings->SetFoliageQuality(visualSetting);
     Settings->SetShadingQuality(visualSetting);
+    Settings->SetReflectionQuality(visualSetting);
 
     // --- 4. Apply and Save ---
     // true = checks for resolution changes and runs a benchmark if necessary
     Settings->ApplySettings(true);
     Settings->SaveSettings();
+}
+
+void UVisualSettingsManager::CycleVisualsPreset()
+{
+    int currentPreset = (int)_currentVisualsPreset;
+    currentPreset = (currentPreset + 1) % 4;
+    _currentVisualsPreset = (EVisualsValue)currentPreset;
+
+    SetVisualSettings(_currentVisualsPreset);
 }

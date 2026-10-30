@@ -142,6 +142,9 @@ protected:
 	void DoShowCropHealth();
 
 	UFUNCTION(BlueprintCallable, Category = "Input")
+	void DoCycleVisualQuality();
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
 	void DoHideCropHealth();
 
 	UFUNCTION(BlueprintCallable, Category = "Input")
@@ -218,6 +221,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* ShowCropHealth;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* CycleVisualQuality;
 
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, Category = "Input")

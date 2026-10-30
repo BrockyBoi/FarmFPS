@@ -64,6 +64,7 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		// Switch weapon
 		EnhancedInputComponent->BindAction(SwitchWeaponAction, ETriggerEvent::Triggered, this, &AShooterCharacter::DoSwitchWeapon);
+		EnhancedInputComponent->BindAction(SetWeaponIndexAction, ETriggerEvent::Triggered, this, &AShooterCharacter::SetWeaponIndex);
 		//EnhancedInputComponent->BindAction(SelectInventoryItemAction, ETriggerEvent::Triggered, this, &AShooterCharacter::DoSwitchWeapon);
 
 		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AShooterCharacter::DoReload);
@@ -205,6 +206,27 @@ void AShooterCharacter::DoSwitchWeapon(const FInputActionValue& Value)
 
 		// set the new weapon as current
 		CurrentWeapon = OwnedWeapons[WeaponIndex];
+
+		// activate the new weapon
+		CurrentWeapon->ActivateWeapon();
+	}
+}
+
+void AShooterCharacter::SetWeaponIndex(const FInputActionValue& Value)
+{
+	int value = FMath::RoundToInt(Value.Get<float>());
+
+	// ensure we have at least two weapons two switch between
+	if (OwnedWeapons.Num() > 1 && !IsDead() && OwnedWeapons.IsValidIndex(value - 1))
+	{
+		// deactivate the old weapon
+		CurrentWeapon->DeactivateWeapon();
+
+		// find the index of the current weapon in the owned list
+		int32 WeaponIndex = OwnedWeapons.Find(CurrentWeapon);
+
+		// set the new weapon as current
+		CurrentWeapon = OwnedWeapons[value - 1];
 
 		// activate the new weapon
 		CurrentWeapon->ActivateWeapon();

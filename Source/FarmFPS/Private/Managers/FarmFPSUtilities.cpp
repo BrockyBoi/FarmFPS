@@ -13,8 +13,9 @@
 #include "Managers/ObjectiveManager.h"
 #include "Managers/PerkManager.h"
 #include "Managers/TradeOffUpgradeManager.h"
-#include "Managers/Weather/WeatherManager.h"
 #include "Managers/TutorialScreenManager.h"
+#include "Managers/VisualSettingsManager.h"
+#include "Managers/Weather/WeatherManager.h"
 #include "ModifiedValueData.h"
 #include "StatusEffects/EffectManager.h"
 #include "SaveSystem/SaveGameManager.h"
@@ -36,18 +37,12 @@ AActor* UFarmFPSUtilities::GetPlayerCharacter(const UObject* WorldContextObject)
 
 AGameStateBase* UFarmFPSUtilities::GetGameBaseState(const UObject* WorldContextObject)
 {
-	if (!ensure(IsValid(WorldContextObject)))
+	if (!ensure(IsValid(WorldContextObject)) || !ensure(IsValid(WorldContextObject->GetWorld())))
 	{
 		return nullptr;
 	}
 
-	AGameStateBase* gameState = WorldContextObject->GetWorld()->GetGameState();
-	if (IsValid(gameState))
-	{
-		return gameState;
-	}
-
-	return nullptr;
+	return WorldContextObject->GetWorld()->GetGameState();
 }
 
 UPerkManager* UFarmFPSUtilities::GetPlayerPerkManager(const UObject* WorldContextObject)
@@ -67,13 +62,7 @@ UObjectiveManager* UFarmFPSUtilities::GetObjectiveManager(const UObject* WorldCo
 		return nullptr;
 	}
 
-	UObjectiveManager* objectiveManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UObjectiveManager>();
-	if (IsValid(objectiveManager))
-	{
-		return objectiveManager;
-	}
-
-	return nullptr;
+	return GetGameBaseState(WorldContextObject)->FindComponentByClass<UObjectiveManager>();
 }
 
 ABreadStand* UFarmFPSUtilities::GetBreadStand(const UObject* WorldContextObject)
@@ -95,13 +84,7 @@ UCustomerSpawnerManager* UFarmFPSUtilities::GetCustomerSpawnerManager(const UObj
 		return nullptr;
 	}
 
-	UCustomerSpawnerManager* customerSpawnerManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UCustomerSpawnerManager>();
-	if (IsValid(customerSpawnerManager))
-	{
-		return customerSpawnerManager;
-	}
-
-	return nullptr;
+	return GetGameBaseState(WorldContextObject)->FindComponentByClass<UCustomerSpawnerManager>();
 }
 
 UDayNightCycleManager* UFarmFPSUtilities::GetDayNightCycleManager(const UObject* WorldContextObject)
@@ -111,13 +94,7 @@ UDayNightCycleManager* UFarmFPSUtilities::GetDayNightCycleManager(const UObject*
 		return nullptr;
 	}
 
-	UDayNightCycleManager* dayNightCycleManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UDayNightCycleManager>();
-	if (IsValid(dayNightCycleManager))
-	{
-		return dayNightCycleManager;
-	}
-
-	return nullptr;
+	return GetGameBaseState(WorldContextObject)->FindComponentByClass<UDayNightCycleManager>();
 }
 
 UActorLookupComponent* UFarmFPSUtilities::GetResourceActorLookupComponent(const UObject* WorldContextObject)
@@ -127,13 +104,7 @@ UActorLookupComponent* UFarmFPSUtilities::GetResourceActorLookupComponent(const 
 		return nullptr;
 	}
 
-	UActorLookupComponent* lookupComponent = GetGameBaseState(WorldContextObject)->FindComponentByClass<UActorLookupComponent>();
-	if (IsValid(lookupComponent))
-	{
-		return lookupComponent;
-	}
-
-	return nullptr;
+	return GetGameBaseState(WorldContextObject)->FindComponentByClass<UActorLookupComponent>();
 }
 
 UActorPool* UFarmFPSUtilities::GetActorPool(const UObject* WorldContextObject)
@@ -143,13 +114,7 @@ UActorPool* UFarmFPSUtilities::GetActorPool(const UObject* WorldContextObject)
 		return nullptr;
 	}
 
-	UActorPool* actorPool = GetGameBaseState(WorldContextObject)->FindComponentByClass<UActorPool>();
-	if (IsValid(actorPool))
-	{
-		return actorPool;
-	}
-
-	return nullptr;
+	return GetGameBaseState(WorldContextObject)->FindComponentByClass<UActorPool>();
 }
 
 UBreadRequirementManager* UFarmFPSUtilities::GetBreadRequirementManager(const UObject* WorldContextObject)
@@ -159,13 +124,7 @@ UBreadRequirementManager* UFarmFPSUtilities::GetBreadRequirementManager(const UO
 		return nullptr;
 	}
 
-	UBreadRequirementManager* breadRequirementManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UBreadRequirementManager>();
-	if (IsValid(breadRequirementManager))
-	{
-		return breadRequirementManager;
-	}
-
-	return nullptr;
+	return GetGameBaseState(WorldContextObject)->FindComponentByClass<UBreadRequirementManager>();
 }
 
 UTradeOffUpgradeManager* UFarmFPSUtilities::GetTradeOffUpgradeManager(const UObject* WorldContextObject)
@@ -175,13 +134,7 @@ UTradeOffUpgradeManager* UFarmFPSUtilities::GetTradeOffUpgradeManager(const UObj
 		return nullptr;
 	}
 
-	UTradeOffUpgradeManager* tradeOffUpgradeManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UTradeOffUpgradeManager>();
-	if (IsValid(tradeOffUpgradeManager))
-	{
-		return tradeOffUpgradeManager;
-	}
-
-	return nullptr;
+	return GetGameBaseState(WorldContextObject)->FindComponentByClass<UTradeOffUpgradeManager>();
 }
 
 UTutorialScreenManager* UFarmFPSUtilities::GetTutorialScreenManager(const UObject* WorldContextObject)
@@ -191,13 +144,7 @@ UTutorialScreenManager* UFarmFPSUtilities::GetTutorialScreenManager(const UObjec
 		return nullptr;
 	}
 
-	UTutorialScreenManager* tutorialScreenManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UTutorialScreenManager>();
-	if (IsValid(tutorialScreenManager))
-	{
-		return tutorialScreenManager;
-	}
-
-	return nullptr;
+	return GetGameBaseState(WorldContextObject)->FindComponentByClass<UTutorialScreenManager>();
 }
 
 UEffectManager* UFarmFPSUtilities::GetEffectManager(const UObject* WorldContextObject)
@@ -207,13 +154,7 @@ UEffectManager* UFarmFPSUtilities::GetEffectManager(const UObject* WorldContextO
 		return nullptr;
 	}
 
-	UEffectManager* effectManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UEffectManager>();
-	if (IsValid(effectManager))
-	{
-		return effectManager;
-	}
-
-	return nullptr;
+	return GetGameBaseState(WorldContextObject)->FindComponentByClass<UEffectManager>();
 }
 
 UWeatherManager* UFarmFPSUtilities::GetWeatherManager(const UObject* WorldContextObject)
@@ -223,13 +164,7 @@ UWeatherManager* UFarmFPSUtilities::GetWeatherManager(const UObject* WorldContex
 		return nullptr;
 	}
 
-	UWeatherManager* weatherManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UWeatherManager>();
-	if (IsValid(weatherManager))
-	{
-		return weatherManager;
-	}
-
-	return nullptr;
+	return GetGameBaseState(WorldContextObject)->FindComponentByClass<UWeatherManager>();
 }
 
 USaveGameManager* UFarmFPSUtilities::GetSaveGameManager(const UObject* WorldContextObject)
@@ -239,13 +174,7 @@ USaveGameManager* UFarmFPSUtilities::GetSaveGameManager(const UObject* WorldCont
 		return nullptr;
 	}
 
-	USaveGameManager* saveGameManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<USaveGameManager>();
-	if (IsValid(saveGameManager))
-	{
-		return saveGameManager;
-	}
-
-	return nullptr;
+	return GetGameBaseState(WorldContextObject)->FindComponentByClass<USaveGameManager>();
 }
 
 UAudioManager* UFarmFPSUtilities::GetAudioManager(const UObject* WorldContextObject)
@@ -255,13 +184,17 @@ UAudioManager* UFarmFPSUtilities::GetAudioManager(const UObject* WorldContextObj
 		return nullptr;
 	}
 
-	UAudioManager* audioManager = GetGameBaseState(WorldContextObject)->FindComponentByClass<UAudioManager>();
-	if (IsValid(audioManager))
+	return GetGameBaseState(WorldContextObject)->FindComponentByClass<UAudioManager>();
+}
+
+UVisualSettingsManager* UFarmFPSUtilities::GetVisualSettingsManager(const UObject* WorldContextObject)
+{
+	if (!IsValid(WorldContextObject) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{
-		return audioManager;
+		return nullptr;
 	}
 
-	return nullptr;
+	return GetGameBaseState(WorldContextObject)->FindComponentByClass<UVisualSettingsManager>();
 }
 
 float UFarmFPSUtilities::GetModifiedValueByPlayerPerk(const UObject* WorldContextObject, const FGameplayTag& perkTag, float valueToModify)
@@ -278,18 +211,6 @@ float UFarmFPSUtilities::GetModifiedValueByPlayerPerk(const UObject* WorldContex
 	}
 
 	return 0.f;
-}
-
-AActor* UFarmFPSUtilities::GetTickablePauseActor(const UObject* WorldContextObject)
-{
-	if (ensure(IsValid(WorldContextObject)))
-	{
-		TArray<AActor*> actors;
-		UGameplayStatics::GetAllActorsWithTag(WorldContextObject, TEXT("TickablePausedActor"), actors);
-		return !actors.IsEmpty() ? actors[0] : nullptr;
-	}
-
-	return nullptr;
 }
 
 float UFarmFPSUtilities::GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, const FGameplayTagContainer& perkTags, float valueToModify)

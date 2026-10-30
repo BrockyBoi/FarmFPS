@@ -100,6 +100,9 @@ public:
 	void DoSwitchWeapon(const FInputActionValue& Value);
 
 	UFUNCTION(BlueprintCallable, Category = "Input")
+	void SetWeaponIndex(const FInputActionValue& Value);
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
 	void DoReload();
 
 	virtual void OnGameLoaded(UFarmFPSSaveGame* saveGame) override;
@@ -147,6 +150,9 @@ protected:
 	/** Fire weapon input action */
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* FireAction;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* SetWeaponIndexAction;
 
 	/** Fire weapon input action */
 	UPROPERTY(EditAnywhere, Category = "Input")

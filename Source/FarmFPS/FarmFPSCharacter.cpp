@@ -10,8 +10,9 @@
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/PerkManager.h"
-#include "Managers/Weather/WeatherManager.h"
 #include "Managers/PlayerInventoryItemSelector.h"
+#include "Managers/VisualSettingsManager.h"
+#include "Managers/Weather/WeatherManager.h"
 #include "Plants/Plant.h"
 #include "Projectiles/ConstantCropAffectorArea.h"
 #include "Resources/ResourcePickupActor.h"
@@ -395,6 +396,8 @@ void AFarmFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(ShowCropHealth, ETriggerEvent::Started, this, &AFarmFPSCharacter::DoShowCropHealth);
 		EnhancedInputComponent->BindAction(ShowCropHealth, ETriggerEvent::Completed, this, &AFarmFPSCharacter::DoHideCropHealth);
 
+		EnhancedInputComponent->BindAction(CycleVisualQuality, ETriggerEvent::Started, this, &AFarmFPSCharacter::DoCycleVisualQuality);
+
 		EnhancedInputComponent->BindAction(ThrowInventoryItemAction, ETriggerEvent::Started, this, &AFarmFPSCharacter::OnThrowStart);
 		EnhancedInputComponent->BindAction(ThrowInventoryItemAction, ETriggerEvent::Completed, this, &AFarmFPSCharacter::OnThrowStop);
 	}
@@ -464,6 +467,15 @@ void AFarmFPSCharacter::DoShowCropHealth()
 {
 	_isShowingCropHealth = true;
 	OnShowCropHealth.Broadcast(true);
+}
+
+void AFarmFPSCharacter::DoCycleVisualQuality()
+{
+	UVisualSettingsManager* visualSettingsManager = UFarmFPSUtilities::GetVisualSettingsManager(this);
+	if (ensure(IsValid(visualSettingsManager)))
+	{
+		visualSettingsManager->CycleVisualsPreset();
+	}
 }
 
 void AFarmFPSCharacter::DoHideCropHealth()
