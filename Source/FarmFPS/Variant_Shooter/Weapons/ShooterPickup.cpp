@@ -51,7 +51,7 @@ void AShooterPickup::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (FWeaponTableRow* WeaponData = WeaponType.GetRow<FWeaponTableRow>(FString()))
+	if (FWeaponTableRow* WeaponData = WeaponType.GetRow<FWeaponTableRow>(FString()); ensure(WeaponData != nullptr) && ensure(IsValid(WeaponData->WeaponToSpawn)))
 	{
 		// copy the weapon class
 		WeaponClass = WeaponData->WeaponToSpawn;

@@ -280,6 +280,18 @@ float UFarmFPSUtilities::GetModifiedValueByPlayerPerk(const UObject* WorldContex
 	return 0.f;
 }
 
+AActor* UFarmFPSUtilities::GetTickablePauseActor(const UObject* WorldContextObject)
+{
+	if (ensure(IsValid(WorldContextObject)))
+	{
+		TArray<AActor*> actors;
+		UGameplayStatics::GetAllActorsWithTag(WorldContextObject, TEXT("TickablePausedActor"), actors);
+		return !actors.IsEmpty() ? actors[0] : nullptr;
+	}
+
+	return nullptr;
+}
+
 float UFarmFPSUtilities::GetModifiedValueByPlayerPerks(const UObject* WorldContextObject, const FGameplayTagContainer& perkTags, float valueToModify)
 {
 	if (perkTags.IsEmpty())

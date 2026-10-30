@@ -20,7 +20,8 @@ public class FarmFPS : ModuleRules
 			"GameplayStateTreeModule",
 			"UMG",
 			"GameplayTags",
-			"Slate"
+			"Slate",
+			"SlateCore"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

@@ -89,4 +89,7 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "FarmFPS|Utilities", meta = (WorldContext = "WorldContextObject"))
 	static float GetModifiedValueByPlayerPerk(const UObject* WorldContextObject, const FGameplayTag& perkTag, float valueToModify);
+
+	UFUNCTION(BlueprintPure, Category = "FarmFPS|Utilities", meta = (WorldContext = "WorldContextObject"))
+	static AActor* GetTickablePauseActor(const UObject* WorldContextObject);
 };
