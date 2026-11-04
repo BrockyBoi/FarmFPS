@@ -6,6 +6,7 @@
 #include "Data/CropActorData.h"
 #include "Data/ProjectileActorData.h"
 #include "Data/ResourceActorData.h"
+#include "Managers/ActorPool.h"
 #include "Managers/PooledActorTypes.h"
 
 DECLARE_CYCLE_STAT(TEXT("ActorLookupCheck"), STAT_ActorLookupCheck, STATGROUP_ActorLookup);
@@ -36,6 +37,39 @@ TSubclassOf<AActor> UActorLookupComponent::GetActorReference(const FGameplayTag&
 		return GetCropActor(actorTag);
 	default:
 		return TSubclassOf<AActor>();
+	}
+}
+
+void UActorLookupComponent::PreloadActor(const FGameplayTag& actorTag, EPooledActorType actorType)
+{
+	if (ensure(_resourceActorMap.Contains(actorTag)))
+	{
+		TSoftClassPtr<AActor> actorClass;
+		switch (actorType)
+		{
+		case EPooledActorType::ResourcePickup:
+			actorClass = _resourceActorMap[actorTag].ResourceActorClass;
+			break;
+		case EPooledActorType::Crop:
+			actorClass = _resourceActorMap[actorTag].CropActorClass;
+			break;
+		case EPooledActorType::Projectile:
+			actorClass = _resourceActorMap[actorTag].ProjectileActorClass;
+			break;
+		default:
+			break;
+		}
+
+		if (ensure(!actorClass.IsNull()))
+		{
+			SoftObjectHelper::AsyncLoadSoftClass(this, actorClass, FOnAsyncLoad::CreateWeakLambda(this, [this, actorTag, actorType](UObject* subClassActor)
+				{
+					if (UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this); ensure(IsValid(actorPool)))
+					{
+						actorPool->InitializeActors(actorTag, 1, actorType);
+					}
+				}));
+		}
 	}
 }
 

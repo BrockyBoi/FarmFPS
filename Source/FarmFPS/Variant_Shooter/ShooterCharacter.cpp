@@ -3,6 +3,7 @@
 #include "ShooterCharacter.h"
 
 // Brock
+#include "Managers/ActorLookupComponent.h"
 #include "Managers/PlayerInventoryItemSelector.h"
 #include "Resources/ResourceInventory.h"
 
@@ -320,6 +321,11 @@ void AShooterCharacter::AddWeaponClass(const TSubclassOf<AShooterWeapon>& Weapon
 			// switch to the new weapon
 			CurrentWeapon = AddedWeapon;
 			CurrentWeapon->ActivateWeapon();
+
+			if (UActorLookupComponent* actorLookup = UFarmFPSUtilities::GetActorLookupComponent(this); ensure(IsValid(actorLookup)))
+			{
+				actorLookup->PreloadActor(AddedWeapon->GetWeaponResourceType(), EPooledActorType::Projectile);
+			}
 		}
 	}
 }
@@ -359,6 +365,11 @@ void AShooterCharacter::AddWeaponClass(const TSubclassOf<AShooterWeapon>& Weapon
 			CurrentWeapon->ActivateWeapon();
 
 			AddedWeapon->SetWeaponFireType(fireType);
+
+			if (UActorLookupComponent* actorLookup = UFarmFPSUtilities::GetActorLookupComponent(this); ensure(IsValid(actorLookup)))
+			{
+				actorLookup->PreloadActor(AddedWeapon->GetWeaponResourceType(), EPooledActorType::Projectile);
+			}
 		}
 	}
 }

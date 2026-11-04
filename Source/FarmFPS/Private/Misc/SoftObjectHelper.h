@@ -34,7 +34,7 @@ public:
 	}
 
 	template<typename T>
-	static void AsyncLoadSoftObject(TSoftObjectPtr<T> softPointer, FOnAsyncLoad callback)
+	static void AsyncLoadSoftObject(UObject* WorldContextObject, TSoftObjectPtr<T> softPointer, FOnAsyncLoad callback)
 	{
 		if (ensure(!softPointer.IsNull()))
 		{
@@ -44,7 +44,7 @@ public:
 				return;
 			}
 
-			softPointer.LoadAsync(FLoadSoftObjectPathAsyncDelegate::CreateLambda([callback](const FSoftObjectPath& path, UObject* loadedObject)
+			softPointer.LoadAsync(FLoadSoftObjectPathAsyncDelegate::CreateWeakLambda(WorldContextObject, [callback](const FSoftObjectPath& path, UObject* loadedObject)
 				{
 					if (T* obj = Cast<T>(loadedObject); ensure(IsValid(obj)))
 					{
@@ -55,7 +55,16 @@ public:
 	}
 
 	template<typename T>
-	static void AsyncLoadSoftClass(TSoftClassPtr<T> softPointer, FOnAsyncLoad callback)
+	static void AsyncLoadSoftObjectNoCallback(UObject* WorldContextObject, TSoftObjectPtr<T> softPointer)
+	{
+		if (ensure(!softPointer.IsNull()) && !softPointer.IsValid())
+		{
+			softPointer.LoadAsync(FLoadSoftObjectPathAsyncDelegate::CreateWeakLambda(WorldContextObject,[](const FSoftObjectPath&, UObject*){}));
+		}
+	}
+
+	template<typename T>
+	static void AsyncLoadSoftClass(UObject* WorldContextObject, TSoftClassPtr<T> softPointer, FOnAsyncLoad callback)
 	{
 		if (ensure(!softPointer.IsNull()))
 		{
@@ -67,7 +76,7 @@ public:
 
 			FSoftObjectPath path = softPointer.ToSoftObjectPath();
 			FStreamableManager& streamable = UAssetManager::GetStreamableManager();
-			streamable.RequestAsyncLoad(path, FStreamableDelegate::CreateLambda([callback, softPointer]()
+			streamable.RequestAsyncLoad(path, FStreamableDelegate::CreateWeakLambda(WorldContextObject, [callback, softPointer]()
 				{
 					if (T* obj = Cast<T>(softPointer.Get()); ensure(IsValid(obj)))
 					{
@@ -77,14 +86,25 @@ public:
 		}
 	}
 
-	static void SetStaticMesh(TSoftObjectPtr<UStaticMesh> softPointer, UStaticMeshComponent* staticMeshComponent)
+	template<typename T>
+	static void AsyncLoadSoftClassNoCallback(UObject* WorldContextObject, TSoftClassPtr<T> softPointer)
+	{
+		if (ensure(!softPointer.IsNull()) && !softPointer.IsValid())
+		{
+			FSoftObjectPath path = softPointer.ToSoftObjectPath();
+			FStreamableManager& streamable = UAssetManager::GetStreamableManager();
+			streamable.RequestAsyncLoad(path, FStreamableDelegate::CreateWeakLambda(WorldContextObject, [](){}));
+		}
+	}
+
+	static void SetStaticMesh(UObject* WorldContextObject, TSoftObjectPtr<UStaticMesh> softPointer, UStaticMeshComponent* staticMeshComponent)
 	{
 		if (!ensure(IsValid(staticMeshComponent)))
 		{
 			return;
 		}
 
-		AsyncLoadSoftObject(softPointer, FOnAsyncLoad::CreateLambda([staticMeshComponent](UObject* meshPointer)
+		AsyncLoadSoftObject(WorldContextObject, softPointer, FOnAsyncLoad::CreateWeakLambda(WorldContextObject, [staticMeshComponent](UObject* meshPointer)
 			{
 				if (UStaticMesh* mesh = Cast<UStaticMesh>(meshPointer); ensure(IsValid(mesh)))
 				{
@@ -93,14 +113,14 @@ public:
 			}));
 	}
 
-	static void SetStaticMeshMaterial(TSoftObjectPtr<UMaterialInstance> softPointer, UStaticMeshComponent* staticMeshComponent)
+	static void SetStaticMeshMaterial(UObject* WorldContextObject, TSoftObjectPtr<UMaterialInstance> softPointer, UStaticMeshComponent* staticMeshComponent)
 	{
 		if (!ensure(IsValid(staticMeshComponent)))
 		{
 			return;
 		}
 
-		AsyncLoadSoftObject(softPointer, FOnAsyncLoad::CreateLambda([staticMeshComponent](UObject* materialPointer)
+		AsyncLoadSoftObject(WorldContextObject, softPointer, FOnAsyncLoad::CreateWeakLambda(WorldContextObject, [staticMeshComponent](UObject* materialPointer)
 			{
 				if (UMaterialInstance* material = Cast<UMaterialInstance>(materialPointer); ensure(IsValid(material)))
 				{
@@ -109,14 +129,14 @@ public:
 			}));
 	}
 
-	static void SetStaticMeshMaterialOverlay(TSoftObjectPtr<UMaterialInstance> softPointer, UStaticMeshComponent* staticMeshComponent)
+	static void SetStaticMeshMaterialOverlay(UObject* WorldContextObject, TSoftObjectPtr<UMaterialInstance> softPointer, UStaticMeshComponent* staticMeshComponent)
 	{
 		if (!ensure(IsValid(staticMeshComponent)))
 		{
 			return;
 		}
 
-		AsyncLoadSoftObject(softPointer, FOnAsyncLoad::CreateLambda([staticMeshComponent](UObject* materialPointer)
+		AsyncLoadSoftObject(WorldContextObject, softPointer, FOnAsyncLoad::CreateWeakLambda(WorldContextObject, [staticMeshComponent](UObject* materialPointer)
 			{
 				if (UMaterialInstance* material = Cast<UMaterialInstance>(materialPointer); ensure(IsValid(material)))
 				{
@@ -127,7 +147,7 @@ public:
 
 	static void PlaySpawnedSoundAtLocation(UObject* WorldContextObject, TSoftObjectPtr<USoundBase> softPointer, const FVector& location)
 	{
-		AsyncLoadSoftObject(softPointer, FOnAsyncLoad::CreateLambda([WorldContextObject, location](UObject* soundClip)
+		AsyncLoadSoftObject(WorldContextObject, softPointer, FOnAsyncLoad::CreateWeakLambda(WorldContextObject, [WorldContextObject, location](UObject* soundClip)
 			{
 				if (USoundBase* sound = Cast<USoundBase>(soundClip); ensure(IsValid(sound)))
 				{
@@ -138,7 +158,7 @@ public:
 
 	static void PlaySpawned2DSound(UObject* WorldContextObject, TSoftObjectPtr<USoundBase> softPointer)
 	{
-		AsyncLoadSoftObject(softPointer, FOnAsyncLoad::CreateLambda([WorldContextObject](UObject* soundClip)
+		AsyncLoadSoftObject(WorldContextObject, softPointer, FOnAsyncLoad::CreateWeakLambda(WorldContextObject, [WorldContextObject](UObject* soundClip)
 			{
 				if (USoundBase* sound = Cast<USoundBase>(soundClip); ensure(IsValid(sound)))
 				{

@@ -96,7 +96,7 @@ UDayNightCycleManager* UFarmFPSUtilities::GetDayNightCycleManager(const UObject*
 	return GetGameBaseState(WorldContextObject)->FindComponentByClass<UDayNightCycleManager>();
 }
 
-UActorLookupComponent* UFarmFPSUtilities::GetResourceActorLookupComponent(const UObject* WorldContextObject)
+UActorLookupComponent* UFarmFPSUtilities::GetActorLookupComponent(const UObject* WorldContextObject)
 {
 	if (!IsValid(WorldContextObject) || !IsValid(GetGameBaseState(WorldContextObject)))
 	{

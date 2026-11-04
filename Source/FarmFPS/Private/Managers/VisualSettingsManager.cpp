@@ -23,7 +23,7 @@ void UVisualSettingsManager::BeginPlay()
     if (SteamDeckEnv.Equals(TEXT("1")))
     {
         //SetVisualSettings(EVisualsValue::Bad);
-        SetAutoSettings();
+        //SetAutoSettings();
     }
 }
 

@@ -30,6 +30,17 @@ void ASeedProjectile::BeginPlay()
 	Super::BeginPlay();
 
 	CollisionComponent->IgnoreActorWhenMoving(UFarmFPSUtilities::GetPlayerCharacter(this), true);
+	
+	if (UCropProjectileDataAsset* projData = Cast<UCropProjectileDataAsset>(_projectileDataAsset); ensure(IsValid(projData)))
+	{
+		SoftObjectHelper::AsyncLoadSoftObjectNoCallback(this, projData->OnFailToPlantSeedSound);
+		SoftObjectHelper::AsyncLoadSoftObjectNoCallback(this, projData->OnPlantSeedSound);
+	}
+
+	if (UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this); ensure(IsValid(actorPool)))
+	{
+		actorPool->InitializeActors(ProjectileType, 1, EPooledActorType::Crop);
+	}
 }
 
 void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)

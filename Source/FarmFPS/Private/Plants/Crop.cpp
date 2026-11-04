@@ -47,6 +47,16 @@ void ACrop::BeginPlay()
 	Super::BeginPlay();
 
 	_randomPerfectTimingModifierOffset = FMath::RandRange(-_changeInPerfectTimingSizePerFrame, _changeInPerfectTimingSizePerFrame) * .5f;
+
+	if (ensure(IsValid(_cropDataAsset)))
+	{
+		SoftObjectHelper::AsyncLoadSoftObjectNoCallback(this, _cropDataAsset->SunVFX);
+		SoftObjectHelper::AsyncLoadSoftObjectNoCallback(this, _cropDataAsset->WaterVFX);
+		SoftObjectHelper::AsyncLoadSoftObjectNoCallback(this, _cropDataAsset->StandardMaterial);
+		SoftObjectHelper::AsyncLoadSoftObjectNoCallback(this, _cropDataAsset->DestructionParticleSystem);
+		SoftObjectHelper::AsyncLoadSoftObjectNoCallback(this, _cropDataAsset->LoveVFX);
+		SoftObjectHelper::AsyncLoadSoftObjectNoCallback(this, _cropDataAsset->OnBreakCropSound);
+	}
 }
 
 void ACrop::Tick(float DeltaTime)
@@ -74,24 +84,8 @@ void ACrop::SetMeshForCurrentProgress()
 		int staticMeshIndex = FMath::RoundToInt(meshes.Num() * _previousScalePercentage);
 		if (meshes.IsValidIndex(staticMeshIndex))
 		{
-			SoftObjectHelper::AsyncLoadSoftObject(meshes[staticMeshIndex], FOnAsyncLoad::CreateUObject(this, &ACrop::SetCropMesh));
+			SoftObjectHelper::SetStaticMesh(this, meshes[staticMeshIndex], _staticMesh);
 		}
-	}
-}
-
-void ACrop::SetCropMesh(UObject* meshObject)
-{
-	if (UStaticMesh* mesh = Cast<UStaticMesh>(meshObject); ensure(IsValid(mesh)) && ensure(IsValid(_staticMesh)))
-	{
-		_staticMesh->SetStaticMesh(mesh);
-	}
-}
-
-void ACrop::SetCropMaterial(UObject* materialInstance)
-{
-	if (UMaterialInstance* material = Cast<UMaterialInstance>(materialInstance); ensure(IsValid(material)) && ensure(IsValid(_staticMesh)))
-	{
-		_staticMesh->SetMaterial(0, material);
 	}
 }
 
@@ -128,7 +122,7 @@ void ACrop::EnableStartingNiagaraSystems()
 
 	if (!IsValid(_waterVFX))
 	{
-		SoftObjectHelper::AsyncLoadSoftObject(_cropDataAsset->WaterVFX, FOnAsyncLoad::CreateLambda([&](UObject* niagaraSystem)
+		SoftObjectHelper::AsyncLoadSoftObject(this, _cropDataAsset->WaterVFX, FOnAsyncLoad::CreateWeakLambda(this, [&](UObject* niagaraSystem)
 			{
 				SpawnNiagaraComponent(niagaraSystem, ResourceTypeTag::Water);
 			}));
@@ -141,7 +135,7 @@ void ACrop::EnableStartingNiagaraSystems()
 
 	if (!IsValid(_sunVFX))
 	{
-		SoftObjectHelper::AsyncLoadSoftObject(_cropDataAsset->SunVFX, FOnAsyncLoad::CreateLambda([&](UObject* niagaraSystem)
+		SoftObjectHelper::AsyncLoadSoftObject(this, _cropDataAsset->SunVFX, FOnAsyncLoad::CreateWeakLambda(this, [&](UObject* niagaraSystem)
 			{
 				SpawnNiagaraComponent(niagaraSystem, ResourceTypeTag::Light);
 			}));
@@ -163,7 +157,7 @@ void ACrop::OnLightAndWaterFilled()
 
 	if (ensure(IsValid(_cropDataAsset)))
 	{
-		SoftObjectHelper::AsyncLoadSoftObject(_cropDataAsset->FinalMaterial, FOnAsyncLoad::CreateUObject(this, &ACrop::SetCropMaterial));
+		SoftObjectHelper::SetStaticMeshMaterial(this, _cropDataAsset->FinalMaterial, _staticMesh);
 	}
 }
 
@@ -192,7 +186,7 @@ void ACrop::AddActorToPool()
 
 	if (IsValid(_cropDataAsset))
 	{
-		SoftObjectHelper::AsyncLoadSoftObject(_cropDataAsset->DestructionParticleSystem, FOnAsyncLoad::CreateLambda([this](UObject* particleSystem)
+		SoftObjectHelper::AsyncLoadSoftObject(this, _cropDataAsset->DestructionParticleSystem, FOnAsyncLoad::CreateWeakLambda(this, [this](UObject* particleSystem)
 			{
 				if (!IsValid(_onBreakVFX))
 				{
@@ -239,12 +233,16 @@ void ACrop::AddActorToPool()
 
 void ACrop::RemoveFromPool()
 {
-	if (ensure(IsValid(_cropDataAsset)))
+	if (ensure(IsValid(_cropDataAsset)) && ensure(IsValid(_staticMesh)))
 	{
-		SoftObjectHelper::AsyncLoadSoftObject(_cropDataAsset->StandardMaterial, FOnAsyncLoad::CreateLambda([&](UObject* materialInstance)
+		SoftObjectHelper::AsyncLoadSoftObject(this, _cropDataAsset->StandardMaterial, FOnAsyncLoad::CreateWeakLambda(this, [&](UObject* materialInstance)
 			{
-				SetCropMaterial(materialInstance);
-				if (!IsValid(_dynamicMaterialInstance) && ensure(IsValid(_staticMesh)))
+				if (UMaterialInstance* material = Cast<UMaterialInstance>(materialInstance); ensure(IsValid(material)))
+				{
+					_staticMesh->SetMaterial(0, material);
+				}
+
+				if (!IsValid(_dynamicMaterialInstance))
 				{
 					_dynamicMaterialInstance = _staticMesh->CreateDynamicMaterialInstance(0);
 				}
@@ -332,7 +330,7 @@ void ACrop::AddResource(const FGameplayTag& resourceType, float amount)
 	{
 		if (!IsValid(_loveVFX))
 		{
-			SoftObjectHelper::AsyncLoadSoftObject(_cropDataAsset->LoveVFX, FOnAsyncLoad::CreateLambda([&](UObject* niagaraSystem)
+			SoftObjectHelper::AsyncLoadSoftObject(this, _cropDataAsset->LoveVFX, FOnAsyncLoad::CreateWeakLambda(this, [&](UObject* niagaraSystem)
 				{
 					SpawnNiagaraComponent(niagaraSystem, ResourceTypeTag::Love);
 				}));

@@ -82,12 +82,6 @@ protected:
 	virtual bool ShouldTick() const override;
 
 	UFUNCTION()
-	void SetCropMesh(UObject* meshObject);
-
-	UFUNCTION()
-	void SetCropMaterial(UObject* materialObject);
-
-	UFUNCTION()
 	void SpawnNiagaraComponent(UObject* niagaraObject, const FGameplayTag& resourceTag);
 
 	void EnableStartingNiagaraSystems();

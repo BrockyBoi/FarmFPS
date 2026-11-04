@@ -29,7 +29,11 @@ void UActorPool::InitializeActors(const FGameplayTag& actorTag, int actorCount, 
 
 	for (int i = 0; i < actorCount; ++i)
 	{
-		SpawnNewActor(actorTag, FVector::ZeroVector, actorType);
+		AActor* actorSpawned = SpawnNewActor(actorTag, FVector::ZeroVector, actorType);
+		if (ensure(IsValid(actorSpawned)))
+		{
+			AddActorToPool(actorTag, actorSpawned, actorType);
+		}
 	}
 }
 
@@ -134,7 +138,7 @@ AActor* UActorPool::SpawnNewActor(const FGameplayTag& actorTag, const FTransform
 {
 	SCOPE_CYCLE_COUNTER(STAT_SpawnActorPoolActor);
 	
-	if (UActorLookupComponent* lookupComponent = UFarmFPSUtilities::GetResourceActorLookupComponent(this); ensure(IsValid(lookupComponent)))
+	if (UActorLookupComponent* lookupComponent = UFarmFPSUtilities::GetActorLookupComponent(this); ensure(IsValid(lookupComponent)))
 	{
 		if (TSubclassOf<AActor> resourceActor = lookupComponent->GetActorReference(actorTag, actorType); ensure(IsValid(resourceActor)))
 		{
@@ -154,7 +158,7 @@ AActor* UActorPool::SpawnNewActor(const FGameplayTag& actorTag, const FVector& s
 {
 	SCOPE_CYCLE_COUNTER(STAT_SpawnActorPoolActor);
 
-	if (UActorLookupComponent* lookupComponent = UFarmFPSUtilities::GetResourceActorLookupComponent(this); ensure(IsValid(lookupComponent)))
+	if (UActorLookupComponent* lookupComponent = UFarmFPSUtilities::GetActorLookupComponent(this); ensure(IsValid(lookupComponent)))
 	{
 		if (TSubclassOf<AActor> resourceActor = lookupComponent->GetActorReference(actorTag, actorType); ensure(IsValid(resourceActor)))
 		{

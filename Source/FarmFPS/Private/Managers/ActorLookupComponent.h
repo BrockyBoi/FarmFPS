@@ -30,6 +30,9 @@ public:
 
 	TSubclassOf<AActor> GetActorReference(const FGameplayTag& actorTag, EPooledActorType actorType) const;
 
+	UFUNCTION(BlueprintCallable)
+	void PreloadActor(const FGameplayTag& actorTag, EPooledActorType actorType);
+
 protected:
 	virtual void BeginPlay() override;	
 	void InitializeMapFromTables();

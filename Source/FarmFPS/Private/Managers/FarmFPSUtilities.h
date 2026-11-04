@@ -56,7 +56,7 @@ public:
 	static UDayNightCycleManager* GetDayNightCycleManager(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintPure, Category = "FarmFPS|Utilities", meta = (WorldContext = "WorldContextObject"))
-	static UActorLookupComponent* GetResourceActorLookupComponent(const UObject* WorldContextObject);
+	static UActorLookupComponent* GetActorLookupComponent(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintPure, Category = "FarmFPS|Utilities", meta = (WorldContext = "WorldContextObject"))
 	static UActorPool* GetActorPool(const UObject* WorldContextObject);

@@ -3,6 +3,7 @@
 #include "ShooterProjectile.h"
 
 // Brock
+#include "Managers/ActorLookupComponent.h"
 #include "Managers/ActorPool.h"
 #include "Managers/AudioManager.h"
 #include "Managers/FarmFPSUtilities.h"
@@ -71,8 +72,8 @@ void AShooterProjectile::RemoveFromPool()
 
 		if (ensure(IsValid(_projectileDataAsset)))
 		{
-			SoftObjectHelper::SetStaticMesh(_projectileDataAsset->Mesh, _staticMeshComponent);
-			SoftObjectHelper::AsyncLoadSoftObject(_projectileDataAsset->TrailVFX, FOnAsyncLoad::CreateLambda([this](UObject* niagaraSystem)
+			SoftObjectHelper::SetStaticMesh(this, _projectileDataAsset->Mesh, _staticMeshComponent);
+			SoftObjectHelper::AsyncLoadSoftObject(this, _projectileDataAsset->TrailVFX, FOnAsyncLoad::CreateWeakLambda(this, [this](UObject* niagaraSystem)
 				{
 					if (!IsValid(_trailVFX))
 					{
@@ -90,7 +91,7 @@ void AShooterProjectile::RemoveFromPool()
 
 			if (!_projectileDataAsset->MeshMaterial.IsNull())
 			{
-				SoftObjectHelper::AsyncLoadSoftObject(_projectileDataAsset->MeshMaterial, FOnAsyncLoad::CreateLambda([&](UObject* materialInstance)
+				SoftObjectHelper::AsyncLoadSoftObject(this, _projectileDataAsset->MeshMaterial, FOnAsyncLoad::CreateWeakLambda(this, [&](UObject* materialInstance)
 					{
 						if (UMaterialInstance* material = Cast<UMaterialInstance>(materialInstance); ensure(IsValid(material)))
 						{
@@ -128,6 +129,19 @@ void AShooterProjectile::BeginPlay()
 	
 	// ignore the pawn that shot this projectile
 	CollisionComponent->IgnoreActorWhenMoving(GetInstigator(), true);
+
+	if (ensure(IsValid(_projectileDataAsset)))
+	{
+		if (!_projectileDataAsset->MeshMaterial.IsNull())
+		{
+			SoftObjectHelper::AsyncLoadSoftObjectNoCallback(this, _projectileDataAsset->MeshMaterial);
+		}
+
+		SoftObjectHelper::AsyncLoadSoftObjectNoCallback(this, _projectileDataAsset->Mesh);
+		SoftObjectHelper::AsyncLoadSoftObjectNoCallback(this, _projectileDataAsset->TrailVFX);
+		SoftObjectHelper::AsyncLoadSoftObjectNoCallback(this, _projectileDataAsset->OnHitVFX);
+		SoftObjectHelper::AsyncLoadSoftObjectNoCallback(this, _projectileDataAsset->OnHitSound);
+	}
 }
 
 void AShooterProjectile::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -308,7 +322,7 @@ void AShooterProjectile::SpawnAsyncOnProjectileHitVFX(float scale)
 		return;
 	}
 
-	SoftObjectHelper::AsyncLoadSoftObject(_projectileDataAsset->OnHitVFX, FOnAsyncLoad::CreateLambda([this, scale](UObject* particleSystem)
+	SoftObjectHelper::AsyncLoadSoftObject(this, _projectileDataAsset->OnHitVFX, FOnAsyncLoad::CreateWeakLambda(this, [this, scale](UObject* particleSystem)
 		{
 			if (!IsValid(_onHitVFX))
 			{

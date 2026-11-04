@@ -171,6 +171,8 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 		if (_timeElapsed >= _timeToReachPeakMoon)
 		{
 			_moonLight->SetActorRotation(FRotator(250.f, 0.f, 0.f));
+			//_sunLight->SetActorHiddenInGame(true);
+			SetComponentTickEnabled(false);
 			return;
 		}
 
@@ -198,6 +200,7 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 		if (_timeElapsed >= _timeToReachPeakMoon)
 		{
 			GenerateDailyTradeOff();
+			SetComponentTickEnabled(false);
 		}
 	}
 }
@@ -329,7 +332,7 @@ void UDayNightCycleManager::EndDay()
 
 	if (ensure(_sunLight.IsValid()) && ensure(_moonLight.IsValid()))
 	{
-		_sunLight->SetActorHiddenInGame(true);
+		//_sunLight->SetActorHiddenInGame(true);
 		_moonLight->SetActorHiddenInGame(false);
 
 		FRotator moonRotation(90.f, 0.f, 0.f);
@@ -376,6 +379,7 @@ void UDayNightCycleManager::SetDayState(EDayState newDayState)
 	_timeElapsed = 0.f;
 	_currentDayState = newDayState;
 	OnDayStateChange.Broadcast(newDayState);
+	SetComponentTickEnabled(true);
 }
 
 void UDayNightCycleManager::GenerateDailyTradeOff()
