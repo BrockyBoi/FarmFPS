@@ -2,9 +2,6 @@
 
 #pragma once
 
-// Brock
-#include "PerkData.h"
-
 // UE
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"

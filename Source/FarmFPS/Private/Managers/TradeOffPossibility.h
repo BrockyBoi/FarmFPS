@@ -3,7 +3,7 @@
 #pragma once
 
 // Brock
-#include "TradeOffData.h"
+#include "Data/TradeOffData.h"
 
 // UE
 #include "CoreMinimal.h"

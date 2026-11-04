@@ -3,7 +3,9 @@
 #pragma once
 
 // Brock
+#include "Data/ProjectileDataAsset.h"
 #include "Managers/PoolableActor.h"
+#include "Misc/SoftObjectHelper.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -15,6 +17,7 @@
 
 class AShooterWeapon;
 class USphereComponent;
+class UParticleSystemComponent;
 class UProjectileMovementComponent;
 class ACharacter;
 class UPrimitiveComponent;
@@ -52,6 +55,12 @@ protected:
 	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
 	void Cosmetic_OnHitObject();
 
+	void StopProjectile();
+
+	void SpawnAsyncOnProjectileHitVFX(float scale);
+
+	void PlayOnHitSound();
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "CropResourceType,ResourceType"))
 	FGameplayTag ProjectileType;
 
@@ -63,10 +72,18 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USphereComponent* CollisionComponent;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Audio")
-	TObjectPtr<USoundBase> _onHitSound;
-
 	TWeakObjectPtr<AShooterWeapon> _owningWeapon;
+
+	UPROPERTY(Transient)
+	UNiagaraComponent* _trailVFX = nullptr;
+
+	UPROPERTY(Transient)
+	UParticleSystemComponent* _onHitVFX = nullptr;
+
+	UPROPERTY(EditDefaultsOnly)
+	UProjectileDataAsset* _projectileDataAsset = nullptr;
+
+	UStaticMeshComponent* _staticMeshComponent = nullptr;
 
 	/** Loudness of the AI perception noise done by this projectile on hit */
 	UPROPERTY(EditAnywhere, Category="Projectile|Noise", meta = (ClampMin = 0, ClampMax = 100))

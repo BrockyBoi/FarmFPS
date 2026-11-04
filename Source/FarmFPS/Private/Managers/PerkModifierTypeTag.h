@@ -28,6 +28,9 @@ namespace PerkModifierTypeTag
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(WaterEfficacy);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(WheatNeededForBread);
 
+	// Day
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(DayLength);
+
 	// Money Related
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(MoneyNeededForUpgrades);
 

@@ -3,14 +3,17 @@
 #pragma once
 
 // Brock
-#include "Managers/BaseModifiableValueData.h"
-#include "Managers/ModifiedValueData.h"
+#include "Data/BaseModifiableValueData.h"
+#include "Data/ModifiedValueData.h"
 
 // UE
 #include "CoreMinimal.h"
 
 // Generated
 #include "CachedModifiableValueDataTableRowHandle.generated.h"
+
+DECLARE_STATS_GROUP(TEXT("ModifiedValueSystem"), STATGROUP_ModifiedValues, STATCAT_Advanced);
+DECLARE_CYCLE_STAT(TEXT("GetModifiedValue"), STAT_GetModifiedValue, STATGROUP_ModifiedValues);
 
 USTRUCT(BlueprintType)
 struct FARMFPS_API FCachedModifiableValueDataTableRowHandle
@@ -56,6 +59,8 @@ struct FARMFPS_API FCachedModifiableValueDataTableRowHandle
 
 	float GetModifiedValue(const UObject* worldObject) const
 	{
+		SCOPE_CYCLE_COUNTER(STAT_GetModifiedValue);
+
 		FModifiedFloatValue& value = GetValue();
 		return value.GetModifiedValue(worldObject);
 	}

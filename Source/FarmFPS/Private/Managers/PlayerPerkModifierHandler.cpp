@@ -3,7 +3,7 @@
 #include "PlayerPerkModifierHandler.h"
 
 // Brock
-#include "PerkData.h"
+#include "Data/PerkData.h"
 #include "PerkManager.h"
 #include "PerkModifierTypeTag.h"
 

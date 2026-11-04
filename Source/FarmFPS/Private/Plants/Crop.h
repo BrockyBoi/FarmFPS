@@ -3,10 +3,11 @@
 #pragma once
 
 // Brock
+#include "Data/CropGrowthData.h"
+#include "Data/CropDataAsset.h"
+#include "Data/ModifiedValueData.h"
 #include "Interactables/MeleeableInterface.h"
-#include "Managers/ModifiedValueData.h"
 #include "Managers/PoolableActor.h"
-#include "Plants/CropData.h"
 #include "Plants/Plant.h"
 
 // UE
@@ -17,8 +18,8 @@
 // Generated
 #include "Crop.generated.h"
 
-class AResourcePickupActor;
 class UCapsuleComponent;
+class UDynamicMaterialInstance;
 class UResourceInventory;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCropPlanted, ACrop*);
@@ -44,6 +45,8 @@ public:
 	bool GetIsInPerfectTiming() const { return _isInPerfectTiming; }
 
 	UCapsuleComponent* GetCapsuleComponent() const;
+
+	const UCropDataAsset* GetCropDataAsset() const;
 
 	static FOnCropPlanted OnCropPlanted;
 
@@ -78,38 +81,61 @@ protected:
 
 	virtual bool ShouldTick() const override;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Crop Yield")
+	UFUNCTION()
+	void SetCropMesh(UObject* meshObject);
+
+	UFUNCTION()
+	void SetCropMaterial(UObject* materialObject);
+
+	UFUNCTION()
+	void SpawnNiagaraComponent(UObject* niagaraObject, const FGameplayTag& resourceTag);
+
+	void EnableStartingNiagaraSystems();
+
+	UPROPERTY(Transient)
+	UNiagaraComponent* _waterVFX = nullptr;
+
+	UPROPERTY(Transient)
+	UNiagaraComponent* _sunVFX = nullptr;
+
+	UPROPERTY(Transient)
+	UNiagaraComponent* _loveVFX = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Crop")
+	UCropDataAsset* _cropDataAsset = nullptr;
+
+	UPROPERTY(Transient)
+	UMaterialInstanceDynamic* _dynamicMaterialInstance = nullptr;
+
+	UPROPERTY(Transient)
+	UParticleSystemComponent* _onBreakVFX = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	float _flashMaterialDuration = .2f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Crop")
+	FName _deadFoliageParameterName = TEXT("DeadFoliageColor");
+
+	UPROPERTY(EditDefaultsOnly, Category = "Crop|Crop Yield")
 	FModifiedFloatValue _perfectTimingYieldBonus = 1.5f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Crop Yield")
+	UPROPERTY(EditDefaultsOnly, Category = "Crop|Crop Yield")
 	FModifiedFloatValue _perfectTimingDuration = 5.f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Crop Yield")
+	UPROPERTY(EditDefaultsOnly, Category = "Crop|Crop Yield")
 	float _yieldPickupSpawnHeight = 100.f;
 
 	bool _hasStartedPerfectTiming = false;
 	bool _isInPerfectTiming = false;
 	bool _hasPerfectTimingPeriodEnded = false;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Perfect Timing")
+	UPROPERTY(EditDefaultsOnly, Category = "Crop|Perfect Timing")
 	float _maxSizeModifierForPerfectTiming = 1.15f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Audio")
-	TObjectPtr<USoundBase> _onBreakCropSound;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
-	TArray<UStaticMesh*> _meshesOverProgress;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Material")
-	TObjectPtr<UMaterialInstance> _standardMaterial;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Material")
-	TObjectPtr<UMaterialInstance> _finalMaterial;
-
-	UPROPERTY(EditAnywhere, Category = "Perfect Timing")
+	UPROPERTY(EditAnywhere, Category = "Crop|Perfect Timing")
 	float _sinAngleInPerfectTiming = 270.f;
 
-	UPROPERTY(EditAnywhere, Category = "Perfect Timing")
+	UPROPERTY(EditAnywhere, Category = "Crop|Perfect Timing")
 	float _changeInPerfectTimingSizePerFrame = -.75f;
 
 	float _randomPerfectTimingModifierOffset = 0.f;

@@ -3,11 +3,12 @@
 #include "ShooterWeapon.h"
 
 // Brock
+#include "Data/ModifiedValueData.h"
 #include "FarmFPSCharacter.h"
 #include "Managers/ActorPool.h"
 #include "Managers/AudioManager.h"
-#include "Managers/ModifiedValueData.h"
 #include "Managers/PerkManager.h"
+#include "Misc/SoftObjectHelper.h"
 
 // Shooter
 #include "ShooterProjectile.h"
@@ -74,6 +75,8 @@ void AShooterWeapon::BeginPlay()
 	{
 		_hasPhysicalRecoil = true;
 	}
+
+	SetActorTickEnabled(false);
 }
 
 void AShooterWeapon::Tick(float DeltaTime)
@@ -147,6 +150,7 @@ void AShooterWeapon::StartFiring()
 		if (bIsChargeableWeapon)
 		{
 			bIsCharging = true;
+			SetActorTickEnabled(true);
 		}
 		else
 		{
@@ -237,13 +241,14 @@ void AShooterWeapon::Fire()
 		GetWorld()->GetTimerManager().SetTimer(RefireTimer, this, &AShooterWeapon::FireCooldownExpired, GetFireRate(), false);
 	}
 
-	if (IsValid(_onShootSound))
+	if (!_onShootSound.IsNull())
 	{
-		UAudioManager::SpawnSoundAtLocation(this, _onShootSound, GetActorLocation());
+		SoftObjectHelper::PlaySpawnedSoundAtLocation(this, _onShootSound, GetActorLocation());
 	}
 
 	_currentTimeCharging = 0.f;
 	bIsCharging = false;
+	SetActorTickEnabled(false);
 }
 
 void AShooterWeapon::StartReload()
@@ -350,6 +355,10 @@ void AShooterWeapon::FireProjectile(const FVector& TargetLocation)
 			CharacterOwner->LaunchCharacter(-forwardVec * PhysicalRecoilMultiplier.GetModifiedValue(this) * chargeMultiplier * bulletCount, false, false);
 		}
 	}
+}
+
+void AShooterWeapon::OnProjectileSpawned(UObject* projectileObject)
+{
 }
 
 FTransform AShooterWeapon::CalculateProjectileSpawnTransform(const FVector& TargetLocation) const

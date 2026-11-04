@@ -3,7 +3,7 @@
 #pragma once
 
 // Brock
-#include "Managers/ModifiedValueData.h"
+#include "Data/ModifiedValueData.h"
 #include "Misc/CachedModifiableValueDataTableRowHandle.h"
 
 // UE
@@ -121,6 +121,9 @@ protected:
 	/** Fire a projectile towards the target location */
 	virtual void FireProjectile(const FVector& TargetLocation);
 
+	UFUNCTION()
+	virtual void OnProjectileSpawned(UObject* projectileObject);
+
 	/** Calculates the spawn transform for projectiles shot by this weapon */
 	FTransform CalculateProjectileSpawnTransform(const FVector& TargetLocation) const;
 
@@ -144,7 +147,7 @@ protected:
 
 	/** Type of projectiles this weapon will shoot */
 	UPROPERTY(EditAnywhere, Category = "Ammo")
-	TSubclassOf<AShooterProjectile> ProjectileClass;
+	TSoftClassPtr<AShooterProjectile> ProjectileClass;
 
 	/** Number of bullets in a magazine */
 	UPROPERTY(EditAnywhere, Category = "Tunable|Ammo")
@@ -233,7 +236,7 @@ protected:
 	float _automaticMagazineSizeMultiplier = 3.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
-	TObjectPtr<USoundBase> _onShootSound;
+	TSoftObjectPtr<USoundBase> _onShootSound;
 
 	/** Game time of last shot fired, used to enforce refire rate on semi auto */
 	float TimeOfLastShot = 0.0f;

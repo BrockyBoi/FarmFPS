@@ -9,9 +9,10 @@
 #include "Misc/MoonHitBox.h"
 #include "Plants/Crop.h"
 #include "Plants/Plant.h"
+#include "Resources/ResourcePickupActor.h"
+#include "Resources/ResourceTypeTag.h"
 #include "StatusEffects/ArcResourceToOtherCropOnHit.h"
 #include "StatusEffects/LingeringStatusEffectOnHit.h"
-#include "Resources/ResourceTypeTag.h"
 
 ACropResourceProjectile::ACropResourceProjectile() : Super()
 {
@@ -171,12 +172,11 @@ void ACropResourceProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Oth
 		return;
 	}
 
-	if (IsValid(_onHitSound))
-	{
-		UAudioManager::SpawnSoundAtLocation(this, _onHitSound, GetActorLocation());
-	}
+	PlayOnHitSound();
+	SpawnAsyncOnProjectileHitVFX(1.f);
 
 	Cosmetic_OnHitObject();
+	StopProjectile();
 
 	if (DeferredDestructionTime > 0.0f)
 	{

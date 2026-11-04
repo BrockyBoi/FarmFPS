@@ -3,7 +3,7 @@
 #pragma once
 
 // Brock
-#include "ModifiedValueData.h"
+#include "Data/ModifiedValueData.h"
 
 // UE
 #include "CoreMinimal.h"

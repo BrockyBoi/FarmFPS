@@ -5,7 +5,9 @@
 // Brock
 #include "Characters/Customer.h"
 #include "Managers/AudioManager.h"
+#include "Managers/PerkManager.h"
 #include "Managers/TutorialScreenManager.h"
+#include "Misc/SoftObjectHelper.h"
 #include "SaveSystem/SaveGameManager.h"
 #include "TradeOffUpgradeManager.h"
 
@@ -13,6 +15,7 @@
 #include "Components/AudioComponent.h"
 #include "EngineUtils.h"
 #include "Engine/DirectionalLight.h"
+#include "Kismet/GameplayStatics.h"
 
 FStaticOnDayStateChange UDayNightCycleManager::OnDayStateChange;
 
@@ -42,6 +45,14 @@ void UDayNightCycleManager::BeginPlay()
 		}
 	}
 
+	TArray<AActor*> actors;
+	UGameplayStatics::GetAllActorsWithTag(this, TEXT("NightSky"), actors);
+	if (actors.Num() > 0)
+	{
+		_nightSkyActor = actors[0];
+		SetNightSkyOpacityPercentage(0.f);
+	}
+
 	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);
 	if (ensure(IsValid(saveGameManager)))
 	{
@@ -59,6 +70,14 @@ void UDayNightCycleManager::BeginPlay()
 		tradeOffUpgradeManager->OnTradeOffAnyInput.AddDynamic(this, &UDayNightCycleManager::StartDay);
 	}
 
+	UPerkManager* perkManager = UFarmFPSUtilities::GetPlayerPerkManager(this);
+	if (ensure(IsValid(perkManager)))
+	{
+		perkManager->OnPerkLevelChange.AddDynamic(this, &UDayNightCycleManager::OnPlayerPerkValueChange);
+	}
+
+	_modifiedDayLength = _dayLength.GetModifiedValue(this);
+
 	ACustomer::OnCustomerServed.AddUObject(this, &UDayNightCycleManager::OnCustomerServed);
 }
 
@@ -74,6 +93,12 @@ void UDayNightCycleManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	if (IsValid(saveGameManager))
 	{
 		saveGameManager->OnLoadGameData.RemoveAll(this);
+	}
+
+	UPerkManager* perkManager = UFarmFPSUtilities::GetPlayerPerkManager(this);
+	if (IsValid(perkManager))
+	{
+		perkManager->OnPerkLevelChange.RemoveAll(this);
 	}
 
 	ACustomer::OnCustomerServed.RemoveAll(this);
@@ -107,7 +132,7 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 			_timeElapsed += DeltaTime;
 		}
 
-		float dayLength = _dayLength.GetModifiedValue(this);
+		float dayLength = GetModifiedDayLength();
 
 		// If player has not finished basic tutorial then simply keep the timer at mid day until it's completed
 		UTutorialScreenManager* tutorialManager = UFarmFPSUtilities::GetTutorialScreenManager(this);
@@ -116,10 +141,24 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 			_timeElapsed = FMath::Clamp(_timeElapsed, 0, dayLength / 2);
 		}
 
-		float lerpedPitch = FMath::Lerp(0.f, _finalDayAngle, _timeElapsed / dayLength) + 180.f;
+		float dayPercentage = _timeElapsed / dayLength;
+		float lerpedPitch = FMath::Lerp(0.f, _finalDayAngle, dayPercentage) + 180.f;
 
 		FRotator rotation(lerpedPitch, 0.f, 0.f);
 		_sunLight->SetActorRotation(rotation);
+
+		if (dayPercentage <= _percentageOfDayWhenNightSkyIsGone)
+		{
+			float endTime = dayLength * _percentageOfDayWhenNightSkyIsGone;
+			float lerpedValue = FMath::Lerp(1, 0.f, _timeElapsed / endTime);
+			SetNightSkyOpacityPercentage(lerpedValue);
+		}
+		else if (dayPercentage >= _percentageOfDayWhenNightSkyShows)
+		{
+			float startTime = dayLength * _percentageOfDayWhenNightSkyShows;
+			float lerpedValue = FMath::Lerp(0, 1.f, (_timeElapsed - startTime) / (dayLength  -startTime));
+			SetNightSkyOpacityPercentage(lerpedValue);
+		}
 
 		if (_timeElapsed >= dayLength)
 		{
@@ -170,16 +209,20 @@ void UDayNightCycleManager::ForceEndDay()
 
 void UDayNightCycleManager::ForceSetTimeLeft(float secondsLeftInDay)
 {
-	float dayLength = _dayLength.GetModifiedValue(this);
+	float dayLength = GetModifiedDayLength();
 	_timeElapsed = FMath::Clamp(dayLength - secondsLeftInDay, 0, dayLength);
+}
+
+float UDayNightCycleManager::GetModifiedDayLength() const
+{
+	return _modifiedDayLength;
 }
 
 void UDayNightCycleManager::TransitionToNextDay()
 {
-	UAudioManager::SpawnSound2D(this, _onNightEndSound);
+	SoftObjectHelper::PlaySpawned2DSound(this, _onNightEndSound);
 	GetMusicAudioComponent(_nightTimeMusic)->FadeOut(0.5f, 0.f);
 
-	_timeElapsed = 0.f;
 	SetDayState(EDayState::NightTransitionToDay);
 }
 
@@ -254,8 +297,10 @@ void UDayNightCycleManager::StartDay()
 		_sunLight->SetActorRotation(rotation);
 	}
 
-	if (ensure(IsValid(_onDayStartSound)) && ensure(IsValid(_daytimeMusic)))
+	if (ensure(!_onDayStartSound.IsNull()) && ensure(!_daytimeMusic.IsNull()))
 	{
+		SoftObjectHelper::PlaySpawned2DSound(this, _onDayStartSound);
+
 		TObjectPtr<UAudioComponent> musicAudioComponent = GetMusicAudioComponent(_daytimeMusic);
 		if (ensure(IsValid(musicAudioComponent)))
 		{
@@ -263,8 +308,6 @@ void UDayNightCycleManager::StartDay()
 			musicAudioComponent->Play();
 		}
 	}
-
-	UAudioManager::SpawnSound2D(this, _onDayStartSound);
 }
 
 void UDayNightCycleManager::EndDay()
@@ -296,10 +339,11 @@ void UDayNightCycleManager::EndDay()
 	FTimerHandle timerHandle;
 	//GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &UDayNightCycleManager::StartDay, _timeUntilAutoStartNextDay, false);
 
-	UAudioManager::SpawnSound2D(this, _onDayEndSound);
+
+	SoftObjectHelper::PlaySpawned2DSound(this, _onDayEndSound);
 }
 
-TObjectPtr<UAudioComponent> UDayNightCycleManager::GetMusicAudioComponent(TObjectPtr<USoundBase> musicClip)
+TObjectPtr<UAudioComponent> UDayNightCycleManager::GetMusicAudioComponent(TSoftObjectPtr<USoundBase> musicClip)
 {
 	if (!_audioManager.IsValid() && ensure(IsValid(GetOwner())))
 	{
@@ -308,10 +352,18 @@ TObjectPtr<UAudioComponent> UDayNightCycleManager::GetMusicAudioComponent(TObjec
 
 	if (ensure(_audioManager.IsValid()))
 	{
-		return _audioManager->GetMusicAudioComponent(musicClip);
+		return _audioManager->GetMusicAudioComponent(musicClip.IsValid() ? musicClip.Get() : musicClip.LoadSynchronous());
 	}
 
 	return nullptr;
+}
+
+void UDayNightCycleManager::OnPlayerPerkValueChange(const FGameplayTag& resourceType, const FPerkData& perkData)
+{
+	if (resourceType == PerkModifierTypeTag::DayLength)
+	{
+		_modifiedDayLength = _dayLength.GetModifiedValue(this);
+	}
 }
 
 void UDayNightCycleManager::EndDayFromLoading(UFarmFPSSaveGame*)
@@ -321,6 +373,7 @@ void UDayNightCycleManager::EndDayFromLoading(UFarmFPSSaveGame*)
 
 void UDayNightCycleManager::SetDayState(EDayState newDayState)
 {
+	_timeElapsed = 0.f;
 	_currentDayState = newDayState;
 	OnDayStateChange.Broadcast(newDayState);
 }
@@ -351,12 +404,25 @@ void UDayNightCycleManager::OnCustomerServed()
 	{
 		if (FMath::IsNearlyZero(_adjustedTimeElapsed))
 		{
-			_adjustedTimeElapsed = FMath::Clamp(_timeElapsed - _timeToRemoveOnCustomerServed.GetModifiedValue(this), 0, _dayLength.GetModifiedValue(this));
+			_adjustedTimeElapsed = FMath::Clamp(_timeElapsed - _timeToRemoveOnCustomerServed.GetModifiedValue(this), 0, GetModifiedDayLength());
 		}
 		else
 		{
-			_adjustedTimeElapsed = FMath::Clamp(_adjustedTimeElapsed - _timeToRemoveOnCustomerServed.GetModifiedValue(this), 0, _dayLength.GetModifiedValue(this));
+			_adjustedTimeElapsed = FMath::Clamp(_adjustedTimeElapsed - _timeToRemoveOnCustomerServed.GetModifiedValue(this), 0, GetModifiedDayLength());
 		}
+	}
+}
+
+void UDayNightCycleManager::SetNightSkyOpacityPercentage(float percent)
+{
+	if (!_nightSkyActor.IsValid())
+	{
+		return;
+	}
+
+	if (UMeshComponent* mesh = _nightSkyActor->FindComponentByClass<UMeshComponent>(); ensure(IsValid(mesh)))
+	{
+		mesh->SetScalarParameterValueOnMaterials(TEXT("Intensity"), percent);
 	}
 }
 

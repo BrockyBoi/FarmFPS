@@ -13,7 +13,7 @@
 // Generated
 #include "ActorPool.generated.h"
 
-
+DECLARE_STATS_GROUP(TEXT("ActorPoolSystem"), STATGROUP_ActorPool, STATCAT_Advanced);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UActorPool : public UActorComponent

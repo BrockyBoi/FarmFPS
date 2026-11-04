@@ -51,10 +51,13 @@ void AShooterPickup::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (FWeaponTableRow* WeaponData = WeaponType.GetRow<FWeaponTableRow>(FString()); ensure(WeaponData != nullptr) && ensure(IsValid(WeaponData->WeaponToSpawn)))
+	if (FWeaponTableRow* WeaponData = WeaponType.GetRow<FWeaponTableRow>(FString()); ensure(WeaponData != nullptr))
 	{
-		// copy the weapon class
-		WeaponClass = WeaponData->WeaponToSpawn;
+		if (ensure(!WeaponData->WeaponToSpawn.IsNull()))
+		{
+			// copy the weapon class
+			WeaponClass = WeaponData->WeaponToSpawn.IsValid() ? WeaponData->WeaponToSpawn.Get() : WeaponData->WeaponToSpawn.LoadSynchronous();
+		}
 	}
 
 	USaveGameManager* saveGameManager = UFarmFPSUtilities::GetSaveGameManager(this);

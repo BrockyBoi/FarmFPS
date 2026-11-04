@@ -3,7 +3,7 @@
 #pragma once
 
 //Brock
-#include "Managers/CraftingData.h"
+#include "Data/CraftingData.h"
 #include "Interactables/InputOutputStationActor.h"
 
 // UE

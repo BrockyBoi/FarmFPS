@@ -117,7 +117,7 @@ void UAudioManager::SetMasterAudioMultiplier(float multiplier, bool setFromLoad)
 	}
 }
 
-void UAudioManager::AddMusicAudioComponentToMap(TObjectPtr<USoundBase> musicClip, TObjectPtr<UAudioComponent> audioComponent)
+void UAudioManager::AddMusicAudioComponentToMap(USoundBase* musicClip, TObjectPtr<UAudioComponent> audioComponent)
 {
 	if (ensure(IsValid(musicClip)) && ensure(IsValid(audioComponent)) && !_currentlyPlayingMusicAudioComponents.Contains(musicClip))
 	{
@@ -158,7 +158,7 @@ void UAudioManager::OnFXAudioComponentStopPlaying()
 	_currentlyPlayingFXAudioComponents = currentlyPlayingAudio;
 }
 
-TObjectPtr<UAudioComponent> UAudioManager::GetMusicAudioComponent(TObjectPtr<USoundBase> musicClip)
+TObjectPtr<UAudioComponent> UAudioManager::GetMusicAudioComponent(USoundBase* musicClip)
 {
 	if (ensure(IsValid(musicClip)) && _currentlyPlayingMusicAudioComponents.Contains(musicClip))
 	{
@@ -168,7 +168,7 @@ TObjectPtr<UAudioComponent> UAudioManager::GetMusicAudioComponent(TObjectPtr<USo
 	return SpawnMusic2D(this, musicClip);
 }
 
-UAudioComponent* UAudioManager::SpawnSoundAtLocation(UObject* worldContext, TObjectPtr<USoundBase> soundClip, const FVector& location)
+UAudioComponent* UAudioManager::SpawnSoundAtLocation(UObject* worldContext, USoundBase* soundClip, const FVector& location)
 {
 	UAudioManager* audioManager = UFarmFPSUtilities::GetAudioManager(worldContext);
 	if (ensure(IsValid(audioManager)) && ensure(IsValid(soundClip)))
@@ -186,7 +186,7 @@ UAudioComponent* UAudioManager::SpawnSoundAtLocation(UObject* worldContext, TObj
 	return nullptr;
 }
 
-UAudioComponent* UAudioManager::SpawnSound2D(UObject* worldContext, TObjectPtr<USoundBase> soundClip)
+UAudioComponent* UAudioManager::SpawnSound2D(UObject* worldContext, USoundBase* soundClip)
 {
 	UAudioManager* audioManager = UFarmFPSUtilities::GetAudioManager(worldContext);
 	if (ensure(IsValid(audioManager)) && ensure(IsValid(soundClip)))
@@ -204,7 +204,7 @@ UAudioComponent* UAudioManager::SpawnSound2D(UObject* worldContext, TObjectPtr<U
 	return nullptr;
 }
 
-TObjectPtr<UAudioComponent> UAudioManager::SpawnMusic2D(UObject* worldContext, TObjectPtr<USoundBase> musicClip)
+TObjectPtr<UAudioComponent> UAudioManager::SpawnMusic2D(UObject* worldContext, USoundBase* musicClip)
 {
 	UAudioManager* audioManager = UFarmFPSUtilities::GetAudioManager(worldContext);
 	if (ensure(IsValid(audioManager)) && ensure(IsValid(musicClip)))

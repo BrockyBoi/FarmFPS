@@ -3,7 +3,7 @@
 #pragma once
 
 // Brock
-#include "Managers/PerkData.h"
+#include "Data/PerkData.h"
 #include "Misc/CachedModifiableValueDataTableRowHandle.h"
 #include "PurchaseLocation.h"
 

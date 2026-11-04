@@ -489,7 +489,7 @@ void AShooterCharacter::OnGameLoaded(UFarmFPSSaveGame* saveGame)
 			FWeaponTableRow* row = _weaponsDataTable->FindRow<FWeaponTableRow>(weapon.WeaponType.GetTagName(), TEXT("OnGameLoaded"));
 			if (ensure(row))
 			{
-				AddWeaponClass(row->WeaponToSpawn, weapon.FireType);
+				AddWeaponClass(row->WeaponToSpawn.LoadSynchronous(), weapon.FireType);
 			}
 		}
 	}

@@ -4,7 +4,11 @@
 
 // Brock
 #include "Managers/ActorPool.h"
+#include "Managers/AudioManager.h"
 #include "Managers/FarmFPSUtilities.h"
+#include "Misc/SoftObjectHelper.h"
+
+#include "ShooterWeapon.h"
 
 // UE
 #include "Components/SphereComponent.h"
@@ -43,28 +47,14 @@ AShooterProjectile::AShooterProjectile()
 
 void AShooterProjectile::AddActorToPool()
 {
-	if (CollisionComponent)
-	{
-		CollisionComponent->SetSimulatePhysics(false);
-
-		CollisionComponent->SetPhysicsLinearVelocity(FVector::ZeroVector);
-		CollisionComponent->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
-	}
-
-	if (ProjectileMovement)
-	{
-		ProjectileMovement->StopMovementImmediately();
-		ProjectileMovement->Deactivate();
-	}
-
-	SetActorScale3D(FVector::OneVector);
-	GetWorld()->GetTimerManager().ClearTimer(LifeTimeTimer);
+	StopProjectile();
 
 	Cosmetic_OnAddedToPool();
 }
 
 void AShooterProjectile::RemoveFromPool()
 {
+	_staticMeshComponent = FindComponentByClass<UStaticMeshComponent>();
 	CollisionComponent->SetSimulatePhysics(true);
 
 	if (ProjectileMovement)
@@ -74,15 +64,52 @@ void AShooterProjectile::RemoveFromPool()
 
 	GetWorld()->GetTimerManager().SetTimer(LifeTimeTimer, this, &AShooterProjectile::OnLifeTimeExpired, LifeTime, false);
 	Cosmetic_OnRemovedFromPool();
+
+	if (ensure(IsValid(_staticMeshComponent)))
+	{
+		_staticMeshComponent->SetVisibility(true);
+
+		if (ensure(IsValid(_projectileDataAsset)))
+		{
+			SoftObjectHelper::SetStaticMesh(_projectileDataAsset->Mesh, _staticMeshComponent);
+			SoftObjectHelper::AsyncLoadSoftObject(_projectileDataAsset->TrailVFX, FOnAsyncLoad::CreateLambda([this](UObject* niagaraSystem)
+				{
+					if (!IsValid(_trailVFX))
+					{
+						_trailVFX = SoftObjectHelper::SpawnAttachedNiagaraComponent(this, GetRootComponent(), niagaraSystem, GetActorLocation(), GetActorRotation(), FVector::OneVector, false, false);
+						_trailVFX->RegisterComponent();
+					}
+
+					if (ensure(IsValid(_trailVFX)))
+					{
+						//_trailVFX->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+						_trailVFX->SetRelativeLocation(FVector::ZeroVector);
+						_trailVFX->Activate();
+					}
+				}));
+
+			if (!_projectileDataAsset->MeshMaterial.IsNull())
+			{
+				SoftObjectHelper::AsyncLoadSoftObject(_projectileDataAsset->MeshMaterial, FOnAsyncLoad::CreateLambda([&](UObject* materialInstance)
+					{
+						if (UMaterialInstance* material = Cast<UMaterialInstance>(materialInstance); ensure(IsValid(material)))
+						{
+							_staticMeshComponent->SetMaterial(0, material);
+						}
+					}));
+			}
+		}
+	}
 }
 
 void AShooterProjectile::Shoot()
 {
 	CollisionComponent->SetSimulatePhysics(false);
 
+	ProjectileMovement->SetUpdatedComponent(GetRootComponent());
+	ProjectileMovement->Activate(true);
 	ProjectileMovement->Velocity = GetActorForwardVector() * ProjectileMovement->InitialSpeed;
 	ProjectileMovement->UpdateComponentVelocity();
-	ProjectileMovement->Activate(true);
 }
 
 void AShooterProjectile::ModifyThroughChargingWeapon(float percentageCharged)
@@ -92,7 +119,7 @@ void AShooterProjectile::ModifyThroughChargingWeapon(float percentageCharged)
 
 void AShooterProjectile::SetOwningWeapon(AShooterWeapon* weapon)
 {
-	_owningWeapon = weapon;
+	_owningWeapon = TWeakObjectPtr<AShooterWeapon>(weapon);
 }
 
 void AShooterProjectile::BeginPlay()
@@ -105,10 +132,10 @@ void AShooterProjectile::BeginPlay()
 
 void AShooterProjectile::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
-	Super::EndPlay(EndPlayReason);
-
 	// clear the destruction timer
 	GetWorld()->GetTimerManager().ClearTimer(DestructionTimer);
+	
+	Super::EndPlay(EndPlayReason);
 }
 
 void AShooterProjectile::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
@@ -142,6 +169,8 @@ void AShooterProjectile::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Ot
 	BP_OnProjectileHit(Hit);
 
 	Cosmetic_OnHitObject();
+
+	StopProjectile();
 
 	// check if we should schedule deferred destruction of the projectile
 	if (DeferredDestructionTime > 0.0f)
@@ -233,9 +262,74 @@ void AShooterProjectile::OnLifeTimeExpired()
 
 void AShooterProjectile::OnDeferredDestruction()
 {
-	UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this);
-	if (ensure(IsValid(actorPool)))
+	if (UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this); ensure(IsValid(actorPool)))
 	{
 		actorPool->AddActorToPool(ProjectileType, this, EPooledActorType::Projectile);
+	}
+}
+
+void AShooterProjectile::StopProjectile()
+{
+	if (CollisionComponent)
+	{
+		CollisionComponent->SetSimulatePhysics(false);
+		CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		CollisionComponent->SetPhysicsLinearVelocity(FVector::ZeroVector);
+		CollisionComponent->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+	}
+
+	if (ProjectileMovement)
+	{
+		ProjectileMovement->StopMovementImmediately();
+		ProjectileMovement->Deactivate();
+	}
+
+	SetActorScale3D(FVector::OneVector);
+	GetWorld()->GetTimerManager().ClearTimer(LifeTimeTimer);
+
+	if (IsValid(_staticMeshComponent))
+	{
+		_staticMeshComponent->SetVisibility(false);
+	}
+
+	if (IsValid(_trailVFX))
+	{
+		_trailVFX->Deactivate();
+	}
+
+	SetActorHiddenInGame(true);
+}
+
+void AShooterProjectile::SpawnAsyncOnProjectileHitVFX(float scale)
+{
+	if (!ensure(IsValid(_projectileDataAsset)))
+	{
+		return;
+	}
+
+	SoftObjectHelper::AsyncLoadSoftObject(_projectileDataAsset->OnHitVFX, FOnAsyncLoad::CreateLambda([this, scale](UObject* particleSystem)
+		{
+			if (!IsValid(_onHitVFX))
+			{
+				constexpr bool autoDestroy = false;
+				constexpr bool autoActivate = false;
+				_onHitVFX = SoftObjectHelper::SpawnParticleSystemComponent(this, particleSystem, GetActorLocation(), GetActorRotation(), FVector::OneVector * scale, autoDestroy, autoActivate);
+			}
+
+			if (ensure(IsValid(_onHitVFX)))
+			{
+				_onHitVFX->SetWorldLocation(GetActorLocation());
+				_onHitVFX->DeactivateImmediate();
+				_onHitVFX->Activate();
+			}
+		}));
+}
+
+void AShooterProjectile::PlayOnHitSound()
+{
+	if (ensure(IsValid(_projectileDataAsset)) && !_projectileDataAsset->OnHitSound.IsNull())
+	{
+		SoftObjectHelper::PlaySpawnedSoundAtLocation(this, _projectileDataAsset->OnHitSound, GetActorLocation());
 	}
 }

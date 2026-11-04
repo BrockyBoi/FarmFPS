@@ -3,8 +3,8 @@
 #pragma once
 
 // Brock
+#include "Data/ResourceActorData.h"
 #include "Managers/PooledActorTypes.h"
-#include "Resources/ResourceActorData.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -17,6 +17,8 @@
 class ACrop;
 class AResourcePickupActor;
 class AShooterProjectile;
+
+DECLARE_STATS_GROUP(TEXT("ActorLookupSystem"), STATGROUP_ActorLookup, STATCAT_Advanced);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UActorLookupComponent : public UActorComponent

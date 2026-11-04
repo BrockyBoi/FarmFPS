@@ -50,25 +50,25 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetModifiedMusicMultiplier() const { return _masterAudioMultiplier * _musicAudioMultiplier; }
 
-	TObjectPtr<UAudioComponent> GetMusicAudioComponent(TObjectPtr<USoundBase> musicClip);
+	TObjectPtr<UAudioComponent> GetMusicAudioComponent(USoundBase* musicClip);
 
-	static UAudioComponent* SpawnSoundAtLocation(UObject* worldContext, TObjectPtr<USoundBase> soundClip, const FVector& location);
-	static UAudioComponent* SpawnSound2D(UObject* worldContext, TObjectPtr<USoundBase> soundClip);
-	static TObjectPtr<UAudioComponent> SpawnMusic2D(UObject* worldContext, TObjectPtr<USoundBase> musicClip);
+	static UAudioComponent* SpawnSoundAtLocation(UObject* worldContext, USoundBase* soundClip, const FVector& location);
+	static UAudioComponent* SpawnSound2D(UObject* worldContext, USoundBase* soundClip);
+	static TObjectPtr<UAudioComponent> SpawnMusic2D(UObject* worldContext, USoundBase* musicClip);
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 private:
-	void AddMusicAudioComponentToMap(TObjectPtr<USoundBase> musicClip, TObjectPtr<UAudioComponent> audioComponent);
+	void AddMusicAudioComponentToMap(USoundBase* musicClip, TObjectPtr<UAudioComponent> audioComponent);
 	void AddFXAudioComponentToArray(TObjectPtr<UAudioComponent> audioComponent);
 
 	UFUNCTION()
 	void OnFXAudioComponentStopPlaying();
 
 	TArray<TObjectPtr<UAudioComponent>> _currentlyPlayingFXAudioComponents;
-	TMap<TObjectPtr<USoundBase>, TObjectPtr<UAudioComponent>> _currentlyPlayingMusicAudioComponents;
+	TMap<USoundBase*, TObjectPtr<UAudioComponent>> _currentlyPlayingMusicAudioComponents;
 
 
 	UPROPERTY(EditAnywhere)

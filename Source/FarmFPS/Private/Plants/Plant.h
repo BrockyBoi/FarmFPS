@@ -3,7 +3,7 @@
 #pragma once
 
 // Brock
-#include "Plants/CropData.h"
+#include "Data/CropGrowthData.h"
 #include "Resources/ResourceInventory.h"
 #include "SaveSystem/Saveable.h"
 #include "SaveSystem/PlantSaveData.h"
@@ -30,7 +30,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void AddResource(const FGameplayTag& resourceType, float amount);
 	void AddResource(const FGameplayTagContainer& resourceTypes, float amount);
-	const FCropData& GetCropData() const { return _cropData; }
+	const FPlantGrowthData& GetPlantGrowthData() const { return _plantGrowthData; }
 
 	void DoDamage(int damageAmount);
 	void SetIsInvincible(bool isInvincible);
@@ -50,16 +50,22 @@ public:
 	float GetCurrentLoveLevel() const;
 
 	UFUNCTION(BlueprintPure)
-	float GetWaterLeft() const { return _cropData.WaterNeeded.GetModifiedValue(this) - GetCurrentWaterLevel(); }
+	float GetWaterLeft() const { return _plantGrowthData.WaterNeeded.GetModifiedValue(this) - GetCurrentWaterLevel(); }
 
 	UFUNCTION(BlueprintPure)
-	float GetWaterPercentage() const { return GetCurrentWaterLevel() / (float)_cropData.WaterNeeded.GetModifiedValue(this); }
+	float GetWaterPercentage() const { return GetCurrentWaterLevel() / (float)_plantGrowthData.WaterNeeded.GetModifiedValue(this); }
 
 	UFUNCTION(BlueprintPure)
-	float GetLightPercentage() const { return GetCurrentLightLevel() / (float)_cropData.LightNeeded.GetModifiedValue(this); }
+	float GetLightPercentage() const { return GetCurrentLightLevel() / (float)_plantGrowthData.LightNeeded.GetModifiedValue(this); }
 
 	UFUNCTION(BlueprintPure)
-	float GetLightLeft() const { return _cropData.LightNeeded.GetModifiedValue(this) - GetCurrentLightLevel(); }
+	float GetLightLeft() const { return _plantGrowthData.LightNeeded.GetModifiedValue(this) - GetCurrentLightLevel(); }
+
+	UFUNCTION(BlueprintPure)
+	bool IsLightFull() const { return FMath::IsNearlyEqual(1.f, GetLightPercentage()); }
+
+	UFUNCTION(BlueprintPure)
+	bool IsWaterFull() const { return FMath::IsNearlyEqual(1.f, GetWaterPercentage()); }
 
 	UFUNCTION(BlueprintPure)
 	float GetCompletionPercentage() const;
@@ -137,8 +143,8 @@ protected:
 
 	int _currentPlantHealth = 0;
 
-	UPROPERTY(EditAnywhere)
-	FCropData _cropData;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Plant|Growth")
+	FPlantGrowthData _plantGrowthData;
 
 	TWeakObjectPtr<UWeatherManager> _weatherManager = nullptr;
 };

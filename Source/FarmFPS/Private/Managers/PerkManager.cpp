@@ -2,7 +2,10 @@
 
 #include "PerkManager.h"
 
+// Brock
 #include "PerkModifierTypeTag.h"
+
+DECLARE_CYCLE_STAT(TEXT("PerkManagerModifyValues"), STAT_ModifyPerkManagerValues, STATGROUP_PerkManager);
 
 UPerkManager::UPerkManager()
 {
@@ -72,6 +75,8 @@ void UPerkManager::ModifyPerkData(const FGameplayTag& perkTag, const FPerkData& 
 		return;
 	}
 
+	SCOPE_CYCLE_COUNTER(STAT_ModifyPerkManagerValues);
+
 	FPerkData& perkData = _activePerks.FindOrAdd(perkTag);
 	perkData.AdditiveValue += perkDataChange.AdditiveValue;
 	perkData.MultiplicativeValue *= perkDataChange.MultiplicativeValue;
@@ -86,12 +91,16 @@ float UPerkManager::ModifyValueByPerks(const FGameplayTag& perkTag, float valueT
 		return 0.f;
 	}
 
+	SCOPE_CYCLE_COUNTER(STAT_ModifyPerkManagerValues);
+
 	return valueToModify * GetPerkData(perkTag).MultiplicativeValue + GetPerkData(perkTag).AdditiveValue;
 }
 
 float UPerkManager::ModifyValueByPerks(const FGameplayTagContainer& perkTags, float valueToModify) const
 {
 	float startingValue = valueToModify;
+
+	SCOPE_CYCLE_COUNTER(STAT_ModifyPerkManagerValues);
 
 	for (const FGameplayTag& perkTag : perkTags)
 	{
@@ -132,5 +141,3 @@ bool UPerkManager::IsValidTag(const FGameplayTag& tag) const
 {
 	return tag.GetTagName().ToString().Contains(PerkModifierTypeTag::PerkModifierBaseTag.GetTag().ToString());
 }
-
-

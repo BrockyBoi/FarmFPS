@@ -3,8 +3,8 @@
 #pragma once
 
 // Brock
+#include "Data/ModifiedValueData.h"
 #include "Interactables/AutomaticResourceTransferPoint.h"
-#include "Managers/ModifiedValueData.h"
 #include "Resources/ResourceInventory.h"
 
 // UE

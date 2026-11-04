@@ -3,7 +3,7 @@
 #pragma once
 
 // Brock
-#include "PerkData.h"
+#include "Data/PerkData.h"
 #include "PerkModifierTypeTag.h"
 
 // UE
@@ -13,6 +13,8 @@
 
 // Generated
 #include "PerkManager.generated.h"
+
+DECLARE_STATS_GROUP(TEXT("PerkManagerSystem"), STATGROUP_PerkManager, STATCAT_Advanced);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UPerkManager : public UActorComponent

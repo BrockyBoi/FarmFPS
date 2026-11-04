@@ -100,7 +100,10 @@ void APlant::AddResource(const FGameplayTag& resourceType, float amount)
 
 			_resourcesInventory->AddResource(resourceType, amount);
 
-			SetNewGrowthPercentage(GetLightPercentage(), false);
+			if (resourceType == ResourceTypeTag::Light)
+			{
+				SetNewGrowthPercentage(GetLightPercentage(), false);
+			}
 
 			if (!_isLightAndWaterFull && IsLightAndWaterFull())
 			{
@@ -130,7 +133,7 @@ void APlant::AddResource(const FGameplayTagContainer& resourceTypes, float amoun
 
 void APlant::DoDamage(int damageAmount)
 {
-	if (_isBroken || _cropData.CropHealth.GetModifiedValue(this) <= 0 || _isInvincible)
+	if (_isBroken || _plantGrowthData.CropHealth.GetModifiedValue(this) <= 0 || _isInvincible)
 	{
 		return;
 	}
@@ -190,9 +193,9 @@ void APlant::InitializeInventory()
 		_resourcesInventory->SetResourceAmount(ResourceTypeTag::Light, 0);
 		_resourcesInventory->SetResourceAmount(ResourceTypeTag::Love, 0);
 
-		_resourcesInventory->SetResourceCap(ResourceTypeTag::Water, _cropData.WaterNeeded.GetModifiedValue(this));
-		_resourcesInventory->SetResourceCap(ResourceTypeTag::Light, _cropData.LightNeeded.GetModifiedValue(this));
-		_resourcesInventory->SetResourceCap(ResourceTypeTag::Love, _cropData.LoveNeeded.GetModifiedValue(this));
+		_resourcesInventory->SetResourceCap(ResourceTypeTag::Water, _plantGrowthData.WaterNeeded.GetModifiedValue(this));
+		_resourcesInventory->SetResourceCap(ResourceTypeTag::Light, _plantGrowthData.LightNeeded.GetModifiedValue(this));
+		_resourcesInventory->SetResourceCap(ResourceTypeTag::Love, _plantGrowthData.LoveNeeded.GetModifiedValue(this));
 	}
 }
 
@@ -213,7 +216,7 @@ void APlant::ListenToWeatherManager(bool listen)
 
 bool APlant::ShouldTick() const
 {
-	return (_weatherManager.IsValid() && _weatherManager->IsStorming()) || !FMath::IsNearlyZero(_adjustedGrowthPercentage);
+	return (_weatherManager.IsValid() && _weatherManager->OnStormStarted.IsBoundToObject(this) && _weatherManager->IsStorming()) || !FMath::IsNearlyZero(_adjustedGrowthPercentage);
 }
 
 void APlant::CheckShouldTick()
@@ -228,7 +231,7 @@ void APlant::SetNewGrowthPercentage(float growthPercentage, bool instant)
 	{
 		if (!instant)
 		{
-			_previousScalePercentage = FMath::GetRangePct(_cropData.StartingScaleSize, _cropData.FinalScaleSize, mesh->GetRelativeTransform().GetScale3D().X);
+			_previousScalePercentage = FMath::GetRangePct(_plantGrowthData.StartingScaleSize, _plantGrowthData.FinalScaleSize, mesh->GetRelativeTransform().GetScale3D().X);
 			_adjustedGrowthPercentage = FMath::Clamp(growthPercentage, 0, 1.f);
 			CheckShouldTick();
 		}
@@ -236,7 +239,7 @@ void APlant::SetNewGrowthPercentage(float growthPercentage, bool instant)
 		{
 			mesh->SetRelativeScale3D(FVector::OneVector * growthPercentage);
 			_adjustedGrowthPercentage = 0.f;
-			_previousScalePercentage = FMath::GetRangePct(_cropData.StartingScaleSize, _cropData.FinalScaleSize, mesh->GetRelativeTransform().GetScale3D().X);
+			_previousScalePercentage = FMath::GetRangePct(_plantGrowthData.StartingScaleSize, _plantGrowthData.FinalScaleSize, mesh->GetRelativeTransform().GetScale3D().X);
 		}
 	}
 
@@ -265,7 +268,7 @@ void APlant::OnDayStateChange(EDayState newState)
 		{
 			_resourcesInventory->SetCanAddResources(false);
 			_resourcesInventory->ClearAllExceptMoney();
-			SetNewGrowthPercentage(_cropData.StartingScaleSize, true);
+			SetNewGrowthPercentage(_plantGrowthData.StartingScaleSize, true);
 			Cosmetic_OnResourceAdded();
 		}
 	}
@@ -301,11 +304,10 @@ void APlant::AffectGrowth()
 		if (!FMath::IsNearlyZero(_adjustedGrowthPercentage))
 		{
 			_previousScalePercentage = FMath::Lerp(_previousScalePercentage, _adjustedGrowthPercentage, _lerpSpeedScale);
-			lerpedScale = FMath::Lerp(_cropData.StartingScaleSize, _cropData.FinalScaleSize, _previousScalePercentage);
+			lerpedScale = FMath::Lerp(_plantGrowthData.StartingScaleSize, _plantGrowthData.FinalScaleSize, _previousScalePercentage);
 			if (FMath::IsNearlyEqual(_previousScalePercentage, _adjustedGrowthPercentage, .01f))
 			{
 				_adjustedGrowthPercentage = 0;
-				_previousScalePercentage = 0;
 			}
 		}
 
@@ -334,17 +336,17 @@ float APlant::GetCompletionPercentage() const
 {
 	int water = GetCurrentWaterLevel();
 	int light = GetCurrentLightLevel();
-	float waterGrowthRatio = water / (float)_cropData.WaterNeeded.GetModifiedValue(this);
-	float lightGrowthRatio = light / (float)_cropData.LightNeeded.GetModifiedValue(this);
+	float waterGrowthRatio = water / (float)_plantGrowthData.WaterNeeded.GetModifiedValue(this);
+	float lightGrowthRatio = light / (float)_plantGrowthData.LightNeeded.GetModifiedValue(this);
 	return (waterGrowthRatio + lightGrowthRatio) / 2.0f;
 }
 
 bool APlant::IsLightAndWaterFull() const
 {
-	return FMath::IsNearlyEqual(GetCurrentLightLevel(), _cropData.LightNeeded.GetModifiedValue(this)) && FMath::IsNearlyEqual(GetCurrentWaterLevel(), _cropData.WaterNeeded.GetModifiedValue(this));
+	return FMath::IsNearlyEqual(GetCurrentLightLevel(), _plantGrowthData.LightNeeded.GetModifiedValue(this)) && FMath::IsNearlyEqual(GetCurrentWaterLevel(), _plantGrowthData.WaterNeeded.GetModifiedValue(this));
 }
 
 bool APlant::IsFullyLoved() const
 {
-	return _cropData.LoveNeeded.GetBaseValue() > 0 && FMath::IsNearlyEqual(GetCurrentLoveLevel(), _cropData.LoveNeeded.GetModifiedValue(this));
+	return _plantGrowthData.LoveNeeded.GetBaseValue() > 0 && FMath::IsNearlyEqual(GetCurrentLoveLevel(), _plantGrowthData.LoveNeeded.GetModifiedValue(this));
 }

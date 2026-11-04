@@ -3,8 +3,8 @@
 #pragma once
 
 // Brock
+#include "Data/CraftingData.h"
 #include "Misc/CachedModifiableValueDataTableRowHandle.h"
-#include "Managers/CraftingData.h"
 
 // UE
 #include "CoreMinimal.h"

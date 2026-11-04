@@ -6,13 +6,14 @@
 #include "FarmFPSCharacter.h"
 
 //Brock
+#include "Interactables/AutomaticResourceTransferPoint.h"
 #include "Managers/ActorPool.h"
 #include "Managers/AudioManager.h"
-#include "Interactables/AutomaticResourceTransferPoint.h"
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/ObjectiveManager.h"
 #include "Managers/ObjectiveTypeTag.h"
+#include "Misc/SoftObjectHelper.h"
 #include "Resources/ResourceInventory.h"
 
 // UE
@@ -58,9 +59,9 @@ void AResourcePickupActor::Tick(float DeltaTime)
 				actorPool->AddActorToPool(_resourceType, this, EPooledActorType::ResourcePickup);
 			}
 
-			if (ensure(IsValid(_onCollectResourceSound)))
+			if (ensure(!_onCollectResourceSound.IsNull()))
 			{
-				UAudioManager::SpawnSoundAtLocation(this, _onCollectResourceSound, GetActorLocation());
+				SoftObjectHelper::PlaySpawnedSoundAtLocation(this, _onCollectResourceSound, GetActorLocation());
 			}
 
 			OnCollected.Broadcast(_resourceType);
@@ -68,7 +69,7 @@ void AResourcePickupActor::Tick(float DeltaTime)
 	}
 	else
 	{
-		AddActorLocalRotation(FRotator(0.f, _rotationRate * DeltaTime * _rotationVariance, 0.f));
+		//AddActorLocalRotation(FRotator(0.f, _rotationRate * DeltaTime * _rotationVariance, 0.f));
 	}
 }
 
@@ -135,7 +136,18 @@ void AResourcePickupActor::RemoveFromPool()
 		dayNightCycle->OnDayStateChange.AddUObject(this, &AResourcePickupActor::OnDayStateChange);
 	}
 
-	SetActorTickEnabled(true);
+	if (ensure(!_staticMeshClass.IsNull()))
+	{
+		_staticMesh->SetStaticMesh(_staticMeshClass.IsValid() ? _staticMeshClass.Get() : _staticMeshClass.LoadSynchronous());
+
+		if (!_customMaterialClass.IsNull())
+		{
+			if (UMaterialInstance* instance = _customMaterialClass.IsValid() ? _customMaterialClass.Get() : _customMaterialClass.LoadSynchronous(); ensure(IsValid(instance)))
+			{
+				_staticMesh->SetMaterial(0, instance);
+			}
+		}
+	}
 
 	OnResourceSpawned.Broadcast(this);
 }
@@ -210,6 +222,7 @@ void AResourcePickupActor::StartMovingTowardsActor()
 	_isMovingToActor = true;
 
 	EnableAllCollision(false);
+	SetActorTickEnabled(true);
 }
 
 void AResourcePickupActor::OnDayStateChange(EDayState dayState)

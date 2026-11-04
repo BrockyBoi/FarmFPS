@@ -3,7 +3,7 @@
 #pragma once
 
 // Brock
-#include "Managers/ModifiedValueData.h"
+#include "Data/ModifiedValueData.h"
 #include "Misc/CachedModifiableValueDataTableRowHandle.h"
 #include "StatusEffects/EffectManager.h"
 

@@ -26,6 +26,9 @@ namespace PerkModifierTypeTag
 	UE_DEFINE_GAMEPLAY_TAG(WaterEfficacy, "PerkModifier.WaterEfficacy");
 	UE_DEFINE_GAMEPLAY_TAG(WheatNeededForBread, "PerkModifier.WheatNeededForBread");
 
+	// Day
+	UE_DEFINE_GAMEPLAY_TAG(DayLength, "PerkModifier.DayLength");
+
 	// Money Related
 	UE_DEFINE_GAMEPLAY_TAG(MoneyNeededForUpgrades, "PerkModifier.MoneyNeededForUpgrades");
 

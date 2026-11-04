@@ -3,10 +3,12 @@
 #include "ActorLookupComponent.h"
 
 // Brock
-#include "Plants/CropActorData.h"
+#include "Data/CropActorData.h"
+#include "Data/ProjectileActorData.h"
+#include "Data/ResourceActorData.h"
 #include "Managers/PooledActorTypes.h"
-#include "Projectiles/ProjectileActorData.h"
-#include "Resources/ResourceActorData.h"
+
+DECLARE_CYCLE_STAT(TEXT("ActorLookupCheck"), STAT_ActorLookupCheck, STATGROUP_ActorLookup);
 
 UActorLookupComponent::UActorLookupComponent()
 {
@@ -22,6 +24,8 @@ void UActorLookupComponent::BeginPlay()
 
 TSubclassOf<AActor> UActorLookupComponent::GetActorReference(const FGameplayTag& actorTag, EPooledActorType actorType) const
 {
+	SCOPE_CYCLE_COUNTER(STAT_ActorLookupCheck);
+
 	switch (actorType)
 	{
 	case EPooledActorType::Projectile:
@@ -37,9 +41,10 @@ TSubclassOf<AActor> UActorLookupComponent::GetActorReference(const FGameplayTag&
 
 TSubclassOf<AResourcePickupActor> UActorLookupComponent::GetResourceActor(const FGameplayTag& resourceType) const
 {
-	if (ensure(_resourceActorMap.Contains(resourceType)))
+	if (ensure(_resourceActorMap.Contains(resourceType)) && ensure(!_resourceActorMap[resourceType].ResourceActorClass.IsNull()))
 	{
-		return _resourceActorMap[resourceType].ResourceActorClass;
+		TSoftClassPtr<AResourcePickupActor> actorClass = _resourceActorMap[resourceType].ResourceActorClass;
+		return actorClass.IsValid() ? actorClass.Get() : actorClass.LoadSynchronous();
 	}
 
 	return TSubclassOf<AResourcePickupActor>();
@@ -47,9 +52,10 @@ TSubclassOf<AResourcePickupActor> UActorLookupComponent::GetResourceActor(const 
 
 TSubclassOf<AShooterProjectile> UActorLookupComponent::GetProjectileActor(const FGameplayTag& resourceType) const
 {
-	if (ensure(_resourceActorMap.Contains(resourceType)))
+	if (ensure(_resourceActorMap.Contains(resourceType)) && ensure(!_resourceActorMap[resourceType].ProjectileActorClass.IsNull()))
 	{
-		return _resourceActorMap[resourceType].ProjectileActorClass;
+		TSoftClassPtr<AShooterProjectile> actorClass = _resourceActorMap[resourceType].ProjectileActorClass;
+		return actorClass.IsValid() ? actorClass.Get() : actorClass.LoadSynchronous();
 	}
 
 	return TSubclassOf<AShooterProjectile>();
@@ -57,9 +63,10 @@ TSubclassOf<AShooterProjectile> UActorLookupComponent::GetProjectileActor(const 
 
 TSubclassOf<ACrop> UActorLookupComponent::GetCropActor(const FGameplayTag& cropType) const
 {
-	if (ensure(_resourceActorMap.Contains(cropType)))
+	if (ensure(_resourceActorMap.Contains(cropType)) && ensure(!_resourceActorMap[cropType].CropActorClass.IsNull()))
 	{
-		return _resourceActorMap[cropType].CropActorClass;
+		TSoftClassPtr<ACrop> actorClass = _resourceActorMap[cropType].CropActorClass;
+		return actorClass.IsValid() ? actorClass.Get() : actorClass.LoadSynchronous();
 	}
 
 	return TSubclassOf<ACrop>();

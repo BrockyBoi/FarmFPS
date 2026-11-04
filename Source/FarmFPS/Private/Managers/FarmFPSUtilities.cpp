@@ -16,7 +16,6 @@
 #include "Managers/TutorialScreenManager.h"
 #include "Managers/VisualSettingsManager.h"
 #include "Managers/Weather/WeatherManager.h"
-#include "ModifiedValueData.h"
 #include "StatusEffects/EffectManager.h"
 #include "SaveSystem/SaveGameManager.h"
 
@@ -47,7 +46,7 @@ AGameStateBase* UFarmFPSUtilities::GetGameBaseState(const UObject* WorldContextO
 
 UPerkManager* UFarmFPSUtilities::GetPlayerPerkManager(const UObject* WorldContextObject)
 {
-	if (ensure(IsValid(GetPlayerCharacter(WorldContextObject))))
+	if (IsValid(GetPlayerCharacter(WorldContextObject)))
 	{
 		return GetPlayerCharacter(WorldContextObject)->FindComponentByClass<UPerkManager>();
 	}

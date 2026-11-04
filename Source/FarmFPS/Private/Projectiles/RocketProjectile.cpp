@@ -4,6 +4,7 @@
 
 // Brock
 #include "Managers/AudioManager.h"
+#include "Misc/SoftObjectHelper.h"
 #include "FarmFPSCharacter.h"
 #include "Plants/Plant.h"
 
@@ -43,10 +44,7 @@ void ARocketProjectile::Explode()
 	TSet<AActor*> overlappingActors;
 	_cropCollider->GetOverlappingActors(overlappingActors);
 
-	if (IsValid(_onHitSound))
-	{
-		UAudioManager::SpawnSoundAtLocation(this, _onHitSound, GetActorLocation());
-	}
+	PlayOnHitSound();
 
 	for (AActor* actor : overlappingActors)
 	{

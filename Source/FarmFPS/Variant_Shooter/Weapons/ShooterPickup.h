@@ -36,7 +36,7 @@ struct FWeaponTableRow : public FTableRowBase
 
 	/** Weapon class to grant on pickup */
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<AShooterWeapon> WeaponToSpawn;
+	TSoftClassPtr<AShooterWeapon> WeaponToSpawn;
 
 	UPROPERTY(EditAnywhere)
 	FGameplayTag WeaponTypeTag;

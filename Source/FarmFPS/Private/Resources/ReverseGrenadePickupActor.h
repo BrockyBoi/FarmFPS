@@ -3,7 +3,7 @@
 #pragma once
 
 // Brock
-#include "Managers/ModifiedValueData.h"
+#include "Data/ModifiedValueData.h"
 #include "Resources/GrenadeActor.h"
 
 // UE

@@ -29,7 +29,7 @@ void ArcResourceToOtherCropOnHit::StartEffect()
 		for (FHitResult& result : hitResults)
 		{
 			ACrop* crop = Cast<ACrop>(result.GetActor());
-			if (IsValid(crop) && crop->GetCropData().ResourceType == _cropToAffect->GetCropData().ResourceType)
+			if (IsValid(crop) && ensure(IsValid(crop->GetCropDataAsset())) && crop->GetCropDataAsset()->ResourceType == _cropToAffect->GetCropDataAsset()->ResourceType)
 			{
 				ArcToCrop(crop);
 

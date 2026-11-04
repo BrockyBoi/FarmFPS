@@ -3,9 +3,9 @@
 #pragma once
 
 // Brock
-#include "PerkData.h"
-#include "ModifiedValueData.h"
-#include "TradeOffData.h"
+#include "Data/ModifiedValueData.h"
+#include "Data/PerkData.h"
+#include "Data/TradeOffData.h"
 #include "TradeOffPossibility.h"
 
 // UE

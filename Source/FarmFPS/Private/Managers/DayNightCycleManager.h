@@ -3,8 +3,8 @@
 #pragma once
 
 // Brock
+#include "Data/ModifiedValueData.h"
 #include "Misc/CachedModifiableValueDataTableRowHandle.h"
-#include "ModifiedValueData.h"
 
 // UE
 #include "CoreMinimal.h"
@@ -40,6 +40,8 @@ public:
 
 	void ForceEndDay();
 	void ForceSetTimeLeft(float secondsLeftInDay);
+
+	float GetModifiedDayLength() const;
 
 	UFUNCTION(BlueprintPure)
 	bool IsDay() const { return _currentDayState == EDayState::Day; }
@@ -90,7 +92,10 @@ private:
 	void StartDay();
 	void EndDay();
 
-	TObjectPtr<UAudioComponent> GetMusicAudioComponent(TObjectPtr<USoundBase> musicClip);
+	TObjectPtr<UAudioComponent> GetMusicAudioComponent(TSoftObjectPtr<USoundBase> musicClip);
+
+	UFUNCTION()
+	void OnPlayerPerkValueChange(const FGameplayTag& resourceType, const FPerkData& perkData);
 
 	void EndDayFromLoading(UFarmFPSSaveGame*);
 
@@ -100,10 +105,14 @@ private:
 
 	void OnCustomerServed();
 
+	void SetNightSkyOpacityPercentage(float percent);
+
 	TWeakObjectPtr<UAudioManager> _audioManager;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tunables")
 	FCachedModifiableValueDataTableRowHandle _dayLength = 60.f;
+
+	float _modifiedDayLength = 0;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tunables")
 	FCachedModifiableValueDataTableRowHandle _timeToRemoveOnCustomerServed = 5.f;
@@ -124,19 +133,21 @@ private:
 	TWeakObjectPtr<ADirectionalLight> _moonLight = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
-	TObjectPtr<USoundBase> _onDayStartSound = nullptr;
+	TSoftObjectPtr<USoundBase> _onDayStartSound = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
-	TObjectPtr<USoundBase> _onDayEndSound = nullptr;
+	TSoftObjectPtr<USoundBase> _onDayEndSound = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
-	TObjectPtr<USoundBase> _daytimeMusic = nullptr;
+	TSoftObjectPtr<USoundBase> _daytimeMusic = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
-	TObjectPtr<USoundBase> _nightTimeMusic = nullptr;
+	TSoftObjectPtr<USoundBase> _nightTimeMusic = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
-	TObjectPtr<USoundBase> _onNightEndSound = nullptr;
+	TSoftObjectPtr<USoundBase> _onNightEndSound = nullptr;
+
+	TWeakObjectPtr<AActor> _nightSkyActor;
 
 	UPROPERTY(EditAnywhere)
 	FLinearColor _startOfDayColor = FLinearColor::Green;
@@ -160,9 +171,15 @@ private:
 	float _adjustedTimeElapsed = 0.f;
 
 	UPROPERTY(EditAnywhere)
+	float _percentageOfDayWhenNightSkyIsGone = .1f;
+
+	UPROPERTY(EditAnywhere)
+	float _percentageOfDayWhenNightSkyShows = .9f;
+
+	UPROPERTY(EditAnywhere)
 	EDayState _dayStateOnDayReset = EDayState::MidNight;
 
-	EDayState _currentDayState;
+	EDayState _currentDayState = EDayState::Day;
 
 	bool _CHEATIsUnlimitedDay = false;
 };

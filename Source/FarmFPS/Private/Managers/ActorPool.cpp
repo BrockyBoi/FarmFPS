@@ -7,6 +7,8 @@
 #include "FarmFPSUtilities.h"
 #include "PoolableActor.h"
 
+DECLARE_CYCLE_STAT(TEXT("SpawnActorPoolActor"), STAT_SpawnActorPoolActor, STATGROUP_ActorPool);
+
 UActorPool::UActorPool()
 {
 	PrimaryComponentTick.bCanEverTick = false;
@@ -118,6 +120,7 @@ void UActorPool::AddActorToPool(const FGameplayTag& actorTag, AActor* actor, EPo
 		pooledActors[actorTag].Add(actor);
 		actor->SetActorEnableCollision(false);
 		actor->SetActorHiddenInGame(true);
+		actor->SetActorTickEnabled(false);
 
 		IPoolableActor* poolableActor = Cast<IPoolableActor>(actor);
 		if (ensure(actor->Implements<UPoolableActor>()))
@@ -129,17 +132,15 @@ void UActorPool::AddActorToPool(const FGameplayTag& actorTag, AActor* actor, EPo
 
 AActor* UActorPool::SpawnNewActor(const FGameplayTag& actorTag, const FTransform& spawnTransform, EPooledActorType actorType)
 {
-	UActorLookupComponent* lookupComponent = UFarmFPSUtilities::GetResourceActorLookupComponent(this);
-	if (ensure(IsValid(lookupComponent)))
+	SCOPE_CYCLE_COUNTER(STAT_SpawnActorPoolActor);
+	
+	if (UActorLookupComponent* lookupComponent = UFarmFPSUtilities::GetResourceActorLookupComponent(this); ensure(IsValid(lookupComponent)))
 	{
-		TSubclassOf<AActor> resourceActor = lookupComponent->GetActorReference(actorTag, actorType);
-		if (ensure(IsValid(resourceActor)))
+		if (TSubclassOf<AActor> resourceActor = lookupComponent->GetActorReference(actorTag, actorType); ensure(IsValid(resourceActor)))
 		{
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			AActor* actor = GetWorld()->SpawnActor<AActor>(resourceActor, spawnTransform, SpawnParams);
-
-			if (ensure(IsValid(actor)))
+			if (AActor* actor = GetWorld()->SpawnActor<AActor>(resourceActor, spawnTransform, SpawnParams); ensure(IsValid(actor)))
 			{
 				return actor;
 			}
@@ -151,17 +152,15 @@ AActor* UActorPool::SpawnNewActor(const FGameplayTag& actorTag, const FTransform
 
 AActor* UActorPool::SpawnNewActor(const FGameplayTag& actorTag, const FVector& spawnLocation, EPooledActorType actorType)
 {
-	UActorLookupComponent* lookupComponent = UFarmFPSUtilities::GetResourceActorLookupComponent(this);
-	if (ensure(IsValid(lookupComponent)))
+	SCOPE_CYCLE_COUNTER(STAT_SpawnActorPoolActor);
+
+	if (UActorLookupComponent* lookupComponent = UFarmFPSUtilities::GetResourceActorLookupComponent(this); ensure(IsValid(lookupComponent)))
 	{
-		TSubclassOf<AActor> resourceActor = lookupComponent->GetActorReference(actorTag, actorType);
-		if (ensure(IsValid(resourceActor)))
+		if (TSubclassOf<AActor> resourceActor = lookupComponent->GetActorReference(actorTag, actorType); ensure(IsValid(resourceActor)))
 		{
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			AActor* actor = GetWorld()->SpawnActor<AActor>(resourceActor, spawnLocation, FRotator::ZeroRotator, SpawnParams);
-
-			if (ensure(IsValid(actor)))
+			if (AActor* actor = GetWorld()->SpawnActor<AActor>(resourceActor, spawnLocation, FRotator::ZeroRotator, SpawnParams); ensure(IsValid(actor)))
 			{
 				return actor;
 			}

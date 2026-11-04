@@ -21,7 +21,8 @@ public class FarmFPS : ModuleRules
 			"UMG",
 			"GameplayTags",
 			"Slate",
-			"SlateCore"
+			"SlateCore",
+			"Niagara"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

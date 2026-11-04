@@ -29,6 +29,8 @@ void ABreadOven::BeginPlay()
 	{
 		_fireTargetCollider->OnComponentBeginOverlap.AddDynamic(this, &ABreadOven::OnFireTargetOverlap);
 	}
+
+	SetActorTickEnabled(false);
 }
 
 void ABreadOven::Tick(float DeltaTime)

@@ -5,7 +5,8 @@
 #include "ShooterProjectile.h"
 
 // Brock
-#include "Managers/ModifiedValueData.h"
+#include "Data/ModifiedValueData.h"
+#include "Data/CropProjectileDataAsset.h"
 #include "Managers/PoolableActor.h"
 #include "Misc/CachedModifiableValueDataTableRowHandle.h"
 
@@ -31,7 +32,16 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 
-	bool CanSpawnCropAtLocation(class ACrop* crop, const FVector& spawnLocation, const FVector& hitNormal) const;
+	bool CanSpawnCropAtLocation(const FCollisionShape& collisionShape, const FVector& spawnLocation, const FVector& hitNormal) const;
+
+	void OnSpawnSeedFail();
+	void OnSpawnSeedSuccess();
+
+	UPROPERTY(EditDefaultsOnly)
+	float _capsuleHeight = 44;
+
+	UPROPERTY(EditDefaultsOnly)
+	float _capsuleWidth = 22;
 
 	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
 	void Cosmetic_OnSpawnedSeedSucceed();
@@ -39,8 +49,11 @@ protected:
 	UFUNCTION(BlueprintCosmetic, BlueprintImplementableEvent)
 	void Cosmetic_OnSpawnSeedFail();
 
-	UPROPERTY(EditDefaultsOnly, Category = "Audio")
-	TObjectPtr<USoundBase> _unableToPlantSound;
+	UPROPERTY(EditAnywhere)
+	float _failedSpawnSeedVFXScale = .2f;
+
+	UPROPERTY(EditAnywhere)
+	float _succeedSpawnSeedVFXScale = .5f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tunables")
 	FCachedModifiableValueDataTableRowHandle _minDistanceFromNearestCrop = 15.f;

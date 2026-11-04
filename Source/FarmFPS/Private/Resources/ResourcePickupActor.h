@@ -113,5 +113,11 @@ protected:
 	uint16 _resourceAmount = 1;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
-	TObjectPtr<USoundBase> _onCollectResourceSound = nullptr;
+	TSoftObjectPtr<USoundBase> _onCollectResourceSound = nullptr;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UStaticMesh> _staticMeshClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UMaterialInstance> _customMaterialClass;
 };

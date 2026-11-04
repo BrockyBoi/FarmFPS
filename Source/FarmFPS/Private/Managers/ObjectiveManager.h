@@ -3,7 +3,7 @@
 #pragma once
 
 // Brock
-#include "ObjectiveData.h"
+#include "Data/ObjectiveData.h"
 
 // UE
 #include "CoreMinimal.h"

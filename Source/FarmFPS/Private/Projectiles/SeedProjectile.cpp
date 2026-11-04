@@ -7,6 +7,7 @@
 #include "Managers/AudioManager.h"
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
+#include "Misc/SoftObjectHelper.h"
 #include "Plants/Crop.h"
 #include "Plants/FarmingPlotComponent.h"
 #include "Resources/ResourcePickupActor.h"
@@ -49,85 +50,85 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 		UFarmingPlotComponent* farmPlot = Other->FindComponentByClass<UFarmingPlotComponent>();
 		if (IsValid(farmPlot) && farmPlot->GetAllowedSeedTypes().HasTag(ProjectileType) && IsValid(dayNightCycle) && dayNightCycle->IsDay())
 		{
-			ACrop* crop = Cast<ACrop>(actorPool->GetActorFromPool(ProjectileType, HitLocation, EPooledActorType::Crop));
-			if (ensure(IsValid(crop)))
+			FCollisionShape shape = FCollisionShape();
+			shape.SetCapsule(_capsuleHeight, _capsuleWidth);
+
+			FVector modifiedVector = HitLocation;
+
+			// Make sure that there are no other crops at current location
+			if (!CanSpawnCropAtLocation(shape, modifiedVector, HitNormal))
 			{
-				FVector modifiedVector = HitLocation;
+				int maxAttemptsAllowed = 24;
+				int currentAttempt = 0;
+				float distFromHit = _minDistanceFromNearestCrop.GetValue().GetModifiedValue(this);
+				FVector randVector = FVector::Zero();
+				FRotator slopeRotator = UKismetMathLibrary::MakeRotFromZ(HitNormal);
+				FVector slopeForward = FRotationMatrix(slopeRotator).GetUnitAxis(EAxis::X);
+				FVector slopeRight = FRotationMatrix(slopeRotator).GetUnitAxis(EAxis::Y);
+				float angle = FMath::RandRange(0, 360);
 
-				// Make sure that there are no other crops at current location
-				if (!CanSpawnCropAtLocation(crop, modifiedVector, HitNormal))
+				do
 				{
-					int maxAttemptsAllowed = 24;
-					int currentAttempt = 0;
-					float distFromHit = _minDistanceFromNearestCrop.GetValue().GetModifiedValue(this);
-					FVector randVector = FVector::Zero();
-					FRotator slopeRotator = UKismetMathLibrary::MakeRotFromZ(HitNormal);
-					FVector slopeForward = FRotationMatrix(slopeRotator).GetUnitAxis(EAxis::X);
-					FVector slopeRight = FRotationMatrix(slopeRotator).GetUnitAxis(EAxis::Y);
-					float angle = FMath::RandRange(0, 360);
+					currentAttempt++;
+					// Add an extra 15 degrees each attempt to find valid spot
+					angle += currentAttempt * 15;
 
-					do
-					{
-						currentAttempt++;
-						// Add an extra 15 degrees each attempt to find valid spot
-						angle += currentAttempt * 15;
+					float degToRad = FMath::DegreesToRadians(angle);
+					float scaleX = distFromHit * FMath::Cos(angle);
+					float scaleY = distFromHit * FMath::Sin(angle);
 
-						float degToRad = FMath::DegreesToRadians(angle);
-						float scaleX = distFromHit * FMath::Cos(angle);
-						float scaleY = distFromHit * FMath::Sin(angle);
+					modifiedVector = HitLocation + (slopeForward * scaleX) + (slopeRight * scaleY);
+				} while (!CanSpawnCropAtLocation(shape, modifiedVector, HitNormal) && currentAttempt < maxAttemptsAllowed);
+			}
 
-						modifiedVector = HitLocation + (slopeForward * scaleX) + (slopeRight * scaleY);
-					} while (!CanSpawnCropAtLocation(crop, modifiedVector, HitNormal) && currentAttempt < maxAttemptsAllowed);
-				}
-
-				if (CanSpawnCropAtLocation(crop, modifiedVector, HitNormal))
+			if (CanSpawnCropAtLocation(shape, modifiedVector, HitNormal))
+			{
+				if (ACrop* crop = Cast<ACrop>(actorPool->GetActorFromPool(ProjectileType, HitLocation, EPooledActorType::Crop)); ensure(IsValid(crop)))
 				{
 					crop->SetActorLocation(modifiedVector);
 					crop->SetActorRotation(Other->GetActorRotation());
 
 					crop->SetWasPlantedSuccessfully(true);
-					Cosmetic_OnSpawnedSeedSucceed();
-				}
-				else
-				{
-					actorPool->AddActorToPool(ProjectileType, crop, EPooledActorType::Crop);
-					if (IsValid(_unableToPlantSound) && ensure(_owningWeapon.IsValid()) && _owningWeapon->GetWeaponFireType() == EWeaponFireType::SemiAuto)
-					{
-						UAudioManager::SpawnSoundAtLocation(this, _unableToPlantSound, GetActorLocation());
-					}
-
-					crop->SetWasPlantedSuccessfully(false);
-					Cosmetic_OnSpawnSeedFail();
-					return;
+					OnSpawnSeedSuccess();
 				}
 			}
-
-			if (IsValid(_onHitSound))
+			else
 			{
-				UAudioManager::SpawnSoundAtLocation(this, _onHitSound, GetActorLocation());
+				UCropProjectileDataAsset* projData = Cast<UCropProjectileDataAsset>(_projectileDataAsset);
+				if (ensure(IsValid(projData)) && !projData->OnFailToPlantSeedSound.IsNull() && ensure(_owningWeapon.IsValid()) && _owningWeapon->GetWeaponFireType() == EWeaponFireType::SemiAuto)
+				{
+					SoftObjectHelper::PlaySpawnedSoundAtLocation(this, projData->OnFailToPlantSeedSound, GetActorLocation());
+				}
+
+				OnSpawnSeedFail();
+				return;
 			}
 		}
-		else
+
+		UCropProjectileDataAsset* projData = Cast<UCropProjectileDataAsset>(_projectileDataAsset);
+		if (ensure(IsValid(projData)) && !projData->OnPlantSeedSound.IsNull())
 		{
-			Cosmetic_OnSpawnSeedFail();
+			SoftObjectHelper::PlaySpawnedSoundAtLocation(this, projData->OnPlantSeedSound, GetActorLocation());
 		}
+	}
+	else
+	{
+		OnSpawnSeedFail();
 	}
 }
 
-bool ASeedProjectile::CanSpawnCropAtLocation(ACrop* crop, const FVector& spawnLocation, const FVector& hitNormal) const
+bool ASeedProjectile::CanSpawnCropAtLocation(const FCollisionShape& collisionShape, const FVector& spawnLocation, const FVector& hitNormal) const
 {
 	bool hasOtherCrops = false;
 	bool hasValidFarmPlot = false;
-	if (ensure(IsValid(crop)) && ensure(IsValid(crop->GetCapsuleComponent())) && ensure(IsValid(GetWorld())))
+	if (ensure(IsValid(GetWorld())))
 	{
 		// Check that we don't hit any other crops
 		TArray<FHitResult> outHits;
 		FCollisionQueryParams params;
-		params.AddIgnoredActor(crop);
 		FRotator slopeRotator = UKismetMathLibrary::MakeRotFromZ(hitNormal);
 
-		auto shape = crop->GetCapsuleComponent()->GetCollisionShape();
-		GetWorld()->SweepMultiByChannel(outHits, spawnLocation, spawnLocation, FQuat(slopeRotator), _collisionChannelToCheck, FCollisionShape::MakeCapsule(shape.GetCapsuleRadius() / 2.f, shape.GetCapsuleHalfHeight()), params);
+		GetWorld()->SweepMultiByChannel(outHits, spawnLocation, spawnLocation, FQuat(slopeRotator), _collisionChannelToCheck, FCollisionShape::MakeCapsule(collisionShape.GetCapsuleRadius() / 2.f, collisionShape.GetCapsuleHalfHeight()), params);
 		for (FHitResult& result : outHits)
 		{
 			AActor* actor = result.GetActor();
@@ -165,4 +166,18 @@ bool ASeedProjectile::CanSpawnCropAtLocation(ACrop* crop, const FVector& spawnLo
 	}
 
 	return hasValidFarmPlot && !hasOtherCrops;
+}
+
+void ASeedProjectile::OnSpawnSeedFail()
+{
+	Cosmetic_OnSpawnSeedFail();
+
+	SpawnAsyncOnProjectileHitVFX(_failedSpawnSeedVFXScale);
+}
+
+void ASeedProjectile::OnSpawnSeedSuccess()
+{
+	Cosmetic_OnSpawnedSeedSucceed();
+
+	SpawnAsyncOnProjectileHitVFX(_succeedSpawnSeedVFXScale);
 }
