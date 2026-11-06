@@ -77,6 +77,26 @@ void AShooterWeapon::BeginPlay()
 	}
 
 	SetActorTickEnabled(false);
+
+	if (ensure(IsValid(WeaponDataAsset)))
+	{
+		SoftObjectHelper::AsyncLoadSoftObjectNoCallback(this, WeaponDataAsset->ReloadMontage);
+		SoftObjectHelper::AsyncLoadSoftObjectNoCallback(this, WeaponDataAsset->EquipMontage);
+		SoftObjectHelper::AsyncLoadSoftObjectNoCallback(this, WeaponDataAsset->FiringMontage);
+		SoftObjectHelper::AsyncLoadSoftObjectNoCallback(this, WeaponDataAsset->ShootSound);
+
+		SoftObjectHelper::SetSkeletalMesh(this, WeaponDataAsset->Mesh, GetFirstPersonMesh());
+
+		if (!WeaponDataAsset->MeshMaterial.IsNull())
+		{
+			SoftObjectHelper::SetSkeletalMeshMaterial(this, WeaponDataAsset->MeshMaterial, GetFirstPersonMesh());
+		}
+
+		if (!WeaponDataAsset->MuzzleFlashVFX.IsNull())
+		{
+			SoftObjectHelper::AsyncLoadSoftObjectNoCallback(this, WeaponDataAsset->MuzzleFlashVFX);
+		}
+	}
 }
 
 void AShooterWeapon::Tick(float DeltaTime)
@@ -115,6 +135,8 @@ void AShooterWeapon::ActivateWeapon()
 
 	// notify the owner
 	WeaponOwner->OnWeaponActivated(this);
+
+	//WeaponOwner->PlayMontage(EquipMontage);
 }
 
 void AShooterWeapon::DeactivateWeapon()
@@ -241,9 +263,9 @@ void AShooterWeapon::Fire()
 		GetWorld()->GetTimerManager().SetTimer(RefireTimer, this, &AShooterWeapon::FireCooldownExpired, GetFireRate(), false);
 	}
 
-	if (!_onShootSound.IsNull())
+	if (ensure(IsValid(WeaponDataAsset)) && !WeaponDataAsset->ShootSound.IsNull())
 	{
-		SoftObjectHelper::PlaySpawnedSoundAtLocation(this, _onShootSound, GetActorLocation());
+		SoftObjectHelper::PlaySpawnedSoundAtLocation(this, WeaponDataAsset->ShootSound, GetActorLocation());
 	}
 
 	_currentTimeCharging = 0.f;
@@ -262,6 +284,22 @@ void AShooterWeapon::StartReload()
 		WeaponOwner->UpdateWeaponHUD(CurrentBullets, GetMagazineSize());
 
 		float reloadTime = ReloadTime.GetValue().GetModifiedValue(this);
+
+		if (ensure(IsValid(WeaponDataAsset)))
+		{
+			SoftObjectHelper::AsyncLoadSoftObject(this, WeaponDataAsset->ReloadMontage, FOnAsyncLoad::CreateWeakLambda(this, [this, reloadTime](UObject* montage)
+				{
+					if (UAnimMontage* anim = Cast<UAnimMontage>(montage); ensure(IsValid(anim)))
+					{
+						WeaponOwner->PlayMontage(anim, anim->GetPlayLength() / reloadTime);
+					}
+				}));
+
+			if (!WeaponDataAsset->ReloadSound.IsNull())
+			{
+				SoftObjectHelper::PlaySpawnedSoundAtLocation(this, WeaponDataAsset->ReloadSound, GetActorLocation());
+			}
+		}
 
 		GetWorld()->GetTimerManager().SetTimer(ReloadTimer, this, &AShooterWeapon::OnReloadFinish, reloadTime, false);
 	}
@@ -327,7 +365,13 @@ void AShooterWeapon::FireProjectile(const FVector& TargetLocation)
 	}
 
 	// play the firing montage
-	WeaponOwner->PlayFiringMontage(FiringMontage);
+		SoftObjectHelper::AsyncLoadSoftObject(this, WeaponDataAsset->FiringMontage, FOnAsyncLoad::CreateWeakLambda(this, [this](UObject* montage)
+		{
+			if (UAnimMontage* anim = Cast<UAnimMontage>(montage); ensure(IsValid(anim)))
+			{
+				WeaponOwner->PlayMontage(anim);
+			}
+		}));
 
 	// add recoil
 	WeaponOwner->AddWeaponRecoil(FiringRecoil);
@@ -385,14 +429,24 @@ FTransform AShooterWeapon::CalculateProjectileSpawnTransform(const FVector& Targ
 	return FTransform(AimRot, SpawnLoc, FVector::OneVector);
 }
 
-const TSubclassOf<UAnimInstance>& AShooterWeapon::GetFirstPersonAnimInstanceClass() const
+const TSubclassOf<UAnimInstance> AShooterWeapon::GetFirstPersonAnimInstanceClass() const
 {
-	return FirstPersonAnimInstanceClass;
+	if (ensure(IsValid(WeaponDataAsset)) && ensure(!WeaponDataAsset->FirstPersonAnimInstance.IsNull()))
+	{
+		return WeaponDataAsset->FirstPersonAnimInstance.IsValid() ? WeaponDataAsset->FirstPersonAnimInstance.Get() : WeaponDataAsset->FirstPersonAnimInstance.LoadSynchronous();
+	}
+
+	return TSubclassOf<UAnimInstance>();
 }
 
-const TSubclassOf<UAnimInstance>& AShooterWeapon::GetThirdPersonAnimInstanceClass() const
+const TSubclassOf<UAnimInstance> AShooterWeapon::GetThirdPersonAnimInstanceClass() const
 {
-	return ThirdPersonAnimInstanceClass;
+	if (ensure(IsValid(WeaponDataAsset)) && ensure(!WeaponDataAsset->FirstPersonAnimInstance.IsNull()))
+	{
+		return WeaponDataAsset->ThirdPersonAnimInstance.IsValid() ? WeaponDataAsset->ThirdPersonAnimInstance.Get() : WeaponDataAsset->ThirdPersonAnimInstance.LoadSynchronous();
+	}
+
+	return TSubclassOf<UAnimInstance>();
 }
 
 int32 AShooterWeapon::GetMagazineSize() const

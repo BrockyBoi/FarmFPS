@@ -81,6 +81,8 @@ protected:
 
 	virtual bool ShouldTick() const override;
 
+	void AffectCropColor();
+
 	UFUNCTION()
 	void SpawnNiagaraComponent(UObject* niagaraObject, const FGameplayTag& resourceTag);
 
@@ -106,6 +108,11 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float _flashMaterialDuration = .2f;
+
+	float _previousColorPercentage = 0;
+	float _adjustedColorPercentage = 0;
+	FLinearColor _previousColor = FLinearColor::Black;
+	FLinearColor _adjustedColor = FLinearColor::Black;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Crop")
 	FName _deadFoliageParameterName = TEXT("DeadFoliageColor");

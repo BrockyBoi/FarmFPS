@@ -30,7 +30,7 @@ public:
 	virtual void AttachWeaponMeshes(AShooterWeapon* Weapon) = 0;
 
 	/** Plays the firing montage for the weapon */
-	virtual void PlayFiringMontage(UAnimMontage* Montage) = 0;
+	virtual void PlayMontage(UAnimMontage* Montage, float rate = 1.f) = 0;
 
 	/** Applies weapon recoil to the owner */
 	virtual void AddWeaponRecoil(float Recoil) = 0;

@@ -53,7 +53,7 @@ public:
 	virtual void AttachWeaponMeshes(AShooterWeapon* Weapon) override;
 
 	/** Plays the firing montage for the weapon */
-	virtual void PlayFiringMontage(UAnimMontage* Montage) override;
+	virtual void PlayMontage(UAnimMontage* Montage, float rate = 1.f) override;
 
 	/** Applies weapon recoil to the owner */
 	virtual void AddWeaponRecoil(float Recoil) override;

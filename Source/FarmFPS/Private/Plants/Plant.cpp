@@ -41,7 +41,10 @@ void APlant::BeginPlay()
 	}
 
 	_staticMesh = FindComponentByClass<UStaticMeshComponent>();
-	ensure(IsValid(_staticMesh));
+	if (ensure(IsValid(_staticMesh)))
+	{
+		_startingScale = GetActorScale();
+	}
 }
 
 void APlant::Tick(float DeltaTime)
@@ -237,7 +240,7 @@ void APlant::SetNewGrowthPercentage(float growthPercentage, bool instant)
 		}
 		else
 		{
-			mesh->SetRelativeScale3D(FVector::OneVector * growthPercentage);
+			mesh->SetRelativeScale3D(_startingScale * growthPercentage);
 			_adjustedGrowthPercentage = 0.f;
 			_previousScalePercentage = FMath::GetRangePct(_plantGrowthData.StartingScaleSize, _plantGrowthData.FinalScaleSize, mesh->GetRelativeTransform().GetScale3D().X);
 		}

@@ -143,7 +143,9 @@ protected:
 
 	int _currentPlantHealth = 0;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Plant|Growth")
+	FVector _startingScale;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Plant|Growth")
 	FPlantGrowthData _plantGrowthData;
 
 	TWeakObjectPtr<UWeatherManager> _weatherManager = nullptr;

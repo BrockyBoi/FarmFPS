@@ -4,6 +4,7 @@
 
 // Brock
 #include "Data/ModifiedValueData.h"
+#include "Data/WeaponDataAsset.h"
 #include "Misc/CachedModifiableValueDataTableRowHandle.h"
 
 // UE
@@ -82,10 +83,10 @@ public:
 	USkeletalMeshComponent* GetThirdPersonMesh() const { return ThirdPersonMesh; };
 
 	/** Returns the first person anim instance class */
-	const TSubclassOf<UAnimInstance>& GetFirstPersonAnimInstanceClass() const;
+	const TSubclassOf<UAnimInstance> GetFirstPersonAnimInstanceClass() const;
 
 	/** Returns the third person anim instance class */
-	const TSubclassOf<UAnimInstance>& GetThirdPersonAnimInstanceClass() const;
+	const TSubclassOf<UAnimInstance> GetThirdPersonAnimInstanceClass() const;
 
 	/** Returns the magazine size */
 	int32 GetMagazineSize() const;
@@ -156,17 +157,8 @@ protected:
 	/** Number of bullets in the current magazine */
 	int32 CurrentBullets = 0;
 
-	/** Animation montage to play when firing this weapon */
-	UPROPERTY(EditAnywhere, Category = "Animation")
-	UAnimMontage* FiringMontage;
-
-	/** AnimInstance class to set for the first person character mesh when this weapon is active */
-	UPROPERTY(EditAnywhere, Category = "Animation")
-	TSubclassOf<UAnimInstance> FirstPersonAnimInstanceClass;
-
-	/** AnimInstance class to set for the third person character mesh when this weapon is active */
-	UPROPERTY(EditAnywhere, Category = "Animation")
-	TSubclassOf<UAnimInstance> ThirdPersonAnimInstanceClass;
+	UPROPERTY(EditDefaultsOnly)
+	UWeaponDataAsset* WeaponDataAsset;
 
 	/** Cone half-angle for variance while aiming */
 	UPROPERTY(EditAnywhere, Category = "Aim", meta = (ClampMin = 0, ClampMax = 90, Units = "Degrees"))
@@ -234,9 +226,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Auto")
 	float _automaticMagazineSizeMultiplier = 3.f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Audio")
-	TSoftObjectPtr<USoundBase> _onShootSound;
 
 	/** Game time of last shot fired, used to enforce refire rate on semi auto */
 	float TimeOfLastShot = 0.0f;

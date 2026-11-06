@@ -255,9 +255,15 @@ void AShooterCharacter::AttachWeaponMeshes(AShooterWeapon* Weapon)
 	
 }
 
-void AShooterCharacter::PlayFiringMontage(UAnimMontage* Montage)
+void AShooterCharacter::PlayMontage(UAnimMontage* Montage, float rate)
 {
-	// stub
+	if (ensure(IsValid(GetFirstPersonMesh())) && ensure(IsValid(Montage)))
+	{
+		if (UAnimInstance* animInstance = GetFirstPersonMesh()->GetAnimInstance(); ensure(IsValid(animInstance)))
+		{
+			animInstance->Montage_Play(Montage, rate);
+		}
+	}
 }
 
 void AShooterCharacter::AddWeaponRecoil(float Recoil)
@@ -273,6 +279,11 @@ void AShooterCharacter::UpdateWeaponHUD(int32 CurrentAmmo, int32 MagazineSize)
 
 FVector AShooterCharacter::GetWeaponTargetLocation()
 {
+	if (!ensure(IsValid(GetWorld())))
+	{
+		return FVector::ZeroVector;
+	}
+
 	// trace ahead from the camera viewpoint
 	FHitResult OutHit;
 
@@ -290,6 +301,11 @@ FVector AShooterCharacter::GetWeaponTargetLocation()
 
 void AShooterCharacter::AddWeaponClass(const TSubclassOf<AShooterWeapon>& WeaponClass)
 {
+	if (!ensure(IsValid(GetWorld())))
+	{
+		return;
+	}
+
 	// do we already own this weapon?
 	AShooterWeapon* OwnedWeapon = FindWeaponOfType(WeaponClass);
 
@@ -332,6 +348,11 @@ void AShooterCharacter::AddWeaponClass(const TSubclassOf<AShooterWeapon>& Weapon
 
 void AShooterCharacter::AddWeaponClass(const TSubclassOf<AShooterWeapon>& WeaponClass, EWeaponFireType fireType)
 {	
+	if (!ensure(IsValid(GetWorld())))
+	{
+		return;
+	}
+
 	// do we already own this weapon?
 	AShooterWeapon* OwnedWeapon = FindWeaponOfType(WeaponClass);
 

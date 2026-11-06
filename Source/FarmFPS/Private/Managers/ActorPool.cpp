@@ -62,8 +62,7 @@ AActor* UActorPool::GetActorFromPool(const FGameplayTag& actorTag, const FTransf
 		pooledActor->SetActorHiddenInGame(false);
 		pooledActor->SetActorEnableCollision(true);
 		pooledActor->SetActorTransform(spawnTransform);
-		IPoolableActor* poolableActor = Cast<IPoolableActor>(pooledActor);
-		if (ensure(pooledActor->Implements<UPoolableActor>()))
+		if (IPoolableActor* poolableActor = Cast<IPoolableActor>(pooledActor); ensure(poolableActor != nullptr))
 		{
 			poolableActor->RemoveFromPool();
 		}
@@ -99,8 +98,7 @@ AActor* UActorPool::GetActorFromPool(const FGameplayTag& actorTag, const FVector
 		pooledActor->SetActorEnableCollision(true);
 		pooledActor->SetActorLocation(spawnLocation);
 
-		IPoolableActor* poolableActor = Cast<IPoolableActor>(pooledActor);
-		if (ensure(pooledActor->Implements<UPoolableActor>()))
+		if (IPoolableActor* poolableActor = Cast<IPoolableActor>(pooledActor); ensure(poolableActor != nullptr))
 		{
 			poolableActor->RemoveFromPool();
 		}
@@ -126,8 +124,7 @@ void UActorPool::AddActorToPool(const FGameplayTag& actorTag, AActor* actor, EPo
 		actor->SetActorHiddenInGame(true);
 		actor->SetActorTickEnabled(false);
 
-		IPoolableActor* poolableActor = Cast<IPoolableActor>(actor);
-		if (ensure(actor->Implements<UPoolableActor>()))
+		if (IPoolableActor* poolableActor = Cast<IPoolableActor>(actor); ensure(poolableActor != nullptr))
 		{
 			poolableActor->AddActorToPool();
 		}

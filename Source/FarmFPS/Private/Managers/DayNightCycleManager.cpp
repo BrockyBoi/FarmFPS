@@ -74,9 +74,12 @@ void UDayNightCycleManager::BeginPlay()
 	if (ensure(IsValid(perkManager)))
 	{
 		perkManager->OnPerkLevelChange.AddDynamic(this, &UDayNightCycleManager::OnPlayerPerkValueChange);
+		_modifiedDayLength = _dayLength.GetModifiedValue(this);
 	}
-
-	_modifiedDayLength = _dayLength.GetModifiedValue(this);
+	else
+	{
+		_modifiedDayLength = _dayLength.GetValue().GetBaseValue();
+	}
 
 	ACustomer::OnCustomerServed.AddUObject(this, &UDayNightCycleManager::OnCustomerServed);
 }
@@ -171,7 +174,7 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 		if (_timeElapsed >= _timeToReachPeakMoon)
 		{
 			_moonLight->SetActorRotation(FRotator(250.f, 0.f, 0.f));
-			//_sunLight->SetActorHiddenInGame(true);
+			_sunLight->SetActorHiddenInGame(true);
 			SetComponentTickEnabled(false);
 			return;
 		}
@@ -201,6 +204,7 @@ void UDayNightCycleManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 		{
 			GenerateDailyTradeOff();
 			SetComponentTickEnabled(false);
+			_timeElapsed = 0;
 		}
 	}
 }
@@ -233,7 +237,7 @@ float UDayNightCycleManager::GetPercentageDayElapsed() const
 {
 	if (_currentDayState == EDayState::Day)
 	{
-		return _timeElapsed / _dayLength.GetModifiedValue(this);
+		return _timeElapsed / _modifiedDayLength;
 	}
 
 	return 0.0f;
@@ -332,7 +336,7 @@ void UDayNightCycleManager::EndDay()
 
 	if (ensure(_sunLight.IsValid()) && ensure(_moonLight.IsValid()))
 	{
-		//_sunLight->SetActorHiddenInGame(true);
+		_sunLight->SetActorHiddenInGame(true);
 		_moonLight->SetActorHiddenInGame(false);
 
 		FRotator moonRotation(90.f, 0.f, 0.f);
@@ -341,7 +345,6 @@ void UDayNightCycleManager::EndDay()
 
 	FTimerHandle timerHandle;
 	//GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &UDayNightCycleManager::StartDay, _timeUntilAutoStartNextDay, false);
-
 
 	SoftObjectHelper::PlaySpawned2DSound(this, _onDayEndSound);
 }
@@ -377,6 +380,7 @@ void UDayNightCycleManager::EndDayFromLoading(UFarmFPSSaveGame*)
 void UDayNightCycleManager::SetDayState(EDayState newDayState)
 {
 	_timeElapsed = 0.f;
+	_adjustedTimeElapsed = 0.f;
 	_currentDayState = newDayState;
 	OnDayStateChange.Broadcast(newDayState);
 	SetComponentTickEnabled(true);

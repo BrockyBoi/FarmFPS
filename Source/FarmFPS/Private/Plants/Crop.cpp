@@ -64,6 +64,7 @@ void ACrop::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	ShowCropCompletionVisuals();
+	AffectCropColor();
 }
 
 void ACrop::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -313,17 +314,18 @@ void ACrop::SetWasPlantedSuccessfully(bool wasSuccessful)
 
 void ACrop::AddResource(const FGameplayTag& resourceType, float amount)
 {
+	float waterPercentage = GetWaterPercentage();
+
 	Super::AddResource(resourceType, amount);
 
 	SetMeshForCurrentProgress();
 
-	if (ensure(IsValid(_cropDataAsset)))
+	if (ensure(IsValid(_cropDataAsset)) && resourceType == ResourceTypeTag::Water)
 	{
-		if (ensure(IsValid(_dynamicMaterialInstance)) && resourceType == ResourceTypeTag::Water)
-		{
-			FLinearColor lerpedColor = FLinearColor::LerpUsingHSV(_cropDataAsset->StartingDeadFoliageColor, FLinearColor::White, GetWaterPercentage());
-			_dynamicMaterialInstance->SetVectorParameterValue(_deadFoliageParameterName, lerpedColor);
-		}
+		FLinearColor lerpedColor = FLinearColor::LerpUsingHSV(_cropDataAsset->StartingDeadFoliageColor, FLinearColor::White, GetWaterPercentage());
+		_adjustedColor = lerpedColor;
+		_previousColorPercentage = waterPercentage;
+		CheckShouldTick();
 	}
 
 	if (IsFullyLoved())
@@ -351,6 +353,26 @@ void ACrop::AddResource(const FGameplayTag& resourceType, float amount)
 	{
 		_sunVFX->Deactivate();
 	}
+}
+
+void ACrop::AffectCropColor()
+{
+	FLinearColor lerpedColor = FLinearColor::Black;
+	if (ensure(IsValid(_dynamicMaterialInstance)) && !_adjustedColor.IsAlmostBlack())
+	{
+		_previousColor = FLinearColor::LerpUsingHSV(_previousColor, _adjustedColor, _lerpSpeedScale);
+		_previousColorPercentage = FMath::Lerp(_previousColorPercentage, GetWaterPercentage(), _lerpSpeedScale);
+		lerpedColor = FLinearColor::LerpUsingHSV(_cropDataAsset->StartingDeadFoliageColor, FLinearColor::White, _previousColorPercentage);
+		if (FLinearColor::Dist(_previousColor, _adjustedColor) < .1f)
+		{
+			_adjustedColor = FLinearColor::Black;
+			_previousColorPercentage = 0.f;
+		}
+
+		_dynamicMaterialInstance->SetVectorParameterValue(_deadFoliageParameterName, lerpedColor);
+	}
+
+	CheckShouldTick();
 }
 
 void ACrop::MeleeObject(int damage)
@@ -488,5 +510,5 @@ void ACrop::DestroyPlant()
 
 bool ACrop::ShouldTick() const
 {
-	return IsLightAndWaterFull() || Super::ShouldTick();
+	return IsLightAndWaterFull() || !_adjustedColor.IsAlmostBlack() || Super::ShouldTick();
 }

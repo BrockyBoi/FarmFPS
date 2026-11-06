@@ -113,6 +113,38 @@ public:
 			}));
 	}
 
+	static void SetSkeletalMesh(UObject* WorldContextObject, TSoftObjectPtr<USkeletalMesh> softPointer, USkeletalMeshComponent* skeletalMeshComponent)
+	{
+		if (!ensure(IsValid(skeletalMeshComponent)))
+		{
+			return;
+		}
+
+		AsyncLoadSoftObject(WorldContextObject, softPointer, FOnAsyncLoad::CreateWeakLambda(WorldContextObject, [skeletalMeshComponent](UObject* meshPointer)
+			{
+				if (USkeletalMesh* mesh = Cast<USkeletalMesh>(meshPointer); ensure(IsValid(mesh)))
+				{
+					skeletalMeshComponent->SetSkeletalMesh(mesh);
+				}
+			}));
+	}
+
+	static void SetSkeletalMeshMaterial(UObject* WorldContextObject, TSoftObjectPtr<UMaterialInstance> softPointer, USkeletalMeshComponent* skeletalMeshComponent)
+	{
+		if (!ensure(IsValid(skeletalMeshComponent)))
+		{
+			return;
+		}
+
+		AsyncLoadSoftObject(WorldContextObject, softPointer, FOnAsyncLoad::CreateWeakLambda(WorldContextObject, [skeletalMeshComponent](UObject* materialPointer)
+			{
+				if (UMaterialInstance* material = Cast<UMaterialInstance>(materialPointer); ensure(IsValid(material)))
+				{
+					skeletalMeshComponent->SetMaterial(0, material);
+				}
+			}));
+	}
+
 	static void SetStaticMeshMaterial(UObject* WorldContextObject, TSoftObjectPtr<UMaterialInstance> softPointer, UStaticMeshComponent* staticMeshComponent)
 	{
 		if (!ensure(IsValid(staticMeshComponent)))

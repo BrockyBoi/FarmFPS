@@ -65,7 +65,7 @@ void AShooterNPC::AttachWeaponMeshes(AShooterWeapon* WeaponToAttach)
 	WeaponToAttach->GetThirdPersonMesh()->AttachToComponent(GetMesh(), AttachmentRule, ThirdPersonWeaponSocket);
 }
 
-void AShooterNPC::PlayFiringMontage(UAnimMontage* Montage)
+void AShooterNPC::PlayMontage(UAnimMontage* Montage, float rate)
 {
 	// unused
 }
