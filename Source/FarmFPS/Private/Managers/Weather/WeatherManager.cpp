@@ -35,6 +35,8 @@ void UWeatherManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		dayNightCycleManager->OnDayBegin.RemoveAll(this);
 		dayNightCycleManager->OnDayEnd.RemoveAll(this);
 	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 void UWeatherManager::CheckIfShouldSpawnStormCloud(float deltaTime)

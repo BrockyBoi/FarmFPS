@@ -34,6 +34,8 @@ protected:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	bool ShouldTick() const;
+
 	UFUNCTION()
 	void OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
@@ -54,6 +56,8 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	FModifiedFloatValue _windStrength = .5f;
+
+	float _cachedWindStrength = 0.f;
 
 	UPROPERTY(EditAnywhere)
 	float _resourceActorStrengthBonus = 1000;

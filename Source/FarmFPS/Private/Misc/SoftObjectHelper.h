@@ -12,6 +12,7 @@
 #include "NiagaraFunctionLibrary.h"
 
 DECLARE_DELEGATE_OneParam(FOnAsyncLoad, UObject* loadedObject);
+DECLARE_DELEGATE(FOnAsyncClassLoad);
 
 class SoftObjectHelper
 {
@@ -64,37 +65,42 @@ public:
 	}
 
 	template<typename T>
-	static void AsyncLoadSoftClass(UObject* WorldContextObject, TSoftClassPtr<T> softPointer, FOnAsyncLoad callback)
+	static TSharedPtr<FStreamableHandle> AsyncLoadSoftClass(UObject* WorldContextObject, TSoftClassPtr<T> softPointer, FOnAsyncClassLoad callback)
 	{
 		if (ensure(!softPointer.IsNull()))
 		{
 			if (softPointer.IsValid())
 			{
-				callback.Execute(softPointer.Get());
-				return;
+				callback.Execute();
 			}
-
-			FSoftObjectPath path = softPointer.ToSoftObjectPath();
-			FStreamableManager& streamable = UAssetManager::GetStreamableManager();
-			streamable.RequestAsyncLoad(path, FStreamableDelegate::CreateWeakLambda(WorldContextObject, [callback, softPointer]()
-				{
-					if (T* obj = Cast<T>(softPointer.Get()); ensure(IsValid(obj)))
+			else
+			{
+				FSoftObjectPath path = softPointer.ToSoftObjectPath();
+				FStreamableManager& streamable = UAssetManager::GetStreamableManager();
+				return streamable.RequestAsyncLoad(path, FStreamableDelegate::CreateWeakLambda(WorldContextObject, [callback, softPointer]()
 					{
-						callback.Execute(obj);
-					}
-				}));
+						if (ensure(softPointer.IsValid()))
+						{
+							callback.Execute();
+						}
+					}));
+			}
 		}
+
+		return TSharedPtr<FStreamableHandle>();
 	}
 
 	template<typename T>
-	static void AsyncLoadSoftClassNoCallback(UObject* WorldContextObject, TSoftClassPtr<T> softPointer)
+	static TSharedPtr<FStreamableHandle> AsyncLoadSoftClassNoCallback(UObject* WorldContextObject, TSoftClassPtr<T> softPointer)
 	{
 		if (ensure(!softPointer.IsNull()) && !softPointer.IsValid())
 		{
 			FSoftObjectPath path = softPointer.ToSoftObjectPath();
 			FStreamableManager& streamable = UAssetManager::GetStreamableManager();
-			streamable.RequestAsyncLoad(path, FStreamableDelegate::CreateWeakLambda(WorldContextObject, [](){}));
+			return streamable.RequestAsyncLoad(path, FStreamableDelegate::CreateWeakLambda(WorldContextObject, [](){}));
 		}
+
+		return TSharedPtr<FStreamableHandle>();
 	}
 
 	static void SetStaticMesh(UObject* WorldContextObject, TSoftObjectPtr<UStaticMesh> softPointer, UStaticMeshComponent* staticMeshComponent)

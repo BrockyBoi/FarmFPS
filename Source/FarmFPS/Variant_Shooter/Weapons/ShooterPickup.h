@@ -3,6 +3,7 @@
 #pragma once
 
 // Brock
+#include "Misc/SoftObjectHelper.h"
 #include "SaveSystem/Saveable.h"
 
 // UE
@@ -63,9 +64,6 @@ protected:
 	/** Data on the type of picked weapon and visuals of this pickup */
 	UPROPERTY(EditAnywhere, Category="Pickup")
 	FDataTableRowHandle WeaponType;
-
-	/** Type to weapon to grant on pickup. Set from the weapon data table. */
-	TSubclassOf<AShooterWeapon> WeaponClass;
 	
 	/** Time to wait before respawning this pickup */
 	UPROPERTY(EditAnywhere, Category="Pickup", meta = (ClampMin = 0, ClampMax = 120, Units = "s"))
@@ -112,4 +110,8 @@ protected:
 	void FinishRespawn();
 
 	bool _hasBeenPickedUp = false;
+
+	TSharedPtr<FStreamableHandle> _streamHandle = nullptr;
+
+	FWeaponTableRow* _weaponTableRow = nullptr;
 };

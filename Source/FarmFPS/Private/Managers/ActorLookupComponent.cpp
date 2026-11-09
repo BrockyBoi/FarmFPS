@@ -60,15 +60,24 @@ void UActorLookupComponent::PreloadActor(const FGameplayTag& actorTag, EPooledAc
 			break;
 		}
 
-		if (ensure(!actorClass.IsNull()))
+		if (actorClass.IsValid())
 		{
-			SoftObjectHelper::AsyncLoadSoftClass(this, actorClass, FOnAsyncLoad::CreateWeakLambda(this, [this, actorTag, actorType](UObject* subClassActor)
+			if (UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this); ensure(IsValid(actorPool)))
+			{
+				actorPool->InitializeActors(actorTag, 1, actorType);
+			}
+		}
+		else if (ensure(!actorClass.IsNull()))
+		{
+			TSharedPtr<FStreamableHandle> handle = SoftObjectHelper::AsyncLoadSoftClass(this, actorClass, FOnAsyncClassLoad::CreateWeakLambda(this, [this, actorTag, actorType]()
 				{
 					if (UActorPool* actorPool = UFarmFPSUtilities::GetActorPool(this); ensure(IsValid(actorPool)))
 					{
 						actorPool->InitializeActors(actorTag, 1, actorType);
 					}
 				}));
+
+			_streamableHandles.Add(handle);
 		}
 	}
 }

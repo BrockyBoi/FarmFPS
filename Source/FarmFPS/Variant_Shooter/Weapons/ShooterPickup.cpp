@@ -53,10 +53,10 @@ void AShooterPickup::BeginPlay()
 
 	if (FWeaponTableRow* WeaponData = WeaponType.GetRow<FWeaponTableRow>(FString()); ensure(WeaponData != nullptr))
 	{
-		if (ensure(!WeaponData->WeaponToSpawn.IsNull()))
+		_weaponTableRow = WeaponData;
+		if (ensure(!_weaponTableRow->WeaponToSpawn.IsNull()))
 		{
-			// copy the weapon class
-			WeaponClass = WeaponData->WeaponToSpawn.IsValid() ? WeaponData->WeaponToSpawn.Get() : WeaponData->WeaponToSpawn.LoadSynchronous();
+			_streamHandle = SoftObjectHelper::AsyncLoadSoftClassNoCallback(this, _weaponTableRow->WeaponToSpawn);
 		}
 	}
 
@@ -112,23 +112,27 @@ void AShooterPickup::OnConstruction(const FTransform& Transform)
 
 void AShooterPickup::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// have we collided against a weapon holder?
+	if (!ensure(_weaponTableRow != nullptr) && ensure(_weaponTableRow->WeaponToSpawn.IsValid()))
+	{
+		return;
+	}
+
 	if (IShooterWeaponHolder* WeaponHolder = Cast<IShooterWeaponHolder>(OtherActor))
 	{
-		WeaponHolder->AddWeaponClass(WeaponClass);
+		WeaponHolder->AddWeaponClass(_weaponTableRow->WeaponToSpawn.Get());
 
-		// hide this mesh
 		SetActorHiddenInGame(true);
-
-		// disable collision
 		SetActorEnableCollision(false);
-
-		// disable ticking
 		SetActorTickEnabled(false);
 
 		// schedule the respawn
 		//GetWorld()->GetTimerManager().SetTimer(RespawnTimer, this, &AShooterPickup::RespawnPickup, RespawnTime, false);
 		_hasBeenPickedUp = true;
+
+		if (_streamHandle.IsValid())
+		{
+			_streamHandle.Reset();
+		}
 	}
 }
 

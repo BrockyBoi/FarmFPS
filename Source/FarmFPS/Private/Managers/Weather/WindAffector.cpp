@@ -25,6 +25,8 @@ void UWindAffector::BeginPlay()
 		_playerCollider->OnComponentEndOverlap.AddDynamic(this, &UWindAffector::OnComponentOverlapEnd);
 	}
 
+	_cachedWindStrength = _windStrength.GetModifiedValue(this);
+
 	OnWindDirectionChangeTimerEnd();
 	GetWorld()->GetTimerManager().SetTimer(_timerHandle, this, &UWindAffector::OnWindDirectionChangeTimerEnd, FMath::RandRange(_minWindDirectionDuration, _maxWindDirectionDuration), false);
 }
@@ -33,26 +35,29 @@ void UWindAffector::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	const FVector2D finalVec = _currentWindDirection * _windStrength.GetModifiedValue(this) * DeltaTime;
-	const FVector finalVec3D = FVector(finalVec.X, finalVec.Y, 0);
-	if (_playerInCollider.IsValid())
+	if (_playerInCollider.IsValid() || _primitiveComponents.Num() > 0 || _projectiles.Num() > 0)
 	{
-		_playerInCollider->AddForeignMovement(finalVec);
-	}
-
-	for (TWeakObjectPtr<UPrimitiveComponent> primitiveComponent : _primitiveComponents)
-	{
-		if (ensure(primitiveComponent.IsValid()) && primitiveComponent->IsSimulatingPhysics())
+		const FVector2D finalVec = _currentWindDirection * _cachedWindStrength * DeltaTime;
+		const FVector finalVec3D = FVector(finalVec.X, finalVec.Y, 0);
+		if (_playerInCollider.IsValid())
 		{
-			primitiveComponent->AddForce(finalVec3D * _resourceActorStrengthBonus);
+			_playerInCollider->AddForeignMovement(finalVec);
 		}
-	}
 
-	for (TWeakObjectPtr<UProjectileMovementComponent> projectile : _projectiles)
-	{
-		if (ensure(projectile.IsValid()))
+		for (TWeakObjectPtr<UPrimitiveComponent> primitiveComponent : _primitiveComponents)
 		{
-			projectile->Velocity += finalVec3D * _projectileStrengthBonus;
+			if (ensure(primitiveComponent.IsValid()) && primitiveComponent->IsSimulatingPhysics())
+			{
+				primitiveComponent->AddForce(finalVec3D * _resourceActorStrengthBonus);
+			}
+		}
+
+		for (TWeakObjectPtr<UProjectileMovementComponent> projectile : _projectiles)
+		{
+			if (ensure(projectile.IsValid()))
+			{
+				projectile->Velocity += finalVec3D * _projectileStrengthBonus;
+			}
 		}
 	}
 }
@@ -96,6 +101,8 @@ void UWindAffector::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent,
 			_primitiveComponents.Add(OtherComp);
 		}
 	}
+
+	SetComponentTickEnabled(ShouldTick());
 }
 
 void UWindAffector::OnComponentOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -122,6 +129,8 @@ void UWindAffector::OnComponentOverlapEnd(UPrimitiveComponent* OverlappedComp, A
 			_primitiveComponents.Remove(OtherComp);
 		}
 	}
+
+	SetComponentTickEnabled(ShouldTick());
 }
 
 void UWindAffector::OnWindDirectionChangeTimerEnd()
@@ -131,5 +140,10 @@ void UWindAffector::OnWindDirectionChangeTimerEnd()
 	GetWorld()->GetTimerManager().SetTimer(_timerHandle, this, &UWindAffector::OnWindDirectionChangeTimerEnd, FMath::RandRange(_minWindDirectionDuration, _maxWindDirectionDuration), false);
 
 	OnWindDirectionChanged.Broadcast();
+}
+
+bool UWindAffector::ShouldTick() const
+{
+	return _playerInCollider.IsValid() || _primitiveComponents.Num() > 0 || _projectiles.Num() > 0;
 }
 

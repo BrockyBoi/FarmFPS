@@ -38,8 +38,8 @@ struct FPlantGrowthData
 
 	FPlantGrowthData()
 	{
-		StartingScaleSize = 0.5f;
-		FinalScaleSize = 2.5f;
+		StartingScaleSize = 0.75f;
+		FinalScaleSize = 1.25f;
 		WaterNeeded = 100;
 		LightNeeded = 100;
 		LoveNeeded = 100;

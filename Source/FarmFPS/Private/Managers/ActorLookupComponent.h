@@ -45,4 +45,6 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	UDataTable* _resourceActorTable;
 	TMap<FGameplayTag, FResourceActorData> _resourceActorMap;
+
+	TArray<TSharedPtr<FStreamableHandle>> _streamableHandles;
 };
