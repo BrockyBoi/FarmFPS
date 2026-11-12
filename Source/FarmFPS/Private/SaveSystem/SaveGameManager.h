@@ -50,6 +50,11 @@ public:
 	DECLARE_MULTICAST_DELEGATE_OneParam(FOnLoadPlayerData, UFarmFPSSaveGame*);
 	FOnLoadPlayerData OnLoadGameData;
 
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBPOnLoadPlayerData);
+
+	UPROPERTY(BlueprintAssignable)
+	FBPOnLoadPlayerData BPOnLoadGameData;
+
 	FOnSavePlayerData OnSavePlayerSettingsData;
 
 	DECLARE_MULTICAST_DELEGATE_OneParam(FOnLoadPlayerSettingsData, UFarmFPSSaveGameSettings*);
@@ -77,13 +82,13 @@ protected:
 	TObjectPtr<UFarmFPSSaveGameSettings> _farmFPSSaveGameSettings = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Save Game")
-	TSubclassOf<AActor> _defaultUpgradePointBP;
+	TSoftClassPtr<AActor> _defaultUpgradePointBP;
 
 	UPROPERTY(EditAnywhere, Category = "Save Game")
-	TSubclassOf<AActor> _defaultUnlockActorPointBP;
+	TSoftClassPtr<AActor> _defaultUnlockActorPointBP;
 
 	UPROPERTY(EditAnywhere, Category = "Save Game")
-	TSubclassOf<AActor> _defaultWeaponUpgradeActorPointBP;
+	TSoftClassPtr<AActor> _defaultWeaponUpgradeActorPointBP;
 
 	TArray<AActor*> _saveableActors;
 };

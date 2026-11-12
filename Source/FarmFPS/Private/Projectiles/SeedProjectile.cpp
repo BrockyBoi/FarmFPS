@@ -130,47 +130,50 @@ void ASeedProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 
 bool ASeedProjectile::CanSpawnCropAtLocation(const FCollisionShape& collisionShape, const FVector& spawnLocation, const FVector& hitNormal) const
 {
+	UCropProjectileDataAsset* projData = Cast<UCropProjectileDataAsset>(_projectileDataAsset);
+	if (!ensure(IsValid(projData)) || !ensure(IsValid(GetWorld())))
+	{
+		return false;
+	}
+
 	bool hasOtherCrops = false;
 	bool hasValidFarmPlot = false;
-	if (ensure(IsValid(GetWorld())))
-	{
-		// Check that we don't hit any other crops
-		TArray<FHitResult> outHits;
-		FCollisionQueryParams params;
-		FRotator slopeRotator = UKismetMathLibrary::MakeRotFromZ(hitNormal);
+	// Check that we don't hit any other crops
+	TArray<FHitResult> outHits;
+	FCollisionQueryParams params;
+	FRotator slopeRotator = UKismetMathLibrary::MakeRotFromZ(hitNormal);
 
-		GetWorld()->SweepMultiByChannel(outHits, spawnLocation, spawnLocation, FQuat(slopeRotator), _collisionChannelToCheck, FCollisionShape::MakeCapsule(collisionShape.GetCapsuleRadius() / 2.f, collisionShape.GetCapsuleHalfHeight()), params);
+	GetWorld()->SweepMultiByChannel(outHits, spawnLocation, spawnLocation, FQuat(slopeRotator), projData->CollisionChannelToCheck, FCollisionShape::MakeCapsule(collisionShape.GetCapsuleRadius() / 2.f, collisionShape.GetCapsuleHalfHeight()), params);
+	for (FHitResult& result : outHits)
+	{
+		AActor* actor = result.GetActor();
+		if (IsValid(actor))
+		{
+			if (actor->IsA<ACrop>())
+			{
+				hasOtherCrops = true;
+				break;
+			}
+			//else if (IsValid(actor->FindComponentByClass<UFarmingPlotComponent>()) && actor->FindComponentByClass<UFarmingPlotComponent>()->GetAllowedSeedTypes().HasTag(ProjectileType))
+			//{
+			//	hasValidFarmPlot = true;
+			//}
+		}
+	}
+
+	// Double check that new location is actually on top of farm plot
+	if (!hasOtherCrops)
+	{
+		GetWorld()->LineTraceMultiByChannel(outHits, spawnLocation + (hitNormal * 10.f), spawnLocation - (hitNormal * 20.f), projData->CollisionChannelToCheck, params);
 		for (FHitResult& result : outHits)
 		{
 			AActor* actor = result.GetActor();
 			if (IsValid(actor))
 			{
-				if (actor->IsA<ACrop>())
+				UFarmingPlotComponent* farmPlot = actor->GetComponentByClass<UFarmingPlotComponent>();
+				if (IsValid(farmPlot) && farmPlot->GetAllowedSeedTypes().HasTag(ProjectileType))
 				{
-					hasOtherCrops = true;
-					break;
-				}
-				//else if (IsValid(actor->FindComponentByClass<UFarmingPlotComponent>()) && actor->FindComponentByClass<UFarmingPlotComponent>()->GetAllowedSeedTypes().HasTag(ProjectileType))
-				//{
-				//	hasValidFarmPlot = true;
-				//}
-			}
-		}
-
-		// Double check that new location is actually on top of farm plot
-		if (!hasOtherCrops)
-		{
-			GetWorld()->LineTraceMultiByChannel(outHits, spawnLocation + (hitNormal * 10.f), spawnLocation - (hitNormal * 20.f), _collisionChannelToCheck, params);
-			for (FHitResult& result : outHits)
-			{
-				AActor* actor = result.GetActor();
-				if (IsValid(actor))
-				{
-					UFarmingPlotComponent* farmPlot = actor->GetComponentByClass<UFarmingPlotComponent>();
-					if (IsValid(farmPlot) && farmPlot->GetAllowedSeedTypes().HasTag(ProjectileType))
-					{
-						return true;
-					}
+					return true;
 				}
 			}
 		}

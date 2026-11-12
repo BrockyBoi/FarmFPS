@@ -35,6 +35,22 @@ public:
 	}
 
 	template<typename T>
+	static TSubclassOf<T> SyncLoadSoftClass(TSoftClassPtr<T> softPointer)
+	{
+		if (ensure(!softPointer.IsNull()))
+		{
+			if (softPointer.IsValid())
+			{
+				return softPointer.Get();
+			}
+
+			return softPointer.LoadSynchronous();
+		}
+
+		return nullptr;
+	}
+
+	template<typename T>
 	static void AsyncLoadSoftObject(UObject* WorldContextObject, TSoftObjectPtr<T> softPointer, FOnAsyncLoad callback)
 	{
 		if (ensure(!softPointer.IsNull()))

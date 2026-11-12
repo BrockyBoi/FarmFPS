@@ -57,7 +57,4 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tunables")
 	FCachedModifiableValueDataTableRowHandle _minDistanceFromNearestCrop = 15.f;
-
-	UPROPERTY(EditDefaultsOnly)
-	TEnumAsByte<ECollisionChannel> _collisionChannelToCheck;
 };

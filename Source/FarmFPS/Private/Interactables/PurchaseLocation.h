@@ -122,4 +122,7 @@ protected:
 	bool _hasAllPrerequisites = false;
 
 	TWeakObjectPtr<AShooterCharacter> _shooterCharacter = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	TSoftObjectPtr<USoundBase> _onUpgradeSuccessSound;
 };

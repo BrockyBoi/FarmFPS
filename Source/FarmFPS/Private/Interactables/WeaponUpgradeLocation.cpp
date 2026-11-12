@@ -56,9 +56,17 @@ void UWeaponUpgradeLocation::OnPurchaseSuccess(UPerkManager* perkManager, UResou
 	}
 }
 
+void UWeaponUpgradeLocation::HidePurchaseLocation(bool shouldHide)
+{
+	if (shouldHide || (!shouldHide && IsValid(GetWeapon())))
+	{
+		Super::HidePurchaseLocation(shouldHide);
+	}
+}
+
 AShooterWeapon* UWeaponUpgradeLocation::GetWeapon() const
 {
-	if (ensure(_shooterCharacter.IsValid()))
+	if (_shooterCharacter.IsValid())
 	{
 		return _shooterCharacter->FindWeaponOfType(_weaponUpgradeData.WeaponToUpgrade);
 	}

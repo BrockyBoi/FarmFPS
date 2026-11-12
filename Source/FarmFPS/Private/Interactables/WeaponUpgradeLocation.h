@@ -44,6 +44,7 @@ public:
 
 protected:
 	virtual void OnPurchaseSuccess(class UPerkManager* perkManager, class UResourceInventory* inventory) override;
+	virtual void HidePurchaseLocation(bool shouldHide) override;
 
 	AShooterWeapon* GetWeapon() const;
 

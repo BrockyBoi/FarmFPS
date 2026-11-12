@@ -17,6 +17,7 @@
 #include "Managers/DayNightCycleManager.h"
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/TutorialScreenManager.h"
+#include "Misc/SoftObjectHelper.h"
 #include "Plants/Plant.h"
 
 // UE
@@ -77,9 +78,9 @@ void USaveGameManager::ResetSavableActors()
 	TArray<AActor*> unlockActorLocations;
 	TArray<AActor*> upgradeWeaponsLocations;
 	UGameplayStatics::GetAllActorsWithInterface(this, USaveable::StaticClass(), _saveableActors);
-	UGameplayStatics::GetAllActorsOfClass(this, _defaultUpgradePointBP, upgradeLocations);
-	UGameplayStatics::GetAllActorsOfClass(this, _defaultUnlockActorPointBP, unlockActorLocations);
-	UGameplayStatics::GetAllActorsOfClass(this, _defaultWeaponUpgradeActorPointBP, upgradeWeaponsLocations);
+	UGameplayStatics::GetAllActorsOfClass(this, SoftObjectHelper::SyncLoadSoftClass(_defaultUpgradePointBP), upgradeLocations);
+	UGameplayStatics::GetAllActorsOfClass(this, SoftObjectHelper::SyncLoadSoftClass(_defaultUnlockActorPointBP), unlockActorLocations);
+	UGameplayStatics::GetAllActorsOfClass(this, SoftObjectHelper::SyncLoadSoftClass(_defaultWeaponUpgradeActorPointBP), upgradeWeaponsLocations);
 	_saveableActors.Append(upgradeLocations);
 	_saveableActors.Append(unlockActorLocations);
 	_saveableActors.Append(upgradeWeaponsLocations);
@@ -188,6 +189,7 @@ void USaveGameManager::LoadGame()
 			_farmFPSSaveGame = Cast<UFarmFPSSaveGame>(UGameplayStatics::LoadGameFromSlot(_playerSaveGameSlotName, 0));
 		}
 		OnLoadGameData.Broadcast(_farmFPSSaveGame);
+		BPOnLoadGameData.Broadcast();
 	}
 }
 

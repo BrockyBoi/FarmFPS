@@ -67,9 +67,6 @@ protected:
 	TArray<FModifiedResourceValue> _priceDataArray;
 
 	UPROPERTY(EditAnywhere)
-	FModifiedFloatValue _bonusPriceMultiplierOnAllBreadSold = 2.f;
-
-	UPROPERTY(EditAnywhere)
 	TMap<FGameplayTag, FBreadPropData> _breadPropSpawnDatas;
 
 	bool _isCurrentlySellingBreadToCustomer = false;

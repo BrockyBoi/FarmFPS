@@ -8,6 +8,7 @@
 // UE
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/AudioComponent.h"
 #include "Components/ShapeComponent.h"
 
 // Generated
@@ -69,6 +70,12 @@ protected:
 
 	TArray<TWeakObjectPtr<UPrimitiveComponent>> _primitiveComponents;
 	TArray<TWeakObjectPtr<UProjectileMovementComponent>> _projectiles;
+
+	UPROPERTY(EditAnywhere)
+	TSoftObjectPtr<USoundBase> _windNoise;
+
+	UPROPERTY(Transient)
+	UAudioComponent* _windAudioComponent = nullptr;
 
 	FTimerHandle _timerHandle;
 };

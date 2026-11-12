@@ -3,6 +3,9 @@
 #include "WindAffector.h"
 
 // Brock
+#include "Managers/AudioManager.h"
+#include "Managers/FarmFPSUtilities.h"
+#include "Misc/SoftObjectHelper.h"
 #include "FarmFPSCharacter.h"
 
 // UE
@@ -88,6 +91,29 @@ void UWindAffector::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent,
 	if (IsValid(player))
 	{
 		_playerInCollider = player;
+		if (!_windNoise.IsNull())
+		{
+			if (!_windNoise.IsValid())
+			{
+				SoftObjectHelper::AsyncLoadSoftObject(this, _windNoise, FOnAsyncLoad::CreateWeakLambda(this, [this](UObject* audioObject)
+					{
+						if (USoundBase* sound = Cast<USoundBase>(audioObject); ensure(IsValid(sound)))
+						{
+							if (UAudioManager* audioManager = UFarmFPSUtilities::GetAudioManager(this); ensure(IsValid(audioManager)))
+							{
+								_windAudioComponent = audioManager->SpawnSound2D(this, sound);
+							}
+						}
+					}));
+			}
+			else
+			{
+				if (UAudioManager* audioManager = UFarmFPSUtilities::GetAudioManager(this); ensure(IsValid(audioManager)))
+				{
+					_windAudioComponent = audioManager->SpawnSound2D(this, _windNoise.Get());
+				}
+			}
+		}
 	}
 	else
 	{
@@ -116,6 +142,12 @@ void UWindAffector::OnComponentOverlapEnd(UPrimitiveComponent* OverlappedComp, A
 	if (IsValid(player) && player == _playerInCollider)
 	{
 		_playerInCollider = nullptr;
+
+		if (ensure(IsValid(_windAudioComponent)))
+		{
+			_windAudioComponent->Stop();
+			_windAudioComponent = nullptr;
+		}
 	}
 	else
 	{

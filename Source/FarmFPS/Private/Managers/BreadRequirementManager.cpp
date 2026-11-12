@@ -44,8 +44,6 @@ void UBreadRequirementManager::EndPlay(EEndPlayReason::Type EndPlayReason)
 	UDayNightCycleManager* dayNightCycleManager = UFarmFPSUtilities::GetDayNightCycleManager(this);
 	if (IsValid(dayNightCycleManager))
 	{
-		dayNightCycleManager->OnDayBegin.RemoveAll(this);
-		dayNightCycleManager->OnDayEnd.RemoveAll(this);
 		dayNightCycleManager->OnDayStateChange.RemoveAll(this);
 	}
 

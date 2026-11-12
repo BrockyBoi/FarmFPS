@@ -7,6 +7,7 @@
 #include "Managers/FarmFPSUtilities.h"
 #include "Managers/PerkManager.h"
 #include "Managers/PerkModifierTypeTag.h"
+#include "Misc/SoftObjectHelper.h"
 #include "Resources/ResourceInventory.h"
 #include "Resources/ResourceTypeTag.h"
 #include "SaveSystem/FarmFPSSaveGame.h"
@@ -221,6 +222,11 @@ void UPurchaseLocation::OnPurchaseSuccess(UPerkManager* perkManager, UResourceIn
 
 	Cosmetic_OnPurchaseSuccess.Broadcast();
 	OnUpgradePurchased.Broadcast();
+
+	if (!_onUpgradeSuccessSound.IsNull())
+	{
+		SoftObjectHelper::PlaySpawned2DSound(this, _onUpgradeSuccessSound);
+	}
 
 	if (_currentPurchaseCount >= _maxPurchaseCount)
 	{

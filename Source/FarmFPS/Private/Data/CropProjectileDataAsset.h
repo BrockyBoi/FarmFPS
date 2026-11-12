@@ -24,4 +24,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data|Audio")
 	TSoftObjectPtr<USoundBase> OnFailToPlantSeedSound;
+
+	UPROPERTY(EditDefaultsOnly)
+	TEnumAsByte<ECollisionChannel> CollisionChannelToCheck;
 };
